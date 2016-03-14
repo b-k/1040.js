@@ -22,7 +22,7 @@ g.u > rect {
 text {
   font-weight: 300;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-  font-size: 14px;
+  font-size: 19px;
 }
 
 .node rect {
@@ -39,10 +39,7 @@ text {
 
 <body>
 
-<div id="inputname">Click on an input box to enter a dollar amount</div>
-<input type="text" name="enter" class="enter" value="" id="entry"/>
-
-<INPUT TYPE=CHECKBOX NAME="dependents" id="deps" onclick="checkbox(id, checked)">I have dependents.<BR>
+<INPUT TYPE=CHECKBOX NAME="dependents" id=".over_65" onclick="checkbox(id, checked)">I am over 65.<BR>
 <INPUT TYPE=CHECKBOX NAME="mortgage" id="mort" onclick="checkbox(id, checked)">I have a mortgage.<BR>
 
 <svg id="svg-canvas" width=960 height=600></svg>
@@ -69,9 +66,10 @@ var edgestorage=[]
 var fixboxsize= function(node) {
   // Round the corners of the nodes
   node.rx = node.ry = 5;
-  size = Math.sqrt(Math.max(node.val, 2000));
+  size = Math.sqrt(Math.max(node.val, 1000));
   node.width = size*2.5;
   node.height = size*.9;
+  node.label = node.baselabel + ": " + node.val
 };
 
 var fb2 = function(v){
@@ -126,24 +124,16 @@ var redrawIt = function(){
 var rm_node=function(nodes, id){
 }
 
-var input = document.getElementById("entry");
-   input.addEventListener('change', function(d){
-        var elmt = g._nodes[document.getElementById("inputname").className];
-        elmt.val= document.getElementById("entry").value;
-        fixboxsize(elmt);
-        console.log(elmt.val);
+svg.selectAll(".u").on('click', 
+        function(d){
+        var promptval = window.prompt(this.textContent, g._nodes[d].val);
+        g._nodes[d].val = parseFloat(promptval);
+        console.log(this.textContent + g._nodes[d].val);
+        fixboxsize(g._nodes[d]);
+        console.log(g._nodes[d].val);
         last_eval += 1;
         CV("1040_refund");
         CV("1040_tax_owed");
-        redrawIt();
-    });
-
-svg.selectAll(".a_node").on('click', 
-        function(d){
-        document.getElementById("inputname").innerHTML=this.textContent;
-        document.getElementById("inputname").className = d;
-        document.getElementById("entry").value= g._nodes[d].val;
-        console.log(this.textContent + g._nodes[d].val);
         redrawIt();
     });
 
@@ -159,11 +149,9 @@ var last_eval = 0;
 function CV(name){
     console.log("eval " + name);
     this_cell = g._nodes[name];
-    if (this_cell.eqn=="u") {console.log ("found "+this_cell.val + "via 'u'"); return parseFloat(this_cell.val);}
-    if (this_cell.last_eval >= last_eval) {console.log ("found "+this_cell.val + "via last_eval"); return parseFloat(this_cell.val);}
-    console.log("eval: "+this_cell.eqn);
+    if (this_cell.eqn=="u" || this_cell.eqn=="") return parseFloat(this_cell.val);
+    if (this_cell.last_eval >= last_eval) return parseFloat(this_cell.val);
     var out = parseFloat(eval(this_cell.eqn));
-    console.log("formula for " + name + "=" + out);
     g._nodes[name].last_eval = last_eval;
     g._nodes[name].val = out;
     fixboxsize(g._nodes[name]);
@@ -173,16 +161,15 @@ function CV(name){
 function checkbox(id, checked){situations[id]=checked;
     if (checked){
         console.log("checked" + id);
-        for (i in  g._nodes)
-            if (g._nodes[i].class=="type-DT"){
+        svg.selectAll(id).each(function(i){
                 nodestorage[i] = g._nodes[i];
                 g.removeNode(i);
                 redrawIt();
-            }
+            });
     } else {
         console.log("unchecked" + id);
-        for (i in  nodestorage)
-            if (nodestorage[i].class=="type-DT"){
+        for (i in nodestorage)
+            if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
                 g.setNode(i, nodestorage[i]);
                 reedge();
                 redrawIt();
