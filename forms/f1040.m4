@@ -81,9 +81,9 @@ m4_form(1040)
 
 Cell(exemptions, 6, "Exemptions", u, u)
 Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , '0')
-Cell(wages,7,<|"Wages, salaries, tips, from form W-2"|>, u, u)
-Cell(interest, 8,"Taxable interest", u, u)
-Ce<||>ll(tax_free_interest, 8.5,"Tax-exempt interest", u, u)
+Cell(wages,7,<|"Wages, salaries, tips, from form W-2"|>,  , u)
+Cell(interest, 8,"Taxable interest",  , u)
+Ce<||>ll(tax_free_interest, 8.5,"Tax-exempt interest",  , u)
 Cell(dividends, 9,"Ordinary dividends", u, u)
 Cel<||>l(qualified_dividends, 9.5,"Qualified dividends",u, u)
 Cell(taxable_tax_refunds, 10,"Taxable state/local income tax refunds/credits/offsets",u, u)
@@ -133,7 +133,7 @@ Cell(agi_again, 38,<|"Adjusted gross income, again"|>, <|CV(AGI)|>)
 
 #39 elderly, blind
 
-Cell(deductions,40,"Deductions", <|deductions() |>)
+Cell(deductions,40,"Deductions", <|deductions() + 0*CV(total_itemized_deductions)|>)
 Cell(agi_minus_deductions, 41,"AGI minus deductions", <|CV(agi_again) - CV(deductions)|>)
 Cell(exemption_amount, 42,"Exemption amount", <|CV(exemptions)*exemption_multiplier|>)
 Cell(taxable_income, 43,"Taxable income", <|max(CV(agi_minus_deductions)-CV(exemption_amount), 0)|>)

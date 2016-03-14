@@ -48,6 +48,8 @@ text {
 <script id="js">
 
 var itemizing = 0;
+var over_65 = 0;
+var spouse_over_65 = 0;
 
 m4_include(fns)
 
@@ -67,7 +69,7 @@ var fixboxsize= function(node) {
   // Round the corners of the nodes
   node.rx = node.ry = 5;
   size = Math.sqrt(Math.max(node.val, 1000));
-  node.width = size*2.5;
+  //node.width = size*2.5;
   node.height = size*.9;
   node.label = node.baselabel + ": " + node.val
 };
@@ -127,10 +129,10 @@ var rm_node=function(nodes, id){
 svg.selectAll(".u").on('click', 
         function(d){
         var promptval = window.prompt(this.textContent, g._nodes[d].val);
+        if(promptval==null) return;
         g._nodes[d].val = parseFloat(promptval);
-        console.log(this.textContent + g._nodes[d].val);
+        //console.log(this.textContent + g._nodes[d].val);
         fixboxsize(g._nodes[d]);
-        console.log(g._nodes[d].val);
         last_eval += 1;
         CV("1040_refund");
         CV("1040_tax_owed");
@@ -147,8 +149,9 @@ var kids = 0;
 var last_eval = 0;
 
 function CV(name){
-    console.log("eval " + name);
+    //console.log("eval " + name);
     this_cell = g._nodes[name];
+    if (!this_cell) this_cell = nodestorage[name];
     if (this_cell.eqn=="u" || this_cell.eqn=="") return parseFloat(this_cell.val);
     if (this_cell.last_eval >= last_eval) return parseFloat(this_cell.val);
     var out = parseFloat(eval(this_cell.eqn));
@@ -168,12 +171,24 @@ function checkbox(id, checked){situations[id]=checked;
             });
     } else {
         console.log("unchecked" + id);
-        for (i in nodestorage)
+        for (i in nodestorage){
+            var changed = false;
+            console.log("checking "+ i+" for "+id.replace('\.',''));
             if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
+                changed=true;
+                console.log("found "+ i);
                 g.setNode(i, nodestorage[i]);
-                reedge();
-                redrawIt();
+                g.setNode(i,  { label: nodestorage[i].label,
+                        baselabel: nodestorage[i].baselabel,
+                        fullname:  nodestorage[i].fullname,
+                        class: nodestorage[i].class, val:nodestorage[i].val
+                        , eqn: nodestorage[i].eqn, last_eval: nodestorage[i].last_eval });
             }
+        }
+        if (changed){
+            reedge();
+            redrawIt();
+        }
     }
 
 }
