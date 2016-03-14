@@ -1,12 +1,17 @@
+m4_changequote(<|,|>)
 <meta charset="utf-8">
 <!-- http://cpettitt.github.io/project/dagre-d3/latest/demo/sentence-tokenization.html -->
 <html>
 <title>The tax graph</title>
 
 <!--<link rel="stylesheet" href="demo.css">-->
-<script src="d3.v3.js"></script>
-<script src="graphlib-dot.js"></script>
-<script src="dagre-d3.js"></script>
+<script>
+m4_include(d3.v3.js)
+
+m4_include(graphlib-dot.js)
+
+m4_include(dagre-d3.js)
+</script>
 
 <style id="css">
 /* This sets the color for user input nodes to a light blue green. */
@@ -65,8 +70,8 @@ var fixboxsize= function(node) {
   // Round the corners of the nodes
   node.rx = node.ry = 5;
   size = Math.sqrt(Math.max(node.val, 2000));
-  node.width = size*1.818;
-  node.height = size;
+  node.width = size*2.5;
+  node.height = size*.9;
 };
 
 var fb2 = function(v){
