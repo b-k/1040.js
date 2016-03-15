@@ -27,6 +27,7 @@ var eitc = function(income, kids){
 }
 
 var max = function(a,b) { return Math.max(a,b)}
+var min = function(a,b) { return Math.min(a,b)}
 
 var deductions = function(){
     var ded=0;

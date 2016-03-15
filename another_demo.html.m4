@@ -14,9 +14,8 @@ m4_include(dagre-d3.js)
 </script>
 
 <style id="css">
-/* This sets the color for user input nodes to a light blue green. */
 g.u > rect {
-  fill: #00ffd0;
+  fill: #a6cb5e;
 }
 
 text {
@@ -91,8 +90,10 @@ var fb2 = function(v){
 g.nodes().forEach(fb2);
 
 var set_edges = function(from, toset){
+    if (typeof g._nodes[from] === "undefined") return;
     for (i in toset){
         if (toset[i]=="") return;
+        if (typeof g._nodes[toset[i]] === "undefined") return;
         g.setEdge(toset[i], from);
     }
 }
@@ -147,6 +148,7 @@ svg.selectAll(".u").on('click',
         last_eval += 1;
         CV("1040_refund");
         CV("1040_tax_owed");
+        CV("1040_carryover_to_next_year");
         redrawIt();
     });
 
@@ -191,10 +193,10 @@ function checkbox(id, checked){situations[id]=checked;
         console.log("unchecked" + id);
         for (i in nodestorage){
             var changed = false;
-            console.log("checking "+ i+" for "+id.replace('\.',''));
+            //console.log("checking "+ i+" for "+id.replace('\.',''));
             if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
                 changed=true;
-                console.log("found "+ i);
+                //console.log("found "+ i);
                 g.setNode(i, nodestorage[i]);
                 g.setNode(i,  { label: nodestorage[i].label,
                         baselabel: nodestorage[i].baselabel,

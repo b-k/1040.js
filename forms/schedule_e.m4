@@ -44,7 +44,6 @@ Cell(sched_e_total_expenses, 20, "Total expenses", <|SUM(advertising, auto_and_t
 
 Cell(net_rr, 21, "Rents/royalties minus expenses", <|SUM(rents_received, royalties_received, sched_e_total_expenses)|>, have_rr)
 
-Cell(total_losses_8582, 22, "placeholder", <|0|>, have_rr)
 Cell(deductible_rr_losses, "Deductible rental real estate loss after limitation", 22, <|CV(total_losses_8582)|>, have_rr)
 
 Cell(sched_e_sum3, 23.0, "Total for line 3 for all rentals", <|CV(rents_received)|>, have_rr)
