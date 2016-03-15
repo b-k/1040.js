@@ -46,6 +46,10 @@ body{
 <INPUT class=check TYPE=CHECKBOX NAME="mortgage" id=".mort" onclick="checkbox(id, checked)" checked>I have a mortgage.<BR>
 <INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" checked>I am itemizing deductions.<BR>
 <INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".have_rr" onclick="checkbox(id, checked)" checked>I have rental or royalty income.<BR>
+<!--
+<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".hide_zeros" onclick="hidezeros(id, checked)">Hide everything that is currently zero.<BR>
+-->
+<a href="http://github.com/b-k/1040.js">I want to make this tax calculator better.</a>
 
 <svg id="svg-canvas" width=960 height=600></svg>
 
