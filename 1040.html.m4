@@ -24,6 +24,17 @@ text {
   font-size: 19px;
 }
 
+input[type=checkbox]
+{
+   /* Double-sized Checkboxes, via http://stackoverflow.com/questions/306924/checkbox-size-in-html-css */
+   -ms-transform: scale(2); /* IE */
+   -moz-transform: scale(2); /* FF */
+   -webkit-transform: scale(2); /* Safari and Chrome */
+   -o-transform: scale(2); /* Opera */
+   padding: 10px;
+}
+
+
 body{
   font-size: 25px;
 }
@@ -46,9 +57,7 @@ body{
 <INPUT class=check TYPE=CHECKBOX NAME="mortgage" id=".mort" onclick="checkbox(id, checked)" checked>I have a mortgage.<BR>
 <INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" checked>I am itemizing deductions.<BR>
 <INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".have_rr" onclick="checkbox(id, checked)" checked>I have rental or royalty income.<BR>
-<!--
 <INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".hide_zeros" onclick="hidezeros(id, checked)">Hide everything that is currently zero.<BR>
--->
 <a href="http://github.com/b-k/1040.js">I want to make this tax calculator better.</a>
 
 <svg id="svg-canvas" width=960 height=600></svg>
@@ -128,7 +137,7 @@ svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
 var val_prompt = function(d){
     var promptval = window.prompt(this.textContent, g._nodes[d].val);
     var floated = parseFloat(promptval)
-    if(Number.isNaN(floated)) return;
+    if(isNaN(floated)) return;
     g._nodes[d].val = floated;
     //console.log(this.textContent + g._nodes[d].val);
     fixboxsize(g._nodes[d]);
@@ -160,14 +169,12 @@ var kids = 0;
 var last_eval = 0;
 
 function CV(name){
-    //console.log("eval " + name);
     this_cell = g._nodes[name];
-    if (!this_cell) this_cell = nodestorage[name];
-    if (this_cell.eqn=="u" || this_cell.eqn=="") return parseFloat(this_cell.val);
-    if (this_cell.last_eval >= last_eval) return parseFloat(this_cell.val);
+    if (typeof this_cell === "undefined") this_cell = nodestorage[name];
+    if (this_cell.eqn==="" || this_cell.last_eval >= last_eval)
+        return parseFloat(this_cell.val);
     var out = parseFloat(eval(this_cell.eqn));
-    this_cell.last_eval = last_eval;
-    this_cell.val = out;
+
     if (g._nodes[name]){
         g._nodes[name].last_eval = last_eval;
         g._nodes[name].val = out;
@@ -182,8 +189,17 @@ function CV(name){
 function checkbox(id, checked){situations[id]=checked;
     if (!checked){
         svg.selectAll(id).each(function(i){
-                nodestorage[i] = g._nodes[i];
+                if (g._nodes[i].class.match("critical")) return;
+                var n = g._nodes[i];
+                nodestorage[i] = { label: n.label,
+                        baselabel: n.baselabel,
+                        fullname:  n.fullname,
+                        class: n.class, val:n.val
+                        , eqn: n.eqn, last_eval: n.last_eval
+                        };
+                console.log("storing " + i + ": "+ g._nodes[i].class)
                 g.removeNode(i);
+                console.log("stored  " + i + ": "+ nodestorage[i].class)
             });
         redrawIt();
     } else {
@@ -191,6 +207,7 @@ function checkbox(id, checked){situations[id]=checked;
             var changed = false;
             if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
                 changed=true;
+                console.log("exhuming " + i + ": "+ nodestorage[i].class)
                 g.setNode(i, nodestorage[i], { label: nodestorage[i].label,
                         baselabel: nodestorage[i].baselabel,
                         fullname:  nodestorage[i].fullname,
@@ -206,7 +223,25 @@ function checkbox(id, checked){situations[id]=checked;
     }
 }
 
-document.getElementById(".have_rr").click()
+function hidezeros(id, checked){
+    if (!checked){
+        checkbox(id, !checked);
+        //svg.selectAll(".a_node").filter(function(d){return g._nodes[d].val==0}).classed('hide_zeros', false)
+    } else {
+//        svg.selectAll(".a_node").filter(function(d){return g._nodes[d].val==0}).classed('hide_zeros', true)
+        for (i in g._nodes)  g._nodes[i].class.replace(/hide_zeros/g, "");
+         for (i in nodestorage)  nodestorage[i].class.replace(/hide_zeros/g, "");
+        for (i in g._nodes) {console.log(i+ " "+g._nodes[i].class +" "+ g._nodes[i].val);
+            if (g._nodes[i].val==0) g._nodes[i].class += " hide_zeros";
+console.log(i+" "+ g._nodes[i].class +" "+ g._nodes[i].val);
+        }
+        redrawIt();
+        checkbox(id, !checked);
+    }
+
+}
+
+//document.getElementById(".have_rr").click()
 
 </script>
 </body>
