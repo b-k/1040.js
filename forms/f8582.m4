@@ -28,5 +28,5 @@ Cell(allowed_real_losses, 10, "Allowed real estate losses", <|min(CV(f8582_min),
 Cell(carryover_to_next_year, 10, "Carry this over to next year", <|max(CV(f8582_min) - CV(f8582_half), 0)|>, have_rr)
 
 Ce<||>ll(div_8582, ">>>>Total ", 14.9, have_rr)
-Ce<||>ll(total_gains_8582, 15, "Total (UI)", '0', have_rr)
+Cell(total_gains_8582, 15, "Total (UI)", '0', have_rr)
 Cell(total_losses_8582, 16, "Total loss", <|min(-CV(allowed_real_losses)+CV(total_gains_8582), 0)|>, have_rr)

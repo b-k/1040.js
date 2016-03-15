@@ -162,7 +162,7 @@ var kids = 0;
 var last_eval = 0;
 
 function CV(name){
-    //console.log("eval " + name);
+    console.log("eval " + name);
     this_cell = g._nodes[name];
     if (!this_cell) this_cell = nodestorage[name];
     if (this_cell.eqn=="u" || this_cell.eqn=="") return parseFloat(this_cell.val);
