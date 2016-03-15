@@ -125,6 +125,19 @@ render(d3.select("svg g"), g);
 var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
 svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
 
+var val_prompt = function(d){
+    var promptval = window.prompt(this.textContent, g._nodes[d].val);
+    var floated = parseFloat(promptval)
+    if(Number.isNaN(floated)) return;
+    g._nodes[d].val = floated;
+    //console.log(this.textContent + g._nodes[d].val);
+    fixboxsize(g._nodes[d]);
+    last_eval += 1;
+    CV("1040_refund");
+    CV("1040_tax_owed");
+    CV("1040_carryover_to_next_year");
+    redrawIt();
+}
 
 var redrawIt = function(){
     render(d3.select("svg g"), g);
@@ -134,35 +147,19 @@ var redrawIt = function(){
     svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
 }
 
-var rm_node=function(nodes, id){
-}
 
-svg.selectAll(".u").on('click', 
-        function(d){
-        var promptval = window.prompt(this.textContent, g._nodes[d].val);
-        var floated = parseFloat(promptval)
-        if(Number.isNaN(floated)) return;
-        g._nodes[d].val = floated;
-        //console.log(this.textContent + g._nodes[d].val);
-        fixboxsize(g._nodes[d]);
-        last_eval += 1;
-        CV("1040_refund");
-        CV("1040_tax_owed");
-        CV("1040_carryover_to_next_year");
-        redrawIt();
-    });
+svg.selectAll(".u").on('click', val_prompt);
 
 svg.selectAll("arrowhead").style("opacity", false);
 
-var situations = {};
-
+var situations = [];
 var have_rr = 0;
 var kids = 0;
 
 var last_eval = 0;
 
 function CV(name){
-    console.log("eval " + name);
+    //console.log("eval " + name);
     this_cell = g._nodes[name];
     if (!this_cell) this_cell = nodestorage[name];
     if (this_cell.eqn=="u" || this_cell.eqn=="") return parseFloat(this_cell.val);
@@ -183,34 +180,31 @@ function CV(name){
 
 function checkbox(id, checked){situations[id]=checked;
     if (!checked){
-        console.log("checked" + id);
         svg.selectAll(id).each(function(i){
                 nodestorage[i] = g._nodes[i];
                 g.removeNode(i);
             });
         redrawIt();
     } else {
-        console.log("unchecked" + id);
         for (i in nodestorage){
             var changed = false;
-            //console.log("checking "+ i+" for "+id.replace('\.',''));
             if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
                 changed=true;
-                //console.log("found "+ i);
-                g.setNode(i, nodestorage[i]);
-                g.setNode(i,  { label: nodestorage[i].label,
+                g.setNode(i, nodestorage[i], { label: nodestorage[i].label,
                         baselabel: nodestorage[i].baselabel,
                         fullname:  nodestorage[i].fullname,
                         class: nodestorage[i].class, val:nodestorage[i].val
-                        , eqn: nodestorage[i].eqn, last_eval: nodestorage[i].last_eval });
+                        , eqn: nodestorage[i].eqn, last_eval: nodestorage[i].last_eval
+                        });
+                g._nodes[i].onclick= val_prompt
             }
         }
         if (changed){
+                svg.selectAll(".u").on('click', val_prompt);
             reedge();
             redrawIt();
         }
     }
-
 }
 
 </script>

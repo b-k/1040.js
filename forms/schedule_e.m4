@@ -21,7 +21,7 @@ def rrlosses(rents, royalties, net, real_loss):
     return 0
 |>)
 
-Cell(rents_received, 3, "Rents received [may be an array]",, u have_rr)
+Cell(rents_received, 3, "Rents received",, u have_rr)
 Cell(royalties_received, 4, "Royalties received",, u have_rr)
 Ce<||>ll(sched_e_expenses_header , ">>>>>>>>>>> expenses            ", 4.9, have_rr)
 
