@@ -95,8 +95,6 @@ Ce<||>ll(ira_income, 15,"IRA distributions", u, u)
 Cell(taxable_ira_income, 15.5,"Taxable IRA distributions", u, u)
 Ce<||>ll(pension,16,"Pensions and annuities", u, u over_65  spouse_over_65)
 Cell(taxable_pension,16.5,"Pensions and annuities",u, u over_65 spouse_over_65)
-Cell(rr_income, 17,"Rents and royalties placeholder", 0, u)
-Cell(rents_and_royalties, 17,"Rents and royalties (&c) from Schedule E", <|if (have_rr) CV(rr_income); else 0;|>)
 Cell(farm_income, 18,"Farm income from Schedule F (UI)", 0, u)
 Cell(unemployment, 19,"Unemployment compensation", u, u)
 Ce<||>ll(ss_benefits, 20,"Social security benefits", u, 'u over_65 spouse_over_65')
@@ -104,7 +102,7 @@ Cell(taxable_ss_benefits, 20.5,"Taxable social security benefits", u, u over_65 
 Cell(other_in, 21,"Other income.", u, u)
 
 Cell(magi_total_in, 0,"Total income for MAGI (PI)", <|SUM(wages, interest, dividends, taxable_tax_refunds, alimony, sched_c, cap_gains, taxable_ira_income, taxable_pension, farm_income, unemployment, taxable_ss_benefits, other_in)|>)
-Cell(total_in, 22,"Total income", <|SUM(magi_total_in, rents_and_royalties)|>)
+Cell(total_in, 22,"Total income", <|SUM(magi_total_in, rr_income)|>)
 
 agi_divider=cell('>>>>>>>>>>>> AGI                                   ', 22.9, '0'),
 
@@ -127,7 +125,7 @@ agi_divider=cell('>>>>>>>>>>>> AGI                                   ', 22.9, '0
 Cell(subtractions_from_income, 36,"Sum of subtractions from gross income (UI)", 0)
 
 Cell(t_and_i_divider, 36.9,'>>>>>>>>>>>> Taxes and income                      ', 0)
-Cell(MAGI, 0,"Modified adjusted gross income", <|CV(magi_total_in) - CV(subtractions_from_income)|>),
+Cell(MAGI, 0,"Modified adjusted gross income", <|CV(magi_total_in) - CV(subtractions_from_income)|>, have_rr)
 Cell(AGI, 37,"Adjusted gross income", <|CV(total_in) - CV(subtractions_from_income)|>)
 Cell(agi_again, 38,<|"Adjusted gross income, again"|>, <|CV(AGI)|>)
 

@@ -25,6 +25,14 @@ text {
   font-size: 19px;
 }
 
+body{
+  font-size: 25px;
+}
+
+input[type="checkbox" i] {
+  font-size: 25px;
+}
+
 .node rect {
   stroke: #999;
   fill: #fff;
@@ -39,8 +47,10 @@ text {
 
 <body>
 
-<INPUT TYPE=CHECKBOX NAME="dependents" id=".over_65" onclick="checkbox(id, checked)">I am over 65.<BR>
-<INPUT TYPE=CHECKBOX NAME="mortgage" id="mort" onclick="checkbox(id, checked)">I have a mortgage.<BR>
+<INPUT class=check TYPE=CHECKBOX NAME="dependents" id=".over_65" onclick="checkbox(id, checked)" checked>I am over 65.<BR>
+<INPUT class=check TYPE=CHECKBOX NAME="mortgage" id=".mort" onclick="checkbox(id, checked)" checked>I have a mortgage.<BR>
+<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" checked>I am itemizing deductions.<BR>
+<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".have_rr" onclick="checkbox(id, checked)" checked>I have rental or royalty income.<BR>
 
 <svg id="svg-canvas" width=960 height=600></svg>
 
@@ -129,8 +139,9 @@ var rm_node=function(nodes, id){
 svg.selectAll(".u").on('click', 
         function(d){
         var promptval = window.prompt(this.textContent, g._nodes[d].val);
-        if(promptval==null) return;
-        g._nodes[d].val = parseFloat(promptval);
+        var floated = parseFloat(promptval)
+        if(Number.isNaN(floated)) return;
+        g._nodes[d].val = floated;
         //console.log(this.textContent + g._nodes[d].val);
         fixboxsize(g._nodes[d]);
         last_eval += 1;
@@ -155,20 +166,27 @@ function CV(name){
     if (this_cell.eqn=="u" || this_cell.eqn=="") return parseFloat(this_cell.val);
     if (this_cell.last_eval >= last_eval) return parseFloat(this_cell.val);
     var out = parseFloat(eval(this_cell.eqn));
-    g._nodes[name].last_eval = last_eval;
-    g._nodes[name].val = out;
-    fixboxsize(g._nodes[name]);
+    this_cell.last_eval = last_eval;
+    this_cell.val = out;
+    if (g._nodes[name]){
+        g._nodes[name].last_eval = last_eval;
+        g._nodes[name].val = out;
+        fixboxsize(g._nodes[name]);
+    } else{
+        nodestorage[name].last_eval = last_eval;
+        nodestorage[name].val = out;
+    }
     return out;
 }
 
 function checkbox(id, checked){situations[id]=checked;
-    if (checked){
+    if (!checked){
         console.log("checked" + id);
         svg.selectAll(id).each(function(i){
                 nodestorage[i] = g._nodes[i];
                 g.removeNode(i);
-                redrawIt();
             });
+        redrawIt();
     } else {
         console.log("unchecked" + id);
         for (i in nodestorage){
