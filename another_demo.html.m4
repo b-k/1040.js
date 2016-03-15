@@ -15,7 +15,7 @@ m4_include(dagre-d3.js)
 
 <style id="css">
 g.u > rect {
-  fill: #a6cb5e;
+  fill: #caf2bd;
 }
 
 text {
@@ -25,10 +25,6 @@ text {
 }
 
 body{
-  font-size: 25px;
-}
-
-input[type="checkbox" i] {
   font-size: 25px;
 }
 
@@ -145,6 +141,7 @@ var redrawIt = function(){
     svg.attr("height", g.graph().height + 40);
     var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
     svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
+svg.selectAll(".u").on('click', val_prompt);
 }
 
 
@@ -196,16 +193,16 @@ function checkbox(id, checked){situations[id]=checked;
                         class: nodestorage[i].class, val:nodestorage[i].val
                         , eqn: nodestorage[i].eqn, last_eval: nodestorage[i].last_eval
                         });
-                g._nodes[i].onclick= val_prompt
             }
         }
         if (changed){
-                svg.selectAll(".u").on('click', val_prompt);
             reedge();
             redrawIt();
         }
     }
 }
+
+document.getElementById(".have_rr").click()
 
 </script>
 </body>

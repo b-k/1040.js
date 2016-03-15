@@ -21,8 +21,7 @@ Cell(f8582_total_in, 4, "Total in",  <|SUM(f8582_total_real_in, f8582_commercial
 
 Cell(f8582_min, 5, "the smaller of the loss on line 1d or the loss on line 4", <|min(CV(f8582_total_real_in), CV(f8582_total_in))|>, have_rr)
 
-Cell(f8582_diff, 8, "Line 6 - Line 7", <|max(150000 - max(CV(MAGI), 0), 0)|>, have_rr)
-Cell(f8582_half, 9, <|"Half of line 8, up to 25k"|>, <|min(25000, CV(f8582_diff)/2.)|>, have_rr)
+Cell(f8582_half, 9, <|"Half of line 8, up to 25k"|>, <|min(25000, max(150000 - max(CV(MAGI), 0), 0)/2.)|>, have_rr)
 Cell(allowed_real_losses, 10, "Allowed real estate losses", <|min(CV(f8582_min), CV(f8582_half))|>, have_rr)
 Cell(carryover_to_next_year, 10, "Carry this over to next year", <|max(CV(f8582_min) - CV(f8582_half), 0)|>, have_rr)
 

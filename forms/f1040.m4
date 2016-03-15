@@ -4,7 +4,7 @@ var status="single"
 
 //#2014 tax rate schedules
 var tax_calc = function (inval){
-    if (inval < 9075) return .1*907.50;
+    if (inval < 9075) return .1*inval;
     if (inval < 36900) return 907.50  + .15*(inval-9075);
     if (inval < 89350) return 5081.25 + .25*(inval-36900);
     if (inval < 186350) return 18193.75 + .28*(inval-89350);
@@ -44,7 +44,7 @@ exemption_multiplier=4000  #changes annually
 
 #2014 tax rate schedules
 def tax_calc(inval):
-    if inval < 9075: return .1*907.50
+    if inval < 9075: return .1*inval
     if inval < 36900: return 907.50  + .15*(inval-9075)
     if inval < 89350: return 5081.25 + .25*(inval-36900)
     if inval < 186350: return 18193.75 + .28*(inval-89350)
