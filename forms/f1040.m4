@@ -161,11 +161,10 @@ Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions)|>
 Cell(exemption_amount, 42,Exemption amount, <|CV(exemptions)*exemption_multiplier|>)
 Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions)-CV(exemption_amount), 0)|>, critical)
 Cell(tax, 44,Tax, <|tax_calc(CV(taxable_income))|>, critical)
-Cell(amt_6251,45, Alternative minimum tax from Form 6251 (UI), <|0|>) //placeholder until I add f6251
-Cell(amt_1040,45, Alternative minimum tax from Form 6251, <|CV(amt_6251)|>)
+Cell(amt_1040,45, Alternative minimum tax from Form 6251, <|CV(f6251, amt)|>)
 Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
 Cell(pretotal_tax, 47,Tax + AMT + F8962, <|SUM(tax, amt_1040, credit_repayment)|>)
-Ce<||>ll(ftc,48, Foreign tax credit (UI), 0)
+Cell(ftc,48, Foreign tax credit (UI), 0)
 #49 Credit for child and dependent care expenses. Attach Form 2441 49
 #50 Education credits from Form 8863, line 19 . . . . . 50
 #51 Retirement savings contributions credit. Attach Form 8880 51
