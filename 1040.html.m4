@@ -142,9 +142,9 @@ var val_prompt = function(d){
     //console.log(this.textContent + g._nodes[d].val);
     fixboxsize(g._nodes[d]);
     last_eval += 1;
-    CV("1040_refund");
-    CV("1040_tax_owed");
-    CV("1040_carryover_to_next_year");
+    CV("f1040_refund");
+    CV("f1040_tax_owed");
+    CV("f8582_carryover_to_next_year");
     redrawIt();
 }
 

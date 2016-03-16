@@ -29,12 +29,12 @@ var eitc = function(income, kids){
 var max = function(a,b) { return Math.max(a,b)}
 var min = function(a,b) { return Math.min(a,b)}
 
-var deductions = function(){
+var deductions = function(itemized){
     var ded=0;
     if (status=="married" || status=="single") ded=6300;
     else if (status=="married filing jointly") ded=12600;
     else if (status=="head of household") ded=9250;
-    if (itemizing) ded=max(ded, CV(total_itemized_deductions));
+    ded=max(ded, itemized);
     return ded
 }
 |>)
@@ -74,11 +74,11 @@ def deductions():
     elif status=="head of household":
         ded=9250
     if itemizing:
-        ded=max(ded, CV('total_itemized_deductions'))
+        ded=max(ded, CV('f1040_sched_a, total_itemized_deductions'))
     return ded
 |>)
 
-m4_form(1040)
+m4_form(f1040)
 
 Cell(exemptions, 6, Exemptions,, u)
 Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , '0')
@@ -103,7 +103,7 @@ Cell(taxable_ss_benefits, 20.5,Taxable social security benefits,, u over_65 spou
 Cell(other_in, 21,Other income.,, u)
 
 Cell(magi_total_in, 0,Total income for MAGI (PI), <|SUM(wages, interest, dividends, taxable_tax_refunds, alimony, sched_c, cap_gains, taxable_ira_income, taxable_pension, farm_income, unemployment, taxable_ss_benefits, other_in)|>)
-Cell(total_in, 22,Total income, <|SUM(magi_total_in, rr_income)|>)
+Cell(total_in, 22,Total income, <|CV(magi_total_in) + CV(f1040_sched_e, rr_income)|>)
 
 agi_divider=cell('>>>>>>>>>>>> AGI                                   ', 22.9, '0'),
 
@@ -131,7 +131,7 @@ Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(subtractions_from_income
 
 #39 elderly, blind
 
-Cell(deductions,40,Deductions, <|deductions() + 0*CV(total_itemized_deductions)|>, critical)
+Cell(deductions,40,Deductions, <|deductions(CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions)|>)
 Cell(exemption_amount, 42,Exemption amount, <|CV(exemptions)*exemption_multiplier|>)
 Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions)-CV(exemption_amount), 0)|>, critical)

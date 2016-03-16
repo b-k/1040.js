@@ -1,4 +1,4 @@
-Form(f1040 itemizing)
+m4_form(f1040_sched_a)
 schedule_a=dict(
 adiv1=cell('>>>>>>>>>>>> Medical and Dental                       ', 0.9, '0'),
 adiv2=cell('>>>>>>>>>>>> Taxes you paid                           ', 4.9, '0'),
@@ -11,7 +11,7 @@ adiv8=cell('>>>>>>>>>>>> Total                                    ', 28.9, '0'),
 
 Cell(medical_expenses, 1, Medical and dental expenses,, u itemizing)
 Ce<||>ll(agi_yet_again, 2, AGI, <|CV(agi_again)|> itemizing)
-Cell(agi_scaled, 2, AGI scaled, <|CV(AGI)* (.075 * (over_65 || spouse_over_65) + .1 *(!over_65&&!spouse_over_65))|>, itemizing)
+Cell(agi_scaled, 2, AGI scaled, <|CV(f1040, AGI)* (.075 * (over_65 || spouse_over_65) + .1 *(!over_65&&!spouse_over_65))|>, itemizing)
 Cell(excess_medical, 4, Medical expenses minus fraction of AGI, <|max(CV(medical_expenses) - CV(agi_scaled), 0)|>, itemizing)
 Cell(local_taxes, 5, State/local Income OR general sales tax,, u itemizing)
 Cell(real_estate_taxes, 6, Real estate taxes,, u itemizing)
@@ -38,7 +38,7 @@ Cell(other_work_expenses, 23, <|Other expenses—investment, safe deposit box, e
 Cell(total_expenses, 24, Total expenses, <|SUM(employee_expenses, tax_prep_fees, other_work_expenses)|>, itemizing)
 Ce<||>ll(agi_yet_agaain, 25, AGI, <|CV(agi_again)|>, itemizing)
 Ce<||>ll(agi_rescaled, 26, AGI scaled, <|CV(agi_again)* 0.02|>, itemizing)
-Cell(expenses_minus_agi_slice, 27, Expenses minus fraction of AGI, <|max(CV(total_expenses) - (CV(AGI)* 0.02), 0)|>, itemizing)
+Cell(expenses_minus_agi_slice, 27, Expenses minus fraction of AGI, <|max(CV(total_expenses) - (CV(f1040, AGI)* 0.02), 0)|>, itemizing)
 
 Cell(other_deductions, 28, Other deductions,, u itemizing)
 Cell(total_itemized_deductions, 29, Total itemized deductions (assuming income < $155k), <|SUM(excess_medical, total_taxes_deducted, total_interest_deduction, charity_total, casualty_or_theft_losses, expenses_minus_agi_slice, other_deductions)|>, itemizing)
