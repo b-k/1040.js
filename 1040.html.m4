@@ -55,6 +55,21 @@ body{
   stroke: #333;
   stroke-width: 1.5px;
 }
+
+
+div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html */
+  position: absolute;
+  text-align: center;
+  /*width: 60px;
+  height: 28px;                 */
+  padding: 3px;
+  font: 25px sans-serif;
+  background: lightsteelblue;
+  border: 1px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
 </style>
 
 <body>
@@ -67,7 +82,6 @@ BOX(have_rr, I have rental or royalty income.)
 <a href="http://github.com/b-k/1040.js">I want to make this tax calculator better.</a>
 
 <svg id="svg-canvas" width=960 height=600></svg>
-
 
 <script id="js">
 <!-- Much of this started at http://cpettitt.github.io/project/dagre-d3/latest/demo/sentence-tokenization.html -->
@@ -100,7 +114,7 @@ var fixboxsize= function(node) {
 };
 
 var fb2 = function(v){
-    fixboxsize(g.node(v)); 
+    fixboxsize(g.node(v));
 }
 
 g.nodes().forEach(fb2);
@@ -146,7 +160,6 @@ var val_prompt = function(d){
     var floated = parseFloat(promptval)
     if(isNaN(floated)) return;
     g._nodes[d].val = floated;
-    //console.log(this.textContent + g._nodes[d].val);
     fixboxsize(g._nodes[d]);
     last_eval += 1;
     CV("f1040_refund");
@@ -204,9 +217,7 @@ function checkbox(id, checked){situations[id]=checked;
                         class: n.class, val:n.val
                         , eqn: n.eqn, last_eval: n.last_eval
                         };
-                console.log("storing " + i + ": "+ g._nodes[i].class)
                 g.removeNode(i);
-                console.log("stored  " + i + ": "+ nodestorage[i].class)
             });
         redrawIt();
     } else {
@@ -214,7 +225,6 @@ function checkbox(id, checked){situations[id]=checked;
             var changed = false;
             if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
                 changed=true;
-                console.log("exhuming " + i + ": "+ nodestorage[i].class)
                 g.setNode(i, nodestorage[i], { label: nodestorage[i].label,
                         baselabel: nodestorage[i].baselabel,
                         fullname:  nodestorage[i].fullname,
@@ -238,15 +248,30 @@ function hidezeros(id, checked){
 //        svg.selectAll(".a_node").filter(function(d){return g._nodes[d].val==0}).classed('hide_zeros', true)
         for (i in g._nodes)  g._nodes[i].class.replace(/hide_zeros/g, "");
          for (i in nodestorage)  nodestorage[i].class.replace(/hide_zeros/g, "");
-        for (i in g._nodes) {console.log(i+ " "+g._nodes[i].class +" "+ g._nodes[i].val);
-            if (g._nodes[i].val==0) g._nodes[i].class += " hide_zeros";
-console.log(i+" "+ g._nodes[i].class +" "+ g._nodes[i].val);
-        }
+        for (i in g._nodes) if (g._nodes[i].val==0) g._nodes[i].class += " hide_zeros";
         redrawIt();
         checkbox(id, !checked);
     }
-
 }
+
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+        .style("opacity", 0);
+
+svg.selectAll(".a_node")
+    .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div .html(g._nodes[d].fullname)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
 document.getElementById(".have_rr").click()
 document.getElementById(".mort").click()
