@@ -6,10 +6,10 @@ m4_changequote(<|,|>)
 
 <!--<link rel="stylesheet" href="demo.css">-->
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
 <script>
-m4_include(graphlib-dot.js)
 
-m4_include(dagre-d3.js)
+m4_include(graphlib-dot.js)
 </script>
 
 <style id="css">
@@ -73,6 +73,10 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 </style>
 
 <body>
+
+Click an avocado box to enter a value.<br>
+To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
+
 
 m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
 BOX(over_65, I am over 65.)
@@ -258,6 +262,7 @@ var div = d3.select("body").append("div")
     .attr("class", "tooltip")
         .style("opacity", 0);
 
+        /*
 svg.selectAll(".a_node")
     .on("mouseover", function(d) {
             div.transition()
@@ -272,6 +277,7 @@ svg.selectAll(".a_node")
                 .duration(500)
                 .style("opacity", 0);
         });
+        */
 
 document.getElementById(".have_rr").click()
 document.getElementById(".mort").click()
