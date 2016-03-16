@@ -1,6 +1,5 @@
 jsversion(<|
 var exemption_multiplier=4000  //changes annually
-var status="single"
 
 //#2014 tax rate schedules
 var tax_calc = function (inval){
@@ -11,7 +10,9 @@ var tax_calc = function (inval){
     if (inval < 405100) return 45353.75 + .33*(inval-186350);
 }
 
-var eitc = function(income, kids){
+var eitc = function(income, k){
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
     //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36 
     //phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
     data=[[7.65, 6610, 506, 8270, 7.65, 14880],
@@ -26,16 +27,39 @@ var eitc = function(income, kids){
     return data[row][2];
 }
 
+var fstatus = function(){
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
+    var single = document.getElementsByName("spouse")[0].checked;
+    if (single && kids) return "head of household";
+    if (single && !kids) return "single";
+    if (document.getElementsByName("spouse")[1].checked) return "married filing jointly";
+    else return "married";
+}
+
 var max = function(a,b) { return Math.max(a,b)}
 var min = function(a,b) { return Math.min(a,b)}
 
 var deductions = function(itemized){
     var ded=0;
+    var status = fstatus();
     if (status=="married" || status=="single") ded=6300;
     else if (status=="married filing jointly") ded=12600;
     else if (status=="head of household") ded=9250;
     ded=max(ded, itemized);
     return ded
+}
+
+var exemption_fn = function(){
+    var ct = 1
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
+    var deps = parseFloat(document.getElementById("nonkid_dependents").value)
+    if (isNaN(deps)) deps = 0;
+    ct += kids + deps
+    var status = fstatus()
+    if (status=="married" || status == "married filing jointly") ct += 1
+    return ct;
 }
 |>)
 
@@ -67,6 +91,7 @@ def eitc(income, kids):
 
 def deductions():
     ded=0
+    var status = fstatus();
     if status=="married" or status=="single":
         ded=6300
     elif status=="married filing jointly":
@@ -80,7 +105,7 @@ def deductions():
 
 m4_form(f1040)
 
-Cell(exemptions, 6, Exemptions,, u)
+Cell(exemptions, 6, Exemptions,exemption_fn(), )
 Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , '0')
 Cell(wages,7,<|Wages, salaries, tips, from form W-2|>,  , u)
 Cell(interest, 8,Taxable interest,  , u)

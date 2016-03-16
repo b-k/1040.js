@@ -9,7 +9,6 @@ m4_changequote(<|,|>)
 <script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
 <script>
 
-m4_include(graphlib-dot.js)
 </script>
 
 <style id="css">
@@ -77,13 +76,24 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
 
+<table><tr><td>
+<input text id="kids" size=3em onchange="recalc()"> Dependent children<br>
+<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 18<br>
+<input type="radio" name="spouse" size=3em checked onchange="recalc()"> I am single.<br>
+<input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file jointly.<br>
+<input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file separately.<br>
+</td><td>
 
 m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
 BOX(over_65, I am over 65.)
+
+BOX(spouse, I am married.)
 BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
 BOX(have_rr, I have rental or royalty income.)
+<INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
 <a href="http://github.com/b-k/1040.js">I want to make this tax calculator better.</a>
+</td></tr></table>
 
 <svg id="svg-canvas" width=960 height=600></svg>
 
@@ -159,8 +169,10 @@ render(d3.select("svg g"), g);
 var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
 svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
 
+
 var val_prompt = function(d){
-    var promptval = window.prompt(this.textContent, g._nodes[d].val);
+    //var promptval = window.prompt(this.textContent, g._nodes[d].val);
+    var promptval = window.prompt(this.textContent);
     var floated = parseFloat(promptval)
     if(isNaN(floated)) return;
     g._nodes[d].val = floated;
@@ -173,12 +185,33 @@ var val_prompt = function(d){
 }
 
 var redrawIt = function(){
+    d3.selectAll("div.tooltip").style("opacity", 0);
     render(d3.select("svg g"), g);
     svg.attr("width", g.graph().width + 40);
     svg.attr("height", g.graph().height + 40);
     var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
     svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
-svg.selectAll(".u").on('click', val_prompt);
+    svg.selectAll(".u").on('click', val_prompt);
+
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+            .style("opacity", 0);
+
+    svg.selectAll(".a_node")
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div .html(g._nodes[d].fullname + "<br>" + g._nodes[d].form)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            }
+            )
+        .on("mouseout", function(d){
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+                });
 }
 
 
@@ -187,8 +220,6 @@ svg.selectAll(".u").on('click', val_prompt);
 svg.selectAll("arrowhead").style("opacity", false);
 
 var situations = [];
-var have_rr = 0;
-var kids = 0;
 
 var last_eval = 0;
 
@@ -210,6 +241,14 @@ function CV(name){
     return out;
 }
 
+function recalc(){
+    last_eval +=1
+    CV("f1040_refund");
+    CV("f1040_tax_owed");
+    CV("f8582_carryover_to_next_year");
+    redrawIt();
+}
+
 function checkbox(id, checked){situations[id]=checked;
     if (!checked){
         svg.selectAll(id).each(function(i){
@@ -217,6 +256,7 @@ function checkbox(id, checked){situations[id]=checked;
                 var n = g._nodes[i];
                 nodestorage[i] = { label: n.label,
                         baselabel: n.baselabel,
+                        form: n.form,
                         fullname:  n.fullname,
                         class: n.class, val:n.val
                         , eqn: n.eqn, last_eval: n.last_eval
@@ -226,22 +266,21 @@ function checkbox(id, checked){situations[id]=checked;
         redrawIt();
     } else {
         for (i in nodestorage){
-            var changed = false;
             if (nodestorage[i].class.indexOf(id.replace('\.',''))>0){
-                changed=true;
                 g.setNode(i, nodestorage[i], { label: nodestorage[i].label,
                         baselabel: nodestorage[i].baselabel,
+                        form: nodestorage[i].form,
                         fullname:  nodestorage[i].fullname,
                         class: nodestorage[i].class, val:nodestorage[i].val
                         , eqn: nodestorage[i].eqn, last_eval: nodestorage[i].last_eval
                         });
             }
         }
-        if (changed){
-            reedge();
-            redrawIt();
-        }
+        reedge();
+        redrawIt();
     }
+    CV("f1040_refund");
+    CV("f1040_tax_owed");
 }
 
 function hidezeros(id, checked){
@@ -258,31 +297,14 @@ function hidezeros(id, checked){
     }
 }
 
-var div = d3.select("body").append("div")
-    .attr("class", "tooltip")
-        .style("opacity", 0);
-
-        /*
-svg.selectAll(".a_node")
-    .on("mouseover", function(d) {
-            div.transition()
-                .duration(200)
-                .style("opacity", .9);
-            div .html(g._nodes[d].fullname)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(500)
-                .style("opacity", 0);
-        });
-        */
 
 document.getElementById(".have_rr").click()
 document.getElementById(".mort").click()
 document.getElementById(".itemizing").click()
 document.getElementById(".over_65").click()
+document.getElementById(".spouse").click()
+
+redrawIt()
 
 </script>
 </body>
