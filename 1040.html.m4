@@ -5,9 +5,8 @@ m4_changequote(<|,|>)
 <title>The tax graph</title>
 
 <!--<link rel="stylesheet" href="demo.css">-->
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
-m4_include(d3.v3.js)
-
 m4_include(graphlib-dot.js)
 
 m4_include(dagre-d3.js)
@@ -34,6 +33,13 @@ input[type=checkbox]
    padding: 10px;
 }
 
+.checkboxtext
+{
+    /* Checkbox text */
+    font-size: 110%;
+    display: inline;
+}
+
 
 body{
   font-size: 25px;
@@ -53,11 +59,11 @@ body{
 
 <body>
 
-<INPUT class=check TYPE=CHECKBOX NAME="dependents" id=".over_65" onclick="checkbox(id, checked)" checked>I am over 65.<BR>
-<INPUT class=check TYPE=CHECKBOX NAME="mortgage" id=".mort" onclick="checkbox(id, checked)" checked>I have a mortgage.<BR>
-<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" checked>I am itemizing deductions.<BR>
-<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".have_rr" onclick="checkbox(id, checked)" checked>I have rental or royalty income.<BR>
-<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".hide_zeros" onclick="hidezeros(id, checked)">Hide everything that is currently zero.<BR>
+m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
+BOX(over_65, I am over 65.)
+BOX(mort, I have a mortgage.)
+BOX(itemizing, I am itemizing.)
+BOX(have_rr, I have rental or royalty income.)
 <a href="http://github.com/b-k/1040.js">I want to make this tax calculator better.</a>
 
 <svg id="svg-canvas" width=960 height=600></svg>
