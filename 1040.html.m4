@@ -1,6 +1,6 @@
 m4_changequote(<|,|>)
 <meta charset="utf-8">
-<!-- http://cpettitt.github.io/project/dagre-d3/latest/demo/sentence-tokenization.html -->
+<!-- Licensed under GPLv2, with one clarification; see https://github.com/b-k/1040.js . -->
 <html>
 <title>The tax graph</title>
 
@@ -64,6 +64,7 @@ body{
 
 
 <script id="js">
+<!-- Much of this started at http://cpettitt.github.io/project/dagre-d3/latest/demo/sentence-tokenization.html -->
 
 var itemizing = 0;
 var over_65 = 0;
@@ -241,7 +242,10 @@ console.log(i+" "+ g._nodes[i].class +" "+ g._nodes[i].val);
 
 }
 
-//document.getElementById(".have_rr").click()
+document.getElementById(".have_rr").click()
+document.getElementById(".mort").click()
+document.getElementById(".itemizing").click()
+document.getElementById(".over_65").click()
 
 </script>
 </body>
