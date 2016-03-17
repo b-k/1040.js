@@ -11,6 +11,7 @@ var tax_calc = function (inval){
 }
 
 var eitc = function(income, k){
+    if (fstatus()=="married") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36 
@@ -30,9 +31,11 @@ var eitc = function(income, k){
 var fstatus = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
+    var deps = parseFloat(document.getElementById("nonkid_dependents").value)
+    if (isNaN(deps)) deps = 0;
     var single = document.getElementsByName("spouse")[0].checked;
-    if (single && kids) return "head of household";
-    if (single && !kids) return "single";
+    if (single && kids+deps) return "head of household";
+    if (single && !(kids+deps)) return "single";
     if (document.getElementsByName("spouse")[1].checked) return "married filing jointly";
     else return "married";
 }
@@ -61,6 +64,18 @@ var exemption_fn = function(){
     if (status=="married" || status == "married filing jointly") ct += 1
     return ct;
 }
+
+var student_loan_income_limit =function(){
+    var status = fstatus()
+    if (status == "married") return 130000
+    return 65000
+}
+
+var student_loan_conditional_fraction = function(income){
+    var status = fstatus()
+    return income/ (status == "married" ? 30000 : 15000)
+}
+
 |>)
 
 pyversion(<|
@@ -143,16 +158,18 @@ agi_divider=cell('>>>>>>>>>>>> AGI                                   ', 22.9, '0
 #30 Penalty on early withdrawal of savings . . . . . . 30
 #31a Alimony paid b Recipient’s SSN ▶ 31a
 #32 IRA deduction . . . . . . . . . . . . . 32
-#33 Student loan interest deduction . . . . . . . . 33
+Cell(student_loan_interest_ded, 33, Student loan interest deduction , <|CV(student_loan_ws_1040, final_credit)|>, s_loans)
 #34 Tuition and fees. Attach Form 8917 . . . . . . . 34
 #35 Domestic production activities deduction. Attach Form 8903 35
 #36 Add lines 23 through 35 . . . . . . . . . . . . . . . . . . . 36
 
-Cell(subtractions_from_income, 36,Sum of subtractions from gross income (UI), 0)
+Ce<||>ll(subtractions_from_income, 36,Sum of subtractions from gross income (UI), 0)
 
 Cell(t_and_i_divider, 36.9,'>>>>>>>>>>>> Taxes and income                      ', 0)
-Cell(MAGI, 0,Modified adjusted gross income, <|CV(magi_total_in) - CV(subtractions_from_income)|>, have_rr)
-Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(subtractions_from_income)|>, critical)
+
+no student loan deduction in MAGI---otherwise the law has an infinite loop
+Cell(MAGI, 0,Modified adjusted gross income, <|CV(magi_total_in)|>, have_rr )
+Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(student_loan_interest_ded)|>, critical)
 
 #39 elderly, blind
 
@@ -200,3 +217,15 @@ Cell(eitc, 66.5,Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
 Cell(total_payments, 74,Total payments, <|SUM(federal_tax_withheld, eitc)|>)
 Cell(refund, 75,Refund!, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
 Cell(tax_owed, 78,Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
+
+m4_form(student_loan_ws_1040)
+Cell(student_loan_interest, 1,Interest you paid in 2015 on qualified student loans,, u s_loans)
+Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
+line 3 is a sum of 1040 lines 23--32, all of which are UI
+line 4 is therefore == line 2 == 1040 line 22 == CV(f1040, total_in)
+
+Cell(income_limit, 5, Income phase-out, <|student_loan_income_limit()|>, s_loans)
+Cell(diff, 6, total income minus phase-out limit, <|max(CV(f1040, total_in) - CV(income_limit), 0)|>, s_loans)
+Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000=married joint or 15,000 otherwise)|>, <|student_loan_conditional_fraction(CV(diff))|>, s_loans)
+Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(diff_divided)|>, s_loans)
+Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)

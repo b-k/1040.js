@@ -77,23 +77,23 @@ Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
 
 <table><tr><td>
-<input text id="kids" size=3em onchange="recalc()"> Dependent children<br>
-<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 18<br>
 <input type="radio" name="spouse" size=3em checked onchange="recalc()"> I am single.<br>
 <input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file jointly.<br>
 <input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file separately.<br>
+<input text id="kids" size=3em onchange="recalc()"> Dependent children<br>
+<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 18<br>
 </td><td>
 
 m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
 BOX(over_65, I am over 65.)
 
-BOX(spouse, I am married.)
 BOX(spouse_over_65, My spouse is over 65.)
+BOX(s_loans, I have student loans.)
 BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
 BOX(have_rr, I have rental or royalty income.)
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
-<a href="http://github.com/b-k/1040.js">I want to make this tax calculator better.</a>
+<a href="http://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
 </td></tr></table>
 
 <svg id="svg-canvas" width=960 height=600></svg>
@@ -300,10 +300,10 @@ function hidezeros(id, checked){
 
 
 document.getElementById(".have_rr").click()
+document.getElementById(".s_loans").click()
 document.getElementById(".mort").click()
 document.getElementById(".itemizing").click()
 document.getElementById(".over_65").click()
-document.getElementById(".spouse").click()
 document.getElementById(".spouse_over_65").click()
 
 redrawIt()
