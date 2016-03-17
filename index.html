@@ -544,7 +544,6 @@ var situations = [];
 var last_eval = 0;
 
 function CV(name){
-    console.log("OK: "+name)
     this_cell = g._nodes[name];
     if (typeof this_cell === "undefined") this_cell = nodestorage[name];
     if (this_cell.eqn==="" || this_cell.last_eval >= last_eval)
