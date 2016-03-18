@@ -80,8 +80,8 @@ To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &l
 <input type="radio" name="spouse" size=3em checked onchange="recalc()"> I am single.<br>
 <input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file jointly.<br>
 <input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file separately.<br>
-<input text id="kids" size=3em onchange="recalc()"> Dependent children<br>
-<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 18<br>
+<input text id="kids" size=3em onchange="kidcalc()"> Dependent children<br>
+<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 17<br>
 </td><td>
 
 m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
@@ -298,6 +298,11 @@ function hidezeros(id, checked){
     }
 }
 
+var kidcalc = function(){ 
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
+    checkbox('.have_kids', (kids>0 ? true : false)); recalc();
+}
 
 document.getElementById(".have_rr").click()
 document.getElementById(".s_loans").click()
@@ -305,6 +310,7 @@ document.getElementById(".mort").click()
 document.getElementById(".itemizing").click()
 document.getElementById(".over_65").click()
 document.getElementById(".spouse_over_65").click()
+checkbox(".have_kids", false)
 
 redrawIt()
 

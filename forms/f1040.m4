@@ -76,6 +76,24 @@ var student_loan_conditional_fraction = function(income){
     return income/ (status == "married" ? 30000 : 15000)
 }
 
+//CTC
+var thousandkids = function(){
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
+    return kids*1000
+}
+
+var ctc_status = function(agi){
+    var ded=0;
+    var status = fstatus();
+    if (status=="head of household" || status=="single") ded=75000;
+    else if (status=="married filing jointly") ded=110000;
+    else if (status=="married") ded=55000;
+    diff = max(agi-ded, 0)
+    return Math.ceil(diff/1000.)*1000*0.05
+}
+
+
 |>)
 
 pyversion(<|
@@ -189,7 +207,7 @@ Cell(ftc,48, Foreign tax credit (UI), 0)
 #53 Residential energy credits. Attach Form 5695 . . . . 53
 #54 Other credits from Form: a 3800 b 8801 c 54
 Cell(total_credits, 55,Total credits, 0)
-Cell(tax_minus_credits, 56,Tax minus credits, <|max(CV(pretotal_tax)-CV(total_credits), 0)|>, critical)
+Cell(tax_minus_credits, 56,Tax minus credits, <|max(CV(pretotal_tax)-CV(total_credits) -CV(ctc_ws_1040, ctc), 0)|>, critical)
 
 #57 Self-employment tax. Attach Schedule SE 
 #58 Unreported social security and Medicare tax from Form: a 4137 b 8919
@@ -229,3 +247,13 @@ Cell(diff, 6, total income minus phase-out limit, <|max(CV(f1040, total_in) - CV
 Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000=married joint or 15,000 otherwise)|>, <|student_loan_conditional_fraction(CV(diff))|>, s_loans)
 Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(diff_divided)|>, s_loans)
 Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
+
+m4_form(ctc_ws_1040)
+Cell(a_thousand_per_child, 1, <|$1,000 per child under 17|>, <|thousandkids()|>, have_kids)
+Cell(ctc_subtraction, 5, <|5% of the rounded-up difference between AGI and a filing-status dependent number|>, <|ctc_status(CV(f1040, AGI))|>, have_kids)
+Cell(credit_remaining, 6, <|$1,000 per child minus the subtraction|>, <|max(CV(a_thousand_per_child) - CV(ctc_subtraction), 0)|>, have_kids)
+
+Line 8: Add the amounts from Form 1040, line 48, Form 1040, line 49, Form 1040, line 51, Form 5695, line 30, Form 1040, line 50, Form 8910, line 15, Form 8936, line 23, and Schedule R, line 22
+I just use FTC to stand in for all of that.
+Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, pretotal_tax) - CV(f1040, ftc)|>, have_kids)
+Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_remaining))|>, have_kids)
