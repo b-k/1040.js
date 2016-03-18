@@ -80,8 +80,8 @@ To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &l
 <input type="radio" name="spouse" size=3em checked onchange="recalc()"> I am single.<br>
 <input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file jointly.<br>
 <input type="radio" name="spouse" size=3em onchange="recalc()"> I have a spouse; we file separately.<br>
-<input text id="kids" size=3em onchange="recalc()"> Dependent children<br>
-<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 18<br>
+<input text id="kids" size=3em onchange="kidcalc()"> Dependent children<br>
+<input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 17<br>
 </td><td>
 
 
@@ -183,6 +183,24 @@ var student_loan_conditional_fraction = function(income){
     return income/ (status == "married" ? 30000 : 15000)
 }
 
+//CTC
+var thousandkids = function(){
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
+    return kids*1000
+}
+
+var ctc_status = function(agi){
+    var ded=0;
+    var status = fstatus();
+    if (status=="head of household" || status=="single") ded=75000;
+    else if (status=="married filing jointly") ded=110000;
+    else if (status=="married") ded=55000;
+    diff = max(agi-ded, 0)
+    return Math.ceil(diff/1000.)*1000*0.05
+}
+
+
 
 
 //sum losses from royalties to possibly limited real estate losses
@@ -267,7 +285,7 @@ g.setNode("f1040_credit_repayment",  { label: "credit_repayment", baselabel: "cr
 g.setNode("f1040_pretotal_tax",  { label: "pretotal_tax", baselabel: "pretotal_tax", form: "f1040", fullname: "Tax + AMT + F8962", class: "a_node ", val:0 , eqn: "CV('f1040_tax') + CV('f1040_amt_1040') + CV('f1040_credit_repayment') + 0", last_eval:0 });
 g.setNode("f1040_ftc",  { label: "ftc", baselabel: "ftc", form: "f1040", fullname: "Foreign tax credit (UI)", class: "a_node ", val:0 , eqn: "0", last_eval:0 });
 g.setNode("f1040_total_credits",  { label: "total_credits", baselabel: "total_credits", form: "f1040", fullname: "Total credits", class: "a_node ", val:0 , eqn: "0", last_eval:0 });
-g.setNode("f1040_tax_minus_credits",  { label: "tax_minus_credits", baselabel: "tax_minus_credits", form: "f1040", fullname: "Tax minus credits", class: "a_node critical", val:0 , eqn: "max(CV('f1040_pretotal_tax')-CV('f1040_total_credits'), 0)", last_eval:0 });
+g.setNode("f1040_tax_minus_credits",  { label: "tax_minus_credits", baselabel: "tax_minus_credits", form: "f1040", fullname: "Tax minus credits", class: "a_node critical", val:0 , eqn: "max(CV('f1040_pretotal_tax')-CV('f1040_total_credits') -CV('ctc_ws_1040_ctc'), 0)", last_eval:0 });
 g.setNode("f1040_obamacare_fee",  { label: "obamacare_fee", baselabel: "obamacare_fee", form: "f1040", fullname: "Health care individual responsibility", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_total_tax",  { label: "total_tax", baselabel: "total_tax", form: "f1040", fullname: "Total tax", class: "a_node ", val:0 , eqn: "CV('f1040_tax_minus_credits') + CV('f1040_obamacare_fee') + 0", last_eval:0 });
 g.setNode("f1040_federal_tax_withheld",  { label: "federal_tax_withheld", baselabel: "federal_tax_withheld", form: "f1040", fullname: "Federal income tax withheld from Forms W-2 and 1099", class: "a_node u", val:0 , eqn: "", last_eval:0 });
@@ -282,6 +300,11 @@ g.setNode("student_loan_ws_1040_diff",  { label: "diff", baselabel: "diff", form
 g.setNode("student_loan_ws_1040_diff_divided",  { label: "diff_divided", baselabel: "diff_divided", form: "student_loan_ws_1040", fullname: "total income minus phase-out limit/(30,000=married joint or 15,000 otherwise)", class: "a_node s_loans", val:0 , eqn: "student_loan_conditional_fraction(CV('student_loan_ws_1040_diff'))", last_eval:0 });
 g.setNode("student_loan_ws_1040_phased_out_loans",  { label: "phased_out_loans", baselabel: "phased_out_loans", form: "student_loan_ws_1040", fullname: "phased-out loans", class: "a_node s_loans", val:0 , eqn: "CV('student_loan_ws_1040_loans_maxed')*CV('student_loan_ws_1040_diff_divided')", last_eval:0 });
 g.setNode("student_loan_ws_1040_final_credit",  { label: "final_credit", baselabel: "final_credit", form: "student_loan_ws_1040", fullname: "Student loan interest credit", class: "a_node s_loans", val:0 , eqn: "max(CV('student_loan_ws_1040_loans_maxed') - CV('student_loan_ws_1040_phased_out_loans'), 0)", last_eval:0 });
+g.setNode("ctc_ws_1040_a_thousand_per_child",  { label: "a_thousand_per_child", baselabel: "a_thousand_per_child", form: "ctc_ws_1040", fullname: "$1,000 per child under 17", class: "a_node have_kids", val:0 , eqn: "thousandkids()", last_eval:0 });
+g.setNode("ctc_ws_1040_ctc_subtraction",  { label: "ctc_subtraction", baselabel: "ctc_subtraction", form: "ctc_ws_1040", fullname: "5% of the rounded-up difference between AGI and a filing-status dependent number", class: "a_node have_kids", val:0 , eqn: "ctc_status(CV('f1040_AGI'))", last_eval:0 });
+g.setNode("ctc_ws_1040_credit_remaining",  { label: "credit_remaining", baselabel: "credit_remaining", form: "ctc_ws_1040", fullname: "$1,000 per child minus the subtraction", class: "a_node have_kids", val:0 , eqn: "max(CV('ctc_ws_1040_a_thousand_per_child') - CV('ctc_ws_1040_ctc_subtraction'), 0)", last_eval:0 });
+g.setNode("ctc_ws_1040_tax_minus_some_credits",  { label: "tax_minus_some_credits", baselabel: "tax_minus_some_credits", form: "ctc_ws_1040", fullname: "Calculated tax minus some credits", class: "a_node have_kids", val:0 , eqn: "CV('f1040_pretotal_tax') - CV('f1040_ftc')", last_eval:0 });
+g.setNode("ctc_ws_1040_ctc",  { label: "ctc", baselabel: "ctc", form: "ctc_ws_1040", fullname: "Child tax credit", class: "a_node have_kids", val:0 , eqn: "min(CV('ctc_ws_1040_tax_minus_some_credits'), CV('ctc_ws_1040_credit_remaining'))", last_eval:0 });
 g.setNode("f1040_sched_a_medical_expenses",  { label: "medical_expenses", baselabel: "medical_expenses", form: "f1040_sched_a", fullname: "Medical and dental expenses", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_agi_scaled",  { label: "agi_scaled", baselabel: "agi_scaled", form: "f1040_sched_a", fullname: "AGI scaled", class: "a_node itemizing", val:0 , eqn: "CV('f1040_AGI')* (.075 * (over_65 || spouse_over_65) + .1 *(!over_65&&!spouse_over_65))", last_eval:0 });
 g.setNode("f1040_sched_a_excess_medical",  { label: "excess_medical", baselabel: "excess_medical", form: "f1040_sched_a", fullname: "Medical expenses minus fraction of AGI", class: "a_node itemizing", val:0 , eqn: "max(CV('f1040_sched_a_medical_expenses') - CV('f1040_sched_a_agi_scaled'), 0)", last_eval:0 });
@@ -412,7 +435,7 @@ set_edges("f1040_taxable_income", ["f1040_agi_minus_deductions", "f1040_exemptio
 set_edges("f1040_tax", ["f1040_taxable_income",  ""])
 set_edges("f1040_amt_1040", ["f6251_amt",  ""])
 set_edges("f1040_pretotal_tax", ["f1040_tax", "f1040_amt_1040", "f1040_credit_repayment",  ""])
-set_edges("f1040_tax_minus_credits", ["f1040_pretotal_tax", "f1040_total_credits",  ""])
+set_edges("f1040_tax_minus_credits", ["f1040_pretotal_tax", "f1040_total_credits", "ctc_ws_1040_ctc",  ""])
 set_edges("f1040_total_tax", ["f1040_tax_minus_credits", "f1040_obamacare_fee",  ""])
 set_edges("f1040_eitc", ["f1040_AGI",  ""])
 set_edges("f1040_total_payments", ["f1040_federal_tax_withheld", "f1040_eitc",  ""])
@@ -423,6 +446,10 @@ set_edges("student_loan_ws_1040_diff", ["f1040_total_in", "student_loan_ws_1040_
 set_edges("student_loan_ws_1040_diff_divided", ["student_loan_ws_1040_diff",  ""])
 set_edges("student_loan_ws_1040_phased_out_loans", ["student_loan_ws_1040_loans_maxed", "student_loan_ws_1040_diff_divided",  ""])
 set_edges("student_loan_ws_1040_final_credit", ["student_loan_ws_1040_loans_maxed", "student_loan_ws_1040_phased_out_loans",  ""])
+set_edges("ctc_ws_1040_ctc_subtraction", ["f1040_AGI",  ""])
+set_edges("ctc_ws_1040_credit_remaining", ["ctc_ws_1040_a_thousand_per_child", "ctc_ws_1040_ctc_subtraction",  ""])
+set_edges("ctc_ws_1040_tax_minus_some_credits", ["f1040_pretotal_tax", "f1040_ftc",  ""])
+set_edges("ctc_ws_1040_ctc", ["ctc_ws_1040_tax_minus_some_credits", "ctc_ws_1040_credit_remaining",  ""])
 set_edges("f1040_sched_a_agi_scaled", ["f1040_AGI",  ""])
 set_edges("f1040_sched_a_excess_medical", ["f1040_sched_a_medical_expenses", "f1040_sched_a_agi_scaled",  ""])
 set_edges("f1040_sched_a_total_taxes_deducted", ["f1040_sched_a_local_taxes", "f1040_sched_a_real_estate_taxes", "f1040_sched_a_property_taxes", "f1040_sched_a_other_taxes",  ""])
@@ -617,6 +644,11 @@ function hidezeros(id, checked){
     }
 }
 
+var kidcalc = function(){ 
+    var kids = parseFloat(document.getElementById("kids").value)
+    if (isNaN(kids)) kids = 0;
+    checkbox('.have_kids', (kids>0 ? true : false)); recalc();
+}
 
 document.getElementById(".have_rr").click()
 document.getElementById(".s_loans").click()
@@ -624,6 +656,7 @@ document.getElementById(".mort").click()
 document.getElementById(".itemizing").click()
 document.getElementById(".over_65").click()
 document.getElementById(".spouse_over_65").click()
+checkbox(".have_kids", false)
 
 redrawIt()
 
