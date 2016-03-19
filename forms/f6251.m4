@@ -22,7 +22,7 @@ function get_amt_exemption(income){
 function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
-    return (status=="married") 
+    return (status=="married")
        ? income * (income <=92700 ? .26 : .28) - 1854
        : income * (income <=185400? .26 : .28) - 3708;
 }

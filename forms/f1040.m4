@@ -14,7 +14,7 @@ var eitc = function(income, k){
     if (fstatus()=="married") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36 
+    //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     //phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
     data=[[7.65, 6610, 506, 8270, 7.65, 14880],
           [34, 9920, 3373,  18190, 15.98, 39296],
@@ -108,7 +108,7 @@ def tax_calc(inval):
     if inval < 405100: return 45353.75 + .33*(inval-186350)
 
 def eitc(income, kids):
-    #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36 
+    #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     #phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
     data=[[7.65, 6610, 506, 8270, 7.65, 14880],
           [34, 9920, 3373,  18190, 15.98, 39296],

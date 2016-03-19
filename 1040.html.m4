@@ -5,8 +5,8 @@ m4_changequote(<|,|>)
 <title>The tax graph</title>
 
 <!--<link rel="stylesheet" href="demo.css">-->
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
+<script src="d3.v3.min.js" charset="utf-8"></script>
+<script src="dagre-d3.min.js" charset="utf-8"></script>
 <script>
 
 </script>
@@ -24,7 +24,7 @@ text {
 
 input[type=checkbox]
 {
-   /* Double-sized Checkboxes, via http://stackoverflow.com/questions/306924/checkbox-size-in-html-css */
+   /* Double-sized Checkboxes, via https://stackoverflow.com/questions/306924/checkbox-size-in-html-css */
    -ms-transform: scale(2); /* IE */
    -moz-transform: scale(2); /* FF */
    -webkit-transform: scale(2); /* Safari and Chrome */
@@ -93,7 +93,7 @@ BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
 BOX(have_rr, I have rental or royalty income.)
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
-<a href="http://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
+<a href="https://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
 </td></tr></table>
 
 <svg id="svg-canvas" width=960 height=600></svg>
@@ -298,7 +298,7 @@ function hidezeros(id, checked){
     }
 }
 
-var kidcalc = function(){ 
+var kidcalc = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     checkbox('.have_kids', (kids>0 ? true : false)); recalc();
