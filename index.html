@@ -5,8 +5,8 @@
 <title>The tax graph</title>
 
 <!--<link rel="stylesheet" href="demo.css">-->
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
+<script src="d3.v3.min.js" charset="utf-8"></script>
+<script src="dagre-d3.min.js" charset="utf-8"></script>
 <script>
 
 </script>
@@ -24,7 +24,7 @@ text {
 
 input[type=checkbox]
 {
-   /* Double-sized Checkboxes, via http://stackoverflow.com/questions/306924/checkbox-size-in-html-css */
+   /* Double-sized Checkboxes, via https://stackoverflow.com/questions/306924/checkbox-size-in-html-css */
    -ms-transform: scale(2); /* IE */
    -moz-transform: scale(2); /* FF */
    -webkit-transform: scale(2); /* Safari and Chrome */
@@ -93,7 +93,7 @@ To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &l
 <INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I am itemizing.</span><BR>
 <INPUT class=check TYPE=CHECKBOX NAME="have_rr" id=".have_rr" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I have rental or royalty income.</span><BR>
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
-<a href="http://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
+<a href="https://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
 </td></tr></table>
 
 <svg id="svg-canvas" width=960 height=600></svg>
@@ -121,7 +121,7 @@ var eitc = function(income, k){
     if (fstatus()=="married") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36 
+    //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     //phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
     data=[[7.65, 6610, 506, 8270, 7.65, 14880],
           [34, 9920, 3373,  18190, 15.98, 39296],
@@ -234,7 +234,7 @@ function get_amt_exemption(income){
 function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
-    return (status=="married") 
+    return (status=="married")
        ? income * (income <=92700 ? .26 : .28) - 1854
        : income * (income <=185400? .26 : .28) - 3708;
 }
@@ -644,7 +644,7 @@ function hidezeros(id, checked){
     }
 }
 
-var kidcalc = function(){ 
+var kidcalc = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     checkbox('.have_kids', (kids>0 ? true : false)); recalc();
