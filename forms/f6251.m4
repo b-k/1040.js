@@ -32,7 +32,6 @@ function med_expenses(expenses, agi){
 
     if (!over_65) return 0
     return Math.max(Math.min(expenses, .025*agi), 0)
-
 }
 |>)
 
@@ -54,20 +53,24 @@ def get_tamt(income):
         return income * (.26 if  income <=92700 else .28) - 1854
     else:
         return income * (.26 if  income <=185400 else .28) - 3708
+
+def med_expenses(expenses, agi):
+    if (not (over_65 or  spouse_over_65)): return 0
+    return max(min(expenses, .025*agi), 0)
 |>)
 
 m4_form(f6251)
-amt_div1=cell(0.1, ">>>>>>>>>>>>> AMT income           "),
-amt_div2=cell(28.9, ">>>>>>>>>>>>> AMT                  "),
+amt_div1=cell(0.1, >>>>>>>>>>>>> AMT income           ),
+amt_div2=cell(28.9, >>>>>>>>>>>>> AMT                  ),
 Ce<||>ll(agi_minus_ded, 1, AGI minus deductions, <|CV(f1040, agi_minus_deductions)|>, itemizing)
 
 Cell(amt_medical, 2, Medical and dental, <|med_expenses(CV(f1040_sched_a, excess_medical), CV(f1040, AGI))|>, itemizing)
 Cell(taxes_deducted, 3, Taxes deducted on Schedule A, <|CV(f1040_sched_a, total_taxes_deducted)|>, itemizing)
 
-mort_interest_adjustment=cell(4, "home mortgage interest adjustment, if any, from line 6 of the worksheet in the instructions for this line 4 (UI)", '0'),
+mort_interest_adjustment=cell(4, <|home mortgage interest adjustment, if any, from line 6 of the worksheet in the instructions for this line 4 (UI)|>, '0'),
 
 Cell(misc_deductions, 5, Miscellaneous deductions from Schedule A, <|CV(f1040_sched_a, expenses_minus_agi_slice)|>, itemizing)
-amt_deduction_deduction=cell(6, "Reduction for limited deductions (UI)", 0)
+amt_deduction_deduction=cell(6, <|Reduction for limited deductions (UI)|>, 0)
 Cell(amt_refund_deduction, 7, <|Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)|>, <|CV(f1040, taxable_tax_refunds)|>, itemizing)
 Cell(amt_investment_expense_deduction, 8, Investment interest expense (UI), 0, itemizing)
 Cell(amt_depletion_deduction, 9, Depletion (UI), 0, itemizing),

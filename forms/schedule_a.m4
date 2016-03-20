@@ -11,7 +11,7 @@ adiv8=cell('>>>>>>>>>>>> Total                                    ', 28.9, '0'),
 
 Cell(medical_expenses, 1, Medical and dental expenses,, u itemizing)
 Ce<||>ll(agi_yet_again, 2, AGI, <|CV(agi_again)|> itemizing)
-Cell(agi_scaled, 2, AGI scaled, <|CV(f1040, AGI)* (.075 * (over_65 || spouse_over_65) + .1 *(!over_65&&!spouse_over_65))|>, itemizing)
+Cell(agi_scaled, 2, AGI scaled, <|CV(f1040, AGI)* IF(Situation(over_65)+Situation(spouse_over_65), .075, .1)|>, itemizing)
 Cell(excess_medical, 4, Medical expenses minus fraction of AGI, <|max(CV(medical_expenses) - CV(agi_scaled), 0)|>, itemizing)
 Cell(local_taxes, 5, State/local Income OR general sales tax,, u itemizing)
 Cell(real_estate_taxes, 6, Real estate taxes,, u itemizing)

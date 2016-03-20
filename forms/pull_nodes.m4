@@ -13,7 +13,7 @@ m4_define(<|SUM|>, <|$@, |>)
 m4_define(<|SUM|>, <|m4_ifelse(<|$1|>,<||>,0,
 <|CV(strip($1)) + SUM(m4_shift($@))|>)|>)
 
-m4_define(Situation, <| situations[".$1"] |>)
+m4_define(Situation, <| situations['.$1'] |>)
 m4_define(IF, <|(($1) ? ($2) : ($3))|>)
 m4_define(FirstPart, <|$1|>)
 m4_define(SecondPart, <|$2|>)

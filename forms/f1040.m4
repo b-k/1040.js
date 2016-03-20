@@ -79,6 +79,13 @@ var ctc_status = function(agi){
 pyversion(<|
 exemption_multiplier=4000  #changes annually
 
+#in python at the moment, situations are just plain booleans
+def Situation(x):
+    return x
+
+def fstatus():
+    return status
+
 #2014 tax rate schedules
 def tax_calc(inval):
     if inval < 9075: return .1*inval
@@ -101,6 +108,24 @@ def eitc(income, kids):
     if income <= data[row][1]: return income*data[row][0]/100.
     return data[row][2]
 
+def exemption_fn():
+    status = fstatus()
+    spouse = 1 if (status=="married" or status == "married filing jointly") else 0
+    return 1 + kids + dependents + spouse
+
+# CTC
+def thousandkids():
+    return kids*1000
+
+from math import ceil
+def ctc_status(agi):
+    ded=0;
+    status = fstatus();
+    if (status=="head of household" or status=="single"): ded=75000
+    elif (status=="married filing jointly"): ded=110000
+    elif (status=="married"): ded=55000
+    diff = max(agi-ded, 0)
+    return ceil(diff/1000.)*1000*0.05
 |>)
 
 m4_form(f1040)
@@ -208,7 +233,7 @@ m4_form(student_loan_ws_1040)
 Cell(student_loan_interest, 1,Interest you paid in 2015 on qualified student loans,, u s_loans)
 Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
 line 3 is a sum of 1040 lines 23--32, all of which are UI
-line 4 is therefore == line 2 == 1040 line 22 == CV(f1040, total_in)
+line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
 
 Cell(income_limit, 5, Income phase-out, <|Fswitch((married, 130000), 65000)|>, s_loans)
 Cell(diff, 6, total income minus phase-out limit, <|max(CV(f1040, total_in) - CV(income_limit), 0)|>, s_loans)
