@@ -1,5 +1,5 @@
 m4_form(f1040_sched_a)
-schedule_a=dict(
+
 adiv1=cell('>>>>>>>>>>>> Medical and Dental                       ', 0.9, '0'),
 adiv2=cell('>>>>>>>>>>>> Taxes you paid                           ', 4.9, '0'),
 adiv3=cell('>>>>>>>>>>>> Interest you paid                        ', 9.9, '0'),

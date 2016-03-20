@@ -179,9 +179,9 @@ var val_prompt = function(d){
     g._nodes[d].val = floated;
     fixboxsize(g._nodes[d]);
     last_eval += 1;
-    CV("f1040_refund");
-    CV("f1040_tax_owed");
-    CV("f8582_carryover_to_next_year");
+    Cv("f1040_refund");
+    Cv("f1040_tax_owed");
+    Cv("f8582_carryover_to_next_year");
     redrawIt();
 }
 
@@ -224,7 +224,7 @@ var situations = [];
 
 var last_eval = 0;
 
-function CV(name){
+function Cv(name){
     this_cell = g._nodes[name];
     if (typeof this_cell === "undefined") this_cell = nodestorage[name];
     if (this_cell.eqn==="" || this_cell.last_eval >= last_eval)
@@ -244,9 +244,9 @@ function CV(name){
 
 function recalc(){
     last_eval +=1
-    CV("f1040_refund");
-    CV("f1040_tax_owed");
-    CV("f8582_carryover_to_next_year");
+    Cv("f1040_refund");
+    Cv("f1040_tax_owed");
+    Cv("f8582_carryover_to_next_year");
     redrawIt();
 }
 
@@ -280,8 +280,8 @@ function checkbox(id, checked){situations[id]=checked;
         reedge();
         redrawIt();
     }
-    CV("f1040_refund");
-    CV("f1040_tax_owed");
+    Cv("f1040_refund");
+    Cv("f1040_tax_owed");
 }
 
 function hidezeros(id, checked){

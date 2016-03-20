@@ -1,15 +1,6 @@
 m4_form(f1040_sched_e)
 
-jsversion(<|
-//sum losses from royalties to possibly limited real estate losses
-rrlosses = function(rents, royalties, net, real_loss){
-    if (rents > 0)   return real_loss;
-    else if (net <0) return net;
-    return 0
-}
-|>)
-
-pyversion(<|
+#an old draft:
 #sum losses from royalties to possibly limited real estate losses
 def rrlosses(rents, royalties, net, real_loss):
     if isinstance(net, tuple):
@@ -21,7 +12,6 @@ def rrlosses(rents, royalties, net, real_loss):
         if rents > 0: return real_loss
         elif net <0:         return net
     return 0
-|>)
 
 Cell(rents_received, 3, Rents received,, u have_rr)
 Cell(royalties_received, 4, Royalties received,, u have_rr)
@@ -55,5 +45,5 @@ Cell(sched_e_sum18, 23.6, Total for line 18 for all propertiess, <|CV(sched_e_de
 Cell(sched_e_sum20, 23.8, Total for line 20 for all propertiess, <|CV(sched_e_total_expenses)|>, have_rr)
 
 Cell(sched_e_income, 24, Positive RR Income, <|CV(net_rr)|>, have_rr)
-Cell(sched_e_losses, 25, Royalty losses plus possibly limited rental losses, <|rrlosses(CV(rents_received), CV(royalties_received), CV(net_rr), CV(deductible_rr_losses))|>, have_rr)
-Cell(rr_income, 26, Total rents and royalties, <|SUM(sched_e_income, sched_e_losses)|>, have_rr)
+Cell(rr_losses, 25, Royalty losses plus possibly limited rental losses, <|IF(CV(rents_received) > 0, CV(deductible_rr_losses), min(CV(net_rr),0))|>, have_rr)
+Cell(rr_income, 26, Total rents and royalties, <|SUM(sched_e_income, rr_losses)|>, have_rr)

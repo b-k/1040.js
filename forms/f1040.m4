@@ -2,6 +2,7 @@ jsversion(<|
 var exemption_multiplier=4000  //changes annually
 
 //#2014 tax rate schedules
+//Could be inlined, but not going to bother.
 var tax_calc = function (inval){
     if (inval < 9075) return .1*inval;
     if (inval < 36900) return 907.50  + .15*(inval-9075);
@@ -43,16 +44,6 @@ var fstatus = function(){
 var max = function(a,b) { return Math.max(a,b)}
 var min = function(a,b) { return Math.min(a,b)}
 
-var deductions = function(itemized){
-    var ded=0;
-    var status = fstatus();
-    if (status=="married" || status=="single") ded=6300;
-    else if (status=="married filing jointly") ded=12600;
-    else if (status=="head of household") ded=9250;
-    ded=max(ded, itemized);
-    return ded
-}
-
 var exemption_fn = function(){
     var ct = 1
     var kids = parseFloat(document.getElementById("kids").value)
@@ -63,17 +54,6 @@ var exemption_fn = function(){
     var status = fstatus()
     if (status=="married" || status == "married filing jointly") ct += 1
     return ct;
-}
-
-var student_loan_income_limit =function(){
-    var status = fstatus()
-    if (status == "married") return 130000
-    return 65000
-}
-
-var student_loan_conditional_fraction = function(income){
-    var status = fstatus()
-    return income/ (status == "married" ? 30000 : 15000)
 }
 
 //CTC
@@ -121,19 +101,6 @@ def eitc(income, kids):
     if income <= data[row][1]: return income*data[row][0]/100.
     return data[row][2]
 
-
-def deductions():
-    ded=0
-    var status = fstatus();
-    if status=="married" or status=="single":
-        ded=6300
-    elif status=="married filing jointly":
-        ded=12600
-    elif status=="head of household":
-        ded=9250
-    if itemizing:
-        ded=max(ded, CV('f1040_sched_a, total_itemized_deductions'))
-    return ded
 |>)
 
 m4_form(f1040)
@@ -191,7 +158,8 @@ Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(student_loan_interest_de
 
 #39 elderly, blind
 
-Cell(deductions,40,Deductions, <|deductions(CV(f1040_sched_a, total_itemized_deductions))|>, critical)
+Cell(std_deduction,39.9,Standard deductions, <|Fswitch((married, 6300), (single, 6300), (married filing jointly, 12600), (head of household, 9250), 0)|>, )
+Cell(deductions,40,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions)|>)
 Cell(exemption_amount, 42,Exemption amount, <|CV(exemptions)*exemption_multiplier|>)
 Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions)-CV(exemption_amount), 0)|>, critical)
@@ -242,9 +210,9 @@ Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(stud
 line 3 is a sum of 1040 lines 23--32, all of which are UI
 line 4 is therefore == line 2 == 1040 line 22 == CV(f1040, total_in)
 
-Cell(income_limit, 5, Income phase-out, <|student_loan_income_limit()|>, s_loans)
+Cell(income_limit, 5, Income phase-out, <|Fswitch((married, 130000), 65000)|>, s_loans)
 Cell(diff, 6, total income minus phase-out limit, <|max(CV(f1040, total_in) - CV(income_limit), 0)|>, s_loans)
-Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000=married joint or 15,000 otherwise)|>, <|student_loan_conditional_fraction(CV(diff))|>, s_loans)
+Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000=married joint or 15,000 otherwise)|>, <|(CV(diff)+0.0)/Fswitch((married, 30000), 15000)|>, s_loans)
 Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(diff_divided)|>, s_loans)
 Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
 
