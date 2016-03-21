@@ -5,6 +5,8 @@ here.
 
 The whole thing is put together via m4. If you have anything even vaguely POSIX-compliant,
 you have m4. Just type `make` on the command line to assemble the parts into tax.html.
+If you are using Windows, you will need to install [Cygwin](https://www.cygwin.com/) first
+to get the required tools.
 
 The tax logic is encoded in a list of cells, which should be easy to modify or add to.
 
