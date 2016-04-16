@@ -1,14 +1,43 @@
 jsversion(<|
 var exemption_multiplier=4000  //changes annually
 
-//#2014 tax rate schedules
+//2015 tax rate schedules
 //Could be inlined, but not going to bother.
 var tax_calc = function (inval){
-    if (inval < 9075) return .1*inval;
-    if (inval < 36900) return 907.50  + .15*(inval-9075);
-    if (inval < 89350) return 5081.25 + .25*(inval-36900);
-    if (inval < 186350) return 18193.75 + .28*(inval-89350);
-    if (inval < 405100) return 45353.75 + .33*(inval-186350);
+    var filing_status = fstatus();
+    if (filing_status == "single") {
+        if (inval < 9225) return inval * 0.1;
+        if (inval < 37450) return 922.50 + 0.15 * (inval - 9225);
+        if (inval < 90750) return 5156.25 + 0.25 * (inval - 37450);
+        if (inval < 189300) return 18481.25 + 0.28 * (inval - 90750);
+        if (inval < 411500) return 46075.25 + 0.33 * (inval - 189300);
+        if (inval < 413200) return 119401.25 + 0.35 * (inval - 411500);
+        return 119996.25 + 0.396 * (inval - 413200);
+    } else if (filing_status == "married filing jointly") {
+        if (inval < 18450) return inval * 0.1;
+        if (inval < 74900) return 1845 + 0.15 * (inval - 18450);
+        if (inval < 151200) return 10312.50 + 0.25 * (inval - 74900);
+        if (inval < 230450) return 29387.50 + 0.28 * (inval - 151200);
+        if (inval < 411500) return 51577.50 + 0.33 * (inval - 230450);
+        if (inval < 464850) return 111324 + 0.35 * (inval - 411500);
+        return 129996.50 + 0.396 * (inval - 464850);
+    } else if (filing_status == "married") {
+        if (inval < 9225) return inval * 0.1;
+        if (inval < 37450) return 922.50 + 0.15 * (inval - 9225);
+        if (inval < 75600) return 5156.25 + 0.25 * (inval - 37450);
+        if (inval < 115225) return 14693.75 + 0.28 * (inval - 75600);
+        if (inval < 205750) return 25788.75 + 0.33 * (inval - 115225);
+        if (inval < 232425) return 55662 + 0.35 * (inval - 205750);
+        return 64998.25 + 0.396 * (inval - 232425);
+    } else if (filing_status == "head of household") {
+        if (inval < 13150) return inval * 0.1;
+        if (inval < 50200) return 1315 + 0.15 * (inval - 13150);
+        if (inval < 129600) return 6872.50 + 0.25 * (inval - 50200);
+        if (inval < 209850) return 26722.50 + 0.28 * (inval - 129600);
+        if (inval < 411500) return 49192.50 + 0.33 * (inval - 209850);
+        if (inval < 439000) return 115737 + 0.35 * (inval - 411500);
+        return 125362 + 0.396 * (inval - 439000);
+    }
 }
 
 var eitc = function(income, k){
@@ -86,13 +115,16 @@ def Situation(x):
 def fstatus():
     return status
 
-#2014 tax rate schedules
+#2015 tax rate schedules
+#Single taxpayers only for now
 def tax_calc(inval):
-    if inval < 9075: return .1*inval
-    if inval < 36900: return 907.50  + .15*(inval-9075)
-    if inval < 89350: return 5081.25 + .25*(inval-36900)
-    if inval < 186350: return 18193.75 + .28*(inval-89350)
-    if inval < 405100: return 45353.75 + .33*(inval-186350)
+    if inval < 9225: return inval * 0.1
+    if inval < 37450: return 922.50  + 0.15 * (inval - 9225)
+    if inval < 90750: return 5156.25 + 0.25 * (inval - 37450)
+    if inval < 189300: return 18481.25 + 0.28 * (inval - 90750)
+    if inval < 411500: return 46075.25 + 0.33 * (inval - 189300)
+    if inval < 413200: return 119401.25 + 0.35 * (inval - 411500)
+    return 119996.25 + 0.396 * (inval - 413200)
 
 def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
