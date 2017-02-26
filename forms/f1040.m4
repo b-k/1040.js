@@ -266,10 +266,10 @@ Cell(tax_minus_credits, 56,Tax minus credits, <|max(CV(pretotal_tax)-CV(total_cr
 #60 a Household employment taxes from Schedule H
 #b First-time homebuyer credit repayment. Attach Form 5405 if required
 
-Cell(obamacare_fee, 61,Health care individual responsibility,, u)
+Cell(aca_fee, 61,Health care individual responsibility,, u)
 
 #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
-Cell(total_tax, 63,Total tax, <|SUM(tax_minus_credits, obamacare_fee)|>)
+Cell(total_tax, 63,Total tax, <|SUM(tax_minus_credits, aca_fee)|>)
 Cell(federal_tax_withheld, 65,Federal income tax withheld from Forms W-2 and 1099,, u)
 
 Cell(payments_divider, 63.9,>>>>>>>>>>>> Payments                              , 0)
