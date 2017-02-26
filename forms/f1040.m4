@@ -6,37 +6,37 @@ var exemption_multiplier=4000  //changes annually
 var tax_calc = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        if (inval < 9225) return inval * 0.1;
-        if (inval < 37450) return 922.50 + 0.15 * (inval - 9225);
-        if (inval < 90750) return 5156.25 + 0.25 * (inval - 37450);
-        if (inval < 189300) return 18481.25 + 0.28 * (inval - 90750);
-        if (inval < 411500) return 46075.25 + 0.33 * (inval - 189300);
-        if (inval < 413200) return 119401.25 + 0.35 * (inval - 411500);
-        return 119996.25 + 0.396 * (inval - 413200);
+        if (inval < 9275) return inval * 0.1;
+        if (inval < 37650) return 927.50 + 0.15 * (inval - 9275);
+        if (inval < 91150) return 5183.75 + 0.25 * (inval - 37650);
+        if (inval < 190150) return 18558.75 + 0.28 * (inval - 91150);
+        if (inval < 413350) return 46278.75 + 0.33 * (inval - 190150);
+        if (inval < 415050) return 120529.75 + 0.35 * (inval - 413350);
+        return 120529.25 + 0.396 * (inval - 415050);
     } else if (filing_status == "married filing jointly") {
-        if (inval < 18450) return inval * 0.1;
-        if (inval < 74900) return 1845 + 0.15 * (inval - 18450);
-        if (inval < 151200) return 10312.50 + 0.25 * (inval - 74900);
-        if (inval < 230450) return 29387.50 + 0.28 * (inval - 151200);
-        if (inval < 411500) return 51577.50 + 0.33 * (inval - 230450);
-        if (inval < 464850) return 111324 + 0.35 * (inval - 411500);
-        return 129996.50 + 0.396 * (inval - 464850);
+        if (inval < 18550) return inval * 0.1;
+        if (inval < 75300) return 1855 + 0.15 * (inval - 18550);
+        if (inval < 151900) return 10367.50 + 0.25 * (inval - 75300);
+        if (fnval < 231450) return 29517.50 + 0.28 * (inval - 151900);
+        if (inval < 413350) return 51791.50 + 0.33 * (inval - 231450);
+        if (inval < 466950) return 111818.50 + 0.35 * (inval - 413350);
+        return 130578.50 + 0.396 * (inval - 466950);
     } else if (filing_status == "married") {
-        if (inval < 9225) return inval * 0.1;
-        if (inval < 37450) return 922.50 + 0.15 * (inval - 9225);
-        if (inval < 75600) return 5156.25 + 0.25 * (inval - 37450);
-        if (inval < 115225) return 14693.75 + 0.28 * (inval - 75600);
-        if (inval < 205750) return 25788.75 + 0.33 * (inval - 115225);
-        if (inval < 232425) return 55662 + 0.35 * (inval - 205750);
-        return 64998.25 + 0.396 * (inval - 232425);
+        if (inval < 9275) return inval * 0.1;
+        if (inval < 37650) return 927.50 + 0.15 * (inval - 9275);
+        if (inval < 75950) return 5183.75 + 0.25 * (inval - 37650);
+        if (inval < 115725) return 14758.75 + 0.28 * (inval - 75950);
+        if (inval < 206675) return 25895.75 + 0.33 * (inval - 115725);
+        if (inval < 233475) return 55909.25 + 0.35 * (inval - 206675);
+        return 65289.25 + 0.396 * (inval - 233475);
     } else if (filing_status == "head of household") {
-        if (inval < 13150) return inval * 0.1;
-        if (inval < 50200) return 1315 + 0.15 * (inval - 13150);
-        if (inval < 129600) return 6872.50 + 0.25 * (inval - 50200);
-        if (inval < 209850) return 26722.50 + 0.28 * (inval - 129600);
-        if (inval < 411500) return 49192.50 + 0.33 * (inval - 209850);
-        if (inval < 439000) return 115737 + 0.35 * (inval - 411500);
-        return 125362 + 0.396 * (inval - 439000);
+        if (inval < 13250) return inval * 0.1;
+        if (inval < 50400) return 1325 + 0.15 * (inval - 13250);
+        if (inval < 130150) return 6897.50 + 0.25 * (inval - 50400);
+        if (inval < 210800) return 26835 + 0.28 * (inval - 130150);
+        if (inval < 413350) return 49417 + 0.33 * (inval - 210800);
+        if (inval < 441000) return 116258.50 + 0.35 * (inval - 413350);
+        return 125936 + 0.396 * (inval - 441000);
     }
 }
 
@@ -46,10 +46,10 @@ var eitc = function(income, k){
     if (isNaN(kids)) kids = 0;
     //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     //phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
-    data=[[7.65, 6610, 506, 8270, 7.65, 14880],
-          [34, 9920, 3373,  18190, 15.98, 39296],
-          [40, 13931, 5572, 18190, 21.06, 44648],
-          [45, 13930, 6269, 18190, 21.06, 47955]];
+    data=[[7.65, 6670, 510, 8340, 7.65, 15010],
+          [34, 10000, 3400,  18340, 15.98, 39617],
+          [40, 14040, 5616, 18340, 21.06, 45007],
+          [45, 14040, 6318, 18340, 21.06, 48340]];
      row = Math.min(kids,3);
     //if (income < 0) print("Negative income! (%s) Please fix." % (income,))
     if (income >= data[row][5]) return 0;
@@ -120,45 +120,45 @@ def fstatus():
 def tax_calc(inval):
     filing_status = fstatus()
     if filing_status == "single":
-        if inval < 9225: return inval * 0.1
-        if inval < 37450: return 922.50 + 0.15 * (inval - 9225)
-        if inval < 90750: return 5156.25 + 0.25 * (inval - 37450)
-        if inval < 189300: return 18481.25 + 0.28 * (inval - 90750)
-        if inval < 411500: return 46075.25 + 0.33 * (inval - 189300)
-        if inval < 413200: return 119401.25 + 0.35 * (inval - 411500)
-        return 119996.25 + 0.396 * (inval - 413200)
+        if inval < 9275: return inval * 0.1
+        if inval < 37650: return 927.50 + 0.15 * (inval - 9275)
+        if inval < 91150: return 5183.75 + 0.25 * (inval - 37650)
+        if inval < 190150: return 18558.75 + 0.28 * (inval - 91150)
+        if inval < 413350: return 46278.75 + 0.33 * (inval - 190150)
+        if inval < 415050: return 120529.75 + 0.35 * (inval - 413350)
+        return 120529.25 + 0.396 * (inval - 415050)
     if filing_status == "married filing jointly":
-        if inval < 18450: return inval * 0.1
-        if inval < 74900: return 1845 + 0.15 * (inval - 18450)
-        if inval < 151200: return 10312.50 + 0.25 * (inval - 74900)
-        if inval < 230450: return 29387.50 + 0.28 * (inval - 151200)
-        if inval < 411500: return 51577.50 + 0.33 * (inval - 230450)
-        if inval < 464850: return 111324 + 0.35 * (inval - 411500)
-        return 129996.50 + 0.396 * (inval - 464850)
+        if inval < 18550: return inval * 0.1
+        if inval < 75300: return 1855 + 0.15 * (inval - 18550)
+        if inval < 151900: return 10367.50 + 0.25 * (inval - 75300)
+        if fnval < 231450: return 29517.50 + 0.28 * (inval - 151900)
+        if inval < 413350: return 51791.50 + 0.33 * (inval - 231450)
+        if inval < 466950: return 111818.50 + 0.35 * (inval - 413350)
+        return 130578.50 + 0.396 * (inval - 466950)
     if filing_status == "married":
-        if inval < 9225: return inval * 0.1
-        if inval < 37450: return 922.50 + 0.15 * (inval - 9225)
-        if inval < 75600: return 5156.25 + 0.25 * (inval - 37450)
-        if inval < 115225: return 14693.75 + 0.28 * (inval - 75600)
-        if inval < 205750: return 25788.75 + 0.33 * (inval - 115225)
-        if inval < 232425: return 55662 + 0.35 * (inval - 205750)
-        return 64998.25 + 0.396 * (inval - 232425)
+        if inval < 9275: return inval * 0.1
+        if inval < 37650: return 927.50 + 0.15 * (inval - 9275)
+        if inval < 75950: return 5183.75 + 0.25 * (inval - 37650)
+        if inval < 115725: return 14758.75 + 0.28 * (inval - 75950)
+        if inval < 206675: return 25895.75 + 0.33 * (inval - 115725)
+        if inval < 233475: return 55909.25 + 0.35 * (inval - 206675)
+        return 65289.25 + 0.396 * (inval - 233475)
     if filing_status == "head of household":
-        if inval < 13150: return inval * 0.1
-        if inval < 50200: return 1315 + 0.15 * (inval - 13150)
-        if inval < 129600: return 6872.50 + 0.25 * (inval - 50200)
-        if inval < 209850: return 26722.50 + 0.28 * (inval - 129600)
-        if inval < 411500: return 49192.50 + 0.33 * (inval - 209850)
-        if inval < 439000: return 115737 + 0.35 * (inval - 411500)
-        return 125362 + 0.396 * (inval - 439000)
+        if inval < 13250: return inval * 0.1
+        if inval < 50400: return 1325 + 0.15 * (inval - 13250)
+        if inval < 130150: return 6897.50 + 0.25 * (inval - 50400)
+        if inval < 210800: return 26835 + 0.28 * (inval - 130150)
+        if inval < 413350: return 49417 + 0.33 * (inval - 210800)
+        if inval < 441000: return 116258.50 + 0.35 * (inval - 413350)
+        return 125936 + 0.396 * (inval - 441000)
 
 def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     #phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
-    data=[[7.65, 6610, 506, 8270, 7.65, 14880],
-          [34, 9920, 3373,  18190, 15.98, 39296],
-          [40, 13931, 5572, 18190, 21.06, 44648],
-          [45, 13930, 6269, 18190, 21.06, 47955]]
+    data=[[7.65, 6670, 510, 8340, 7.65, 15010],
+          [34, 10000, 3400,  18340, 15.98, 39617],
+          [40, 14040, 5616, 18340, 21.06, 45007],
+          [45, 14040, 6318, 18340, 21.06, 48340]]
     row=kids if kids <=3 else 3
     if income < 0: print("Negative income! (%s) Please fix." % (income,))
     if income >= data[row][5]: return 0
