@@ -1,6 +1,4 @@
 jsversion(<|
-var exemption_multiplier=4000  //changes annually
-
 //2015 tax rate schedules
 //Could be inlined, but not going to bother.
 var tax_calc = function (inval){
@@ -106,8 +104,6 @@ var ctc_status = function(agi){
 |>)
 
 pyversion(<|
-exemption_multiplier=4000  #changes annually
-
 #in python at the moment, situations are just plain booleans
 def Situation(x):
     return x
@@ -241,10 +237,10 @@ Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(student_loan_interest_de
 
 #39 elderly, blind
 
-Cell(std_deduction,39.9,Standard deductions, <|Fswitch((married, 6300), (single, 6300), (married filing jointly, 12600), (head of household, 9250), 0)|>, )
+Cell(std_deduction,39.9,Standard deductions, <|Fswitch((married, 6300), (single, 6300), (married filing jointly, 12600), (head of household, 9300), 0)|>, )
 Cell(deductions,40,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions)|>)
-Cell(exemption_amount, 42,Exemption amount, <|CV(exemptions)*exemption_multiplier|>)
+Cell(exemption_amount, 42,Exemption amount (assuming income < $155k), <|CV(exemptions)*4050|>)
 Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions)-CV(exemption_amount), 0)|>, critical)
 Cell(tax, 44,Tax, <|tax_calc(CV(taxable_income))|>, critical)
 Cell(amt_1040,45, Alternative minimum tax from Form 6251, <|CV(f6251, amt)|>)
@@ -295,7 +291,7 @@ line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
 
 Cell(income_limit, 5, Income phase-out, <|Fswitch((married, 130000), 65000)|>, s_loans)
 Cell(diff, 6, total income minus phase-out limit, <|max(CV(f1040, total_in) - CV(income_limit), 0)|>, s_loans)
-Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000=married joint or 15,000 otherwise)|>, <|(CV(diff)+0.0)/Fswitch((married, 30000), 15000)|>, s_loans)
+Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000 if married joint, else 15,000)|>, <|(CV(diff)+0.0)/Fswitch((married, 30000), 15000)|>, s_loans)
 Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(diff_divided)|>, s_loans)
 Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
 
@@ -313,9 +309,6 @@ Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_rema
 m4_form(f1040_tax_refund_ws)
 Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on 2014 Schedule A|>,, u)
 Cell(last_year_itemized_deductions, 1, <|Enter line 29 of your 2014 Schedule A|>,, u)
-Cell(almost_std_deduction,3,Last year's standard deduction, <|Fswitch((married, 6200), (single, 6200), (married filing jointly, 12400), (head of household, 9100), 0)|>, )
-Cell(srblind,4, Senior or blind exemption,<|(Situation(over_65)+Situation(spouse_over_65))*Fswitch((married, 1200), (single, 1550), (married filing jointly, 1200), (head of household, 1550), 0)|>)
+Cell(almost_std_deduction,3,Last year's standard deduction, <|Fswitch((married, 6300), (single, 6300), (married filing jointly, 12600), (head of household, 9250), 0)|>, )
+Cell(srblind,4, Senior or blind exemption,<|(Situation(over_65)+Situation(spouse_over_65))*Fswitch((married, 1250), (single, 1550), (married filing jointly, 1250), (head of household, 1550), 0)|>)
 Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(last_year_refund), max(CV(last_year_itemized_deductions) - (CV(almost_std_deduction)+CV(srblind)), 0))|>, )
-
-
-
