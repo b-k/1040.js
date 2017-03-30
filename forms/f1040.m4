@@ -246,7 +246,7 @@ Cell(tax, 44,Tax, <|tax_calc(CV(taxable_income))|>, critical)
 Cell(amt_1040,45, Alternative minimum tax from Form 6251, <|CV(f6251, amt)|>)
 Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
 Cell(pretotal_tax, 47,Tax + AMT + F8962, <|SUM(tax, amt_1040, credit_repayment)|>)
-Cell(ftc,48, Foreign tax credit (UI), 0, u)
+Cell(ftc,48, Foreign tax credit, , u)
 #49 Credit for child and dependent care expenses. Attach Form 2441 49
 #50 Education credits from Form 8863, line 19 . . . . . 50
 #51 Retirement savings contributions credit. Attach Form 8880 51
@@ -302,7 +302,7 @@ Cell(credit_remaining, 6, <|$1,000 per child minus the subtraction|>, <|max(CV(a
 
 Line 8: Add the amounts from Form 1040, line 48, Form 1040, line 49, Form 1040, line 51, Form 5695, line 30, Form 1040, line 50, Form 8910, line 15, Form 8936, line 23, and Schedule R, line 22
 I just use FTC to stand in for all of that.
-Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, pretotal_tax) - CV(f1040, ftc)|>, have_kids)
+Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, pretotal_tax) - CV(f1040, ftc)|>, )
 Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_remaining))|>, have_kids)
 
 
