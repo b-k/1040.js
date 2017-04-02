@@ -253,7 +253,7 @@ Cell(ftc,48, Foreign tax credit, , u)
 #52 Child tax credit. Attach Schedule 8812, if required . . . 52
 #53 Residential energy credits. Attach Form 5695 . . . . 53
 #54 Other credits from Form: a 3800 b 8801 c 54
-Cell(total_credits, 55,Total credits, 0)
+Cell(total_credits, 55,Total credits, CV(ftc)) #Still using FTC as a stand-in for the whole list
 Cell(tax_minus_credits, 56,Tax minus credits, <|max(CV(pretotal_tax)-CV(total_credits) -CV(ctc_ws_1040, ctc), 0)|>, critical)
 
 #57 Self-employment tax. Attach Schedule SE 
