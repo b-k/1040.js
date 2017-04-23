@@ -200,6 +200,7 @@ Ce<||>ll(ira_income, 15,IRA distributions,, u)
 Cell(taxable_ira_income, 15.5,Taxable IRA distributions,, u)
 Ce<||>ll(pension,16,Pensions and annuities,, u over_65  spouse_over_65)
 Cell(taxable_pension,16.5,Pensions and annuities,, u over_65 spouse_over_65)
+Cell(rr_income,17,Rents and royalties from Schedule E,<|CV(f1040_sched_e,rr_income)|>,have_rr)
 Cell(farm_income, 18,Farm income from Schedule F (UI),, u)
 Cell(unemployment, 19,Unemployment compensation,, u)
 Ce<||>ll(ss_benefits, 20,Social security benefits,, u over_65 spouse_over_65)
@@ -207,7 +208,8 @@ Cell(taxable_ss_benefits, 20.5,Taxable social security benefits,, u over_65 spou
 Cell(other_in, 21,Other income.,, u)
 
 Cell(magi_total_in, 0,Total income for MAGI (PI), <|SUM(wages, interest, dividends, taxable_tax_refunds, alimony, sched_c, cap_gains, taxable_ira_income, taxable_pension, farm_income, unemployment, taxable_ss_benefits, other_in)|>)
-Cell(total_in, 22,Total income, <|CV(magi_total_in) + CV(f1040_sched_e, rr_income)|>)
+Cell(total_in, 22,Total income, <|CV(magi_total_in) + CV(rr_income)|>)
+
 
 Cell(agi_divider,22.9, >>>>>>>>>>>> AGI                                   , 0)
 
@@ -269,7 +271,7 @@ Cell(total_tax, 63,Total tax, <|SUM(tax_minus_credits, aca_fee)|>)
 Cell(federal_tax_withheld, 65,Federal income tax withheld from Forms W-2 and 1099,, u)
 
 Cell(payments_divider, 63.9,>>>>>>>>>>>> Payments                              , 0)
-#65 2016 estimated tax payments and amount applied from 2014 return 65
+#65 2016 estimated tax payments and amount applied from 2015 return 65
 Cell(eitc, 66.5,Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
 #b Nontaxable combat pay election 66b
 #67 Additional child tax credit. Attach Schedule 8812 . . . . . 67
@@ -307,8 +309,8 @@ Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_rema
 
 
 m4_form(f1040_tax_refund_ws)
-Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on 2014 Schedule A|>,, u)
-Cell(last_year_itemized_deductions, 1, <|Enter line 29 of your 2014 Schedule A|>,, u)
+Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on 20145Schedule A|>,, u)
+Cell(last_year_itemized_deductions, 1, <|Enter line 29 of your 2015 Schedule A|>,, u)
 Cell(almost_std_deduction,3,Last year's standard deduction, <|Fswitch((married, 6300), (single, 6300), (married filing jointly, 12600), (head of household, 9250), 0)|>, )
 Cell(srblind,4, Senior or blind exemption,<|(Situation(over_65)+Situation(spouse_over_65))*Fswitch((married, 1250), (single, 1550), (married filing jointly, 1250), (head of household, 1550), 0)|>)
 Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(last_year_refund), max(CV(last_year_itemized_deductions) - (CV(almost_std_deduction)+CV(srblind)), 0))|>, )

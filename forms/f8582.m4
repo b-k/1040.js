@@ -21,7 +21,7 @@ Cell(f8582_commercial_revitalization, 2, Commercial revitalization deductions (U
 Cell(f8582_passive_activities, 3, Passive activity income (UI), 0, have_rr)
 Cell(f8582_total_in, 4, Total in,  <|SUM(f8582_total_real_in, f8582_commercial_revitalization, f8582_passive_activities)|>, have_rr)
 
-Cell(f8582_min, 5, the smaller of the loss on line 1d or the loss on line 4, <|max(min(CV(f8582_total_real_in),0), min(CV(f8582_total_in),0))|>, have_rr)
+Cell(f8582_min, 5, the smaller of the loss on line 1d or the loss on line 4, <|max(min(CV(f8582_net_loss),0), min(CV(f8582_total_in),0)))|>, have_rr)
 
 Cell(magi, 7, MAGI, <|CV(f1040, MAGI)|>, have_rr)
 
