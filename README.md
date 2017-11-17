@@ -47,3 +47,17 @@ calculation. There are some details for people making over $155,000/year (AGI) w
 will handle if any of the contributors ever have that problem. The code is open source,
 and you are encouraged to add cells or logical nuances that apply to your situation;
 see Contributing.md for details.
+
+Citing it
+========
+Here is some information for citing this project in an academic setting:
+
+> Author = Ben Klemens
+>
+> Title = 1040.js
+>
+> DOI = 10.5281/zenodo.1054109
+>
+> year = 2017
+
+The author does work the US Treasury's Office of Tax Analysis, but because this is an unofficial release in no way officially reviewed by Treasury, please do not list an affiliation.
