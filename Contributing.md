@@ -49,11 +49,10 @@ one argument like `CV(mine_rescue_training_credit_carryback)`, it refers to a ce
 the current form. To refer to a cell on another form, use two arguments: `CV(f3800,
 mine_rescue_training_credit_carryback)`.
 
-You can also use `SUM(cell1, cell2, cell3,...)`. All the usual math, including max and
-min, are also options. These will all be cells on the current form; you are stuck with
+You can also use `SUM(cell1, cell2, cell3,...)`. These will all be cells on the current form; you are stuck with
 directly summing `CV`s if you need to refer to other forms.
 
-`max(a, b)` and `min(a, b)` do what you expect.
+All the usual basic mathematical functions, like `max(a, b)` and `min(a, b)`, are also options.
 
 `Situation(x)`: There are a number of binary options describing the filer's situation.
 Favorites include:
@@ -69,39 +68,52 @@ else c". Note that this easily nests, like
 
 `Fswitch((married, 0), (single, 12), 27)`: if filing status is married, 0; if it
 is single, 12, otherwise 27. Options are:
-`married
+```
+married
 married filing jointly
 single
-head of household`
+head of household
+```
 The macro requires that final catch-all option, even if you cover all four options.
 
 Those cover the great majority of what is on a tax form, and if you stick to these
 we'll have a programming-language-independent implementation of the tax code.  If you
 need more, write a function and call it from the cell.
 
-How dependencies are calculated
+Those `<||>`s and how dependencies are calculated
 =====
 
-m4 does it by searching the formula for instances of `CV(x)` and `SUM(y,z)`. If it finds
+A `<| |>` pair tells m4 to treat the given
+element as a single blob for the purposes of evaluating the `Cell` macro, regardless of how many
+commas or macros it contains. Pedantic people would put them everywhere, like
+```
+Cell(<|interest|>, <|8|>, <|Taxable interest|>, <|  |>, <|u|>)
+```
+but that's visual noise and you really only need it around things with commas or other macros.
+
+Another nice trick: `Ce<||>ll` is not intelligible as a macro, so that effectively comments out the cell to m4.
+
+Dependencies are calculated by defining `Cell`  as a macro that searches the formula for
+instances of `CV(x)` and `SUM(y,z)`. If it finds
 those, it indicates that the named cell depends on those elements. Thus, if you are doing
 something complicated that hides the dependencies, you may want to add it to the
 calculation in a trivial way, like `<|do_math_on_agi() + 0*CV(AGI)|>`.
 
 Dependency tracking is why you need the <|angle-pipe brackets|>, by the way: without
 them, the `CV` and `SUM` macros get expanded away, and the dependency-checker doesn't
-see them; the brackets indicate that the text needs to be sent with `CV`s and `SUM`s
-in place.
+see them. The brackets tell m4 to evaluate `CV`s and `SUM`s after `Cell` is evaluated, not
+before.
 
 The two other macros
 =====
 
 `m4_form(f1040)` The form you are working on. Needed once at the top of the file.
 
-`jsversion(<|  |>)` The goal is for cell definitions to be language-agnostic, which we
-can do when the math is just sums, maxes, and mins, but most languages have different
-rules for function definitions. If you are writing a function for a nontrivial cell
-calculation, put the javascript version in this region. See f1040.m4 for an example.
-Adding `pyversion(<|  |>)` is optional.
+`jsversion(<|  |>)`, `pyversion(<|  |>)` The goal is for cell definitions to be
+language-agnostic, which we can do when the math is just sums, maxes, and mins, but
+most languages have different rules for function definitions. If you are writing a
+function for a nontrivial cell calculation, put the version for javascript, python,
+or your own favorite language in such a region. See f1040.m4 for an example.
 
-Anything that is not inside the parens of `Form`, `jsversion`, or `Cell` is ignored, so
+Anything that is not inside the parens of `Form`, `jsversion`/`pyversion`, or `Cell` is ignored, so
 feel free to leave comments between these elements.
