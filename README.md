@@ -22,6 +22,13 @@ think they're so crazy difficult. How can I walk them through the process?
 interest deduction to a mortgage interest credit. How can I get an idea of what those
 changes would look like?
 
+On privacy
+========
+
+The web page is completely standalone. All the math happens in your browser; no data
+is sent to any server.
+
+
 Doing your taxes
 ========
 
