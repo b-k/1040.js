@@ -35,8 +35,10 @@ as the original. Technically, it does not hide intermediate steps from the user,
 it is hard to argue that its layout of a long list of lines, many of which refer to
 lines on other forms, makes the flow at all clear.
 
-FFFF does most but not all calculations, so it can be productive to do your taxes
+FFFF is written, but at best partially maintained, by Intuit, and leaves the user to
+do some calculations him or herself. So it can be productive to check your math math
 using this tax graph, then use the results to fill in the missing calculations at FFFF.
+
 
 Caveats
 ========
