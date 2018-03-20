@@ -72,7 +72,7 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 </style>
 
 <body>
-The 2016 U.S. tax graph<br>
+The 2017 U.S. tax graph<br>
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
 
