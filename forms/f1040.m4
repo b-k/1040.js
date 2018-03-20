@@ -112,8 +112,7 @@ def Situation(x):
 def fstatus():
     return status
 
-#2016 tax rate schedules
-#Single taxpayers only for now
+#tax rate schedules---a reformat from the JS version above.
 def tax_calc(inval):
     filing_status = fstatus()
     if filing_status == "single":
@@ -272,7 +271,7 @@ Cell(total_tax, 63,Total tax, <|SUM(tax_minus_credits, aca_fee)|>)
 Cell(federal_tax_withheld, 65,Federal income tax withheld from Forms W-2 and 1099,, u)
 
 Cell(payments_divider, 63.9,>>>>>>>>>>>> Payments                              , 0)
-#65 2016 estimated tax payments and amount applied from 2015 return 65
+#65 2017 estimated tax payments and amount applied from 2015 return 65
 Cell(eitc, 66.5,Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
 #b Nontaxable combat pay election 66b
 #67 Additional child tax credit. Attach Schedule 8812 . . . . . 67
@@ -287,7 +286,7 @@ Cell(refund, 75,Refund!, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
 Cell(tax_owed, 78,Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
 
 m4_form(student_loan_ws_1040)
-Cell(student_loan_interest, 1,Interest you paid in 2016 on qualified student loans,, u s_loans)
+Cell(student_loan_interest, 1,Interest you paid in 2017 on qualified student loans,, u s_loans)
 Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
 line 3 is a sum of 1040 lines 23--32, all of which are UI
 line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
