@@ -313,10 +313,5 @@ Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up
 Cell(last_year_itemized_deductions, 1, <|Enter line 29 of your 2015 Schedule A|>,, u)
 Cell(almost_std_deduction,3,Last year's standard deduction, <|Fswitch((married, 6300), (single, 6300), (married filing jointly, 12600), (head of household, 9300), 0)|>, )
 Cell(srblind,4, <|Senior or blind exemption (blind not implemented)|>,
-            <|
-            (Situation(over_65)+Situation(spouse_over_65)==1)*
-                Fswitch((married, 7600), (single, 7900), (married filing jointly, 13950), (head of household, 10900), 0)
-            + (Situation(over_65)+Situation(spouse_over_65)==2)*
-                Fswitch((married, 8850), (single, 7900), (married filing jointly, 15200), (head of household, 12450), 0)
-            |>)
+            <|(Situation(over_65)+Situation(spouse_over_65)==1)* Fswitch((married, 7600), (single, 7900), (married filing jointly, 13950), (head of household, 10900), 0) + (Situation(over_65)+Situation(spouse_over_65)==2)* Fswitch((married, 8850), (single, 7900), (married filing jointly, 15200), (head of household, 12450), 0)|>)
 Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(last_year_refund), max(CV(last_year_itemized_deductions) - (CV(almost_std_deduction)+CV(srblind)), 0))|>, )
