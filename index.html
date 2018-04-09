@@ -379,7 +379,7 @@ g.setNode("f8582_f8582_total_real_in",  { label: "f8582_total_real_in", baselabe
 g.setNode("f8582_f8582_commercial_revitalization",  { label: "f8582_commercial_revitalization", baselabel: "f8582_commercial_revitalization", form: "f8582", fullname: "Commercial revitalization deductions (UI)", class: "a_node have_rr", val:0 , eqn: "0", last_eval:0 });
 g.setNode("f8582_f8582_passive_activities",  { label: "f8582_passive_activities", baselabel: "f8582_passive_activities", form: "f8582", fullname: "Passive activity income (UI)", class: "a_node have_rr", val:0 , eqn: "0", last_eval:0 });
 g.setNode("f8582_f8582_total_in",  { label: "f8582_total_in", baselabel: "f8582_total_in", form: "f8582", fullname: "Total in", class: "a_node have_rr", val:0 , eqn: "Cv('f8582_f8582_total_real_in') + Cv('f8582_f8582_commercial_revitalization') + Cv('f8582_f8582_passive_activities') + 0", last_eval:0 });
-g.setNode("f8582_f8582_min",  { label: "f8582_min", baselabel: "f8582_min", form: "f8582", fullname: "the smaller of the loss on line 1d or the loss on line 4", class: "a_node have_rr", val:0 , eqn: "max(min(Cv('f8582_f8582_net_loss'),0), min(Cv('f8582_f8582_total_in'),0))", last_eval:0 });
+g.setNode("f8582_f8582_min",  { label: "f8582_min", baselabel: "f8582_min", form: "f8582", fullname: "the smaller of the loss on line 1d or the loss on line 4", class: "a_node have_rr", val:0 , eqn: "max(min(Cv('f8582_f8582_total_real_in'),0), min(Cv('f8582_f8582_total_in'),0))", last_eval:0 });
 g.setNode("f8582_magi",  { label: "magi", baselabel: "magi", form: "f8582", fullname: "MAGI", class: "a_node have_rr", val:0 , eqn: "Cv('f1040_MAGI')", last_eval:0 });
 g.setNode("f8582_f8582_half",  { label: "f8582_half", baselabel: "f8582_half", form: "f8582", fullname: "Half of line 8, up to 25k", class: "a_node have_rr", val:0 , eqn: "-min(25000, max(150000 - max(Cv('f8582_magi'), 0), 0)/2.)", last_eval:0 });
 g.setNode("f8582_allowed_real_losses",  { label: "allowed_real_losses", baselabel: "allowed_real_losses", form: "f8582", fullname: "Allowed real estate losses", class: "a_node have_rr", val:0 , eqn: "max(Cv('f8582_f8582_min'), Cv('f8582_f8582_half'))", last_eval:0 });
@@ -493,7 +493,7 @@ set_edges("f8582_f8582_net_loss", ["f8582_ws1_8582_net_loss",  ""])
 set_edges("f8582_f8582_carryover", ["f8582_ws1_8582_prior_loss", "f8582_ws1_8582_prior_loss", "f8582_ws1_8582_prior_loss",  ""])
 set_edges("f8582_f8582_total_real_in", ["f8582_f8582_net_in", "f8582_f8582_net_loss", "f8582_f8582_carryover",  ""])
 set_edges("f8582_f8582_total_in", ["f8582_f8582_total_real_in", "f8582_f8582_commercial_revitalization", "f8582_f8582_passive_activities",  ""])
-set_edges("f8582_f8582_min", ["f8582_f8582_net_loss", "f8582_f8582_total_in",  ""])
+set_edges("f8582_f8582_min", ["f8582_f8582_total_real_in", "f8582_f8582_total_in",  ""])
 set_edges("f8582_magi", ["f1040_MAGI",  ""])
 set_edges("f8582_f8582_half", ["f8582_magi",  ""])
 set_edges("f8582_allowed_real_losses", ["f8582_f8582_min", "f8582_f8582_half",  ""])
