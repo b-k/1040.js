@@ -71,6 +71,8 @@ var fstatus = function(){
 
 var max = function(a,b) { return Math.max(a,b)}
 var min = function(a,b) { return Math.min(a,b)}
+var Floor = function(a) { return Math.floor(a)}
+var Ceil = function(a) { return Math.ceil(a)}
 
 var exemption_fn = function(){
     var ct = 1
@@ -171,7 +173,13 @@ def exemption_fn():
 def thousandkids():
     return kids*1000
 
+def Floor(x):
+    return int(x)
+
 from math import ceil
+def Ceil(x):
+    return ceil(x)
+
 def ctc_status(agi):
     ded=0;
     status = fstatus();
