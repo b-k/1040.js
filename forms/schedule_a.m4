@@ -21,9 +21,9 @@ Cell(total_taxes_deducted, 9, Total taxes paid to be deducted, <|SUM(local_taxes
 Cell(reported_mort_interest, 10, Home mortgage interest/points reported on Form 1099,, u itemizing mort)
 Cell(unreported_mort_interest, 11, Home mortgage interest not reported on Form 1098,, u itemizing mort)
 Cell(unreported_mort_points, 12, Home mortgage points not reported on Form 1098,, u itemizing mort)
-Cell(mort_insurance_premia_in, 13, Mortgage insurance premiums,, u itemizing mort)
-Cell(mort_insurance_limit, 13a, mort insurance limit, <|IF((CV(f1040,AGI) - Fswitch((married,50000),100000)) < 0, 1, max(0,min(1,1-Ceil((CV(f1040,AGI) - Fswitch((married, 50000), 100000))/1000)/10.)))|>, itemizing mort)
-Cell(mort_insurance_premia, 13, Mortgage insurance premiums claimed,<|CV(mort_insurance_premia_in)*CV(mort_insurance_limit)|>,  itemizing mort)
+Cell(mort_insurance_premia_in, 13, Mortgage insurance premiums in,, u itemizing mort)
+Cell(mort_insurance_limit, 13.1, mort insurance limit, <|IF((CV(f1040,AGI) - Fswitch((married,50000),100000)) < 0, 1, max(0,min(1,1-Ceil((CV(f1040,AGI) - Fswitch((married, 50000), 100000))/1000)/10.)))|>, itemizing mort)
+Cell(mort_insurance_premia, 13.2, Mortgage insurance premiums claimed,<|CV(mort_insurance_premia_in)*CV(mort_insurance_limit)|>,  itemizing mort)
 Cell(investment_interest, 14, Investment interest,, u itemizing)
 Cell(total_interest_deduction, 15, Total interest to deduct, <|SUM(reported_mort_interest, unreported_mort_interest, unreported_mort_points, mort_insurance_premia, investment_interest)|>, itemizing)
 
