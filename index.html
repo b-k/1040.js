@@ -178,6 +178,8 @@ var fstatus = function(){
 
 var max = function(a,b) { return Math.max(a,b)}
 var min = function(a,b) { return Math.min(a,b)}
+var Floor = function(a) { return Math.floor(a)}
+var Ceil = function(a) { return Math.ceil(a)}
 
 var exemption_fn = function(){
     var ct = 1
@@ -322,7 +324,9 @@ g.setNode("f1040_sched_a_total_taxes_deducted",  { label: "total_taxes_deducted"
 g.setNode("f1040_sched_a_reported_mort_interest",  { label: "reported_mort_interest", baselabel: "reported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest/points reported on Form 1099", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_unreported_mort_interest",  { label: "unreported_mort_interest", baselabel: "unreported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest not reported on Form 1098", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_unreported_mort_points",  { label: "unreported_mort_points", baselabel: "unreported_mort_points", form: "f1040_sched_a", fullname: "Home mortgage points not reported on Form 1098", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_mort_insurance_premia",  { label: "mort_insurance_premia", baselabel: "mort_insurance_premia", form: "f1040_sched_a", fullname: "Mortgage insurance premiums", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_mort_insurance_premia_in",  { label: "mort_insurance_premia_in", baselabel: "mort_insurance_premia_in", form: "f1040_sched_a", fullname: "Mortgage insurance premiums", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_mort_insurance_limit",  { label: "mort_insurance_limit", baselabel: "mort_insurance_limit", form: "f1040_sched_a", fullname: "mort insurance limit", class: "a_node itemizing mort", val:0 , eqn: "(((Cv('f1040_AGI') - ((fstatus()=='married') ? (50000) : (100000 )) ) < 0) ? (1) : (max(0,min(1,1-Ceil((Cv('f1040_AGI') - ((fstatus()=='married') ? (50000) : (100000 )) )/1000)/10.))))", last_eval:0 });
+g.setNode("f1040_sched_a_mort_insurance_premia",  { label: "mort_insurance_premia", baselabel: "mort_insurance_premia", form: "f1040_sched_a", fullname: "Mortgage insurance premiums claimed", class: "a_node itemizing mort", val:0 , eqn: "Cv('f1040_sched_a_mort_insurance_premia_in')*Cv('f1040_sched_a_mort_insurance_limit')", last_eval:0 });
 g.setNode("f1040_sched_a_investment_interest",  { label: "investment_interest", baselabel: "investment_interest", form: "f1040_sched_a", fullname: "Investment interest", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_total_interest_deduction",  { label: "total_interest_deduction", baselabel: "total_interest_deduction", form: "f1040_sched_a", fullname: "Total interest to deduct", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_sched_a_reported_mort_interest') + Cv('f1040_sched_a_unreported_mort_interest') + Cv('f1040_sched_a_unreported_mort_points') + Cv('f1040_sched_a_mort_insurance_premia') + Cv('f1040_sched_a_investment_interest') + 0", last_eval:0 });
 g.setNode("f1040_sched_a_charity_cash",  { label: "charity_cash", baselabel: "charity_cash", form: "f1040_sched_a", fullname: "Gifts to charity by cash or check", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
@@ -467,6 +471,8 @@ set_edges("f1040_tax_refund_ws_taxable_refund", ["f1040_tax_refund_ws_last_year_
 set_edges("f1040_sched_a_agi_scaled", ["f1040_AGI",  ""])
 set_edges("f1040_sched_a_excess_medical", ["f1040_sched_a_medical_expenses", "f1040_sched_a_agi_scaled",  ""])
 set_edges("f1040_sched_a_total_taxes_deducted", ["f1040_sched_a_local_taxes", "f1040_sched_a_real_estate_taxes", "f1040_sched_a_property_taxes", "f1040_sched_a_other_taxes",  ""])
+set_edges("f1040_sched_a_mort_insurance_limit", ["f1040_AGI", "f1040_AGI",  ""])
+set_edges("f1040_sched_a_mort_insurance_premia", ["f1040_sched_a_mort_insurance_premia_in", "f1040_sched_a_mort_insurance_limit",  ""])
 set_edges("f1040_sched_a_total_interest_deduction", ["f1040_sched_a_reported_mort_interest", "f1040_sched_a_unreported_mort_interest", "f1040_sched_a_unreported_mort_points", "f1040_sched_a_mort_insurance_premia", "f1040_sched_a_investment_interest",  ""])
 set_edges("f1040_sched_a_charity_total", ["f1040_sched_a_charity_cash", "f1040_sched_a_charity_noncash", "f1040_sched_a_charity_carryover",  ""])
 set_edges("f1040_sched_a_total_expenses", ["f1040_sched_a_employee_expenses", "f1040_sched_a_tax_prep_fees", "f1040_sched_a_other_work_expenses",  ""])
