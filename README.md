@@ -43,7 +43,7 @@ it is hard to argue that its layout of a long list of lines, many of which refer
 lines on other forms, makes the flow at all clear.
 
 FFFF is written, but at best partially maintained, by Intuit, and leaves the user to
-do some calculations him or herself. So it can be productive to check your math math
+do some calculations him or herself. So it can be productive to check your math
 using this tax graph or py1040, then use the results to fill in the missing calculations
 at FFFF.
 
