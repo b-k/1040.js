@@ -32,9 +32,9 @@ is sent to any server.
 Doing your taxes
 ========
 
-If your sole interest is to "do" your taxes, there are many online services that will
-take in a list of numbers from you and spit out a bottom-line number, hiding what
-happens between beginning and end.
+If your sole interest is to "do" your taxes, you may prefer to use the Python project
+that uses the cell database from 1040.js to produce output that looks more like your
+tax form, at https://github.com/b-k/py1040 .
 
 You can also file directly with the IRS using FFFF [ https://www.freefilefillableforms.com ].
 IRS form 1040 was first developed in 1913, and largely retains the same organization
@@ -44,7 +44,8 @@ lines on other forms, makes the flow at all clear.
 
 FFFF is written, but at best partially maintained, by Intuit, and leaves the user to
 do some calculations him or herself. So it can be productive to check your math math
-using this tax graph, then use the results to fill in the missing calculations at FFFF.
+using this tax graph or py1040, then use the results to fill in the missing calculations
+at FFFF.
 
 
 Caveats
@@ -69,4 +70,4 @@ Here is some information for citing this project in an academic setting:
 >
 > year = 2017
 
-The author does work the US Treasury's Office of Tax Analysis, but because this is an unofficial release in no way officially reviewed by Treasury, please do not list an affiliation.
+The author does work at the US Treasury's Office of Tax Analysis, but because this is an unofficial release in no way officially reviewed by Treasury, please do not list an author affiliation.
