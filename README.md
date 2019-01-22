@@ -4,16 +4,14 @@ You're viewing the source repository; try the graph itself at https://b-k.github
 
 You might use this utility to answer questions like:
 
-* What is the overall flow from W-2s and 1099s to the final refund?
+* What is the overall flow from income statements to the final refund?
 
 * If my tax situation changes, like buying a house or having a kid, how does the shape of my taxes change?
 
 * People keep telling me that having an IRA will reduce my tax bill. By how much?
 
 * If I had a million dollars, what would my taxes look like? What would they look like
-if I made it all in capital gains? [But please note there are some details for people
-making over $155,000/year that 1040.js doesn't yet handle. This has not been a problem for
-any of the contributors.]
+if I made it all in capital gains?
 
 * My mom/dad/libertarian friend complains about how taxes are overwhelmingly complicated, but I don't
 think they're so crazy difficult. How can I walk them through the process?
@@ -21,6 +19,9 @@ think they're so crazy difficult. How can I walk them through the process?
 * A lawmaker has proposed changing tax law, like a flat tax or changing the mortgage
 interest deduction to a mortgage interest credit. How can I get an idea of what those
 changes would look like?
+
+* If you have cloned a copy of the repository, you can rebuild with the version tagged `2017` and do
+a side-to-side comparison of how taxes worked before and after the reform in December 2017.
 
 On privacy
 ========

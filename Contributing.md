@@ -44,7 +44,7 @@ What goes into a formula
 Basic arithmetic is always available, but you will almost certainly need to use one or
 more of the following macros.
 
-CV=cell value, and you can use that function to refer to any other cell. With
+CV=cell value, to refer to any other cell. With
 one argument like `CV(mine_rescue_training_credit_carryback)`, it refers to a cell on
 the current form. To refer to a cell on another form, use two arguments: `CV(f3800,
 mine_rescue_training_credit_carryback)`.
@@ -100,14 +100,14 @@ something complicated that hides the dependencies, you may want to add it to the
 calculation in a trivial way, like `<|do_math_on_agi() + 0*CV(AGI)|>`.
 
 Dependency tracking is why you need the <|angle-pipe brackets|>, by the way: without
-them, the `CV` and `SUM` macros get expanded away, and the dependency-checker doesn't
-see them. The brackets tell m4 to evaluate `CV`s and `SUM`s after `Cell` is evaluated, not
-before.
+them, the `CV` and `SUM` macros get expanded before the dependency-checker
+sees them. The brackets tell m4 to be lazy and evaluate `CV`s and `SUM`s after `Cell` is evaluated.
 
 The two other macros
 =====
 
-`m4_form(f1040)` The form you are working on. Needed once at the top of the file.
+`m4_form(f1040)` The form you are working on. Everything until the next form delcaration
+or end of file is on this form.
 
 `jsversion(<|  |>)`, `pyversion(<|  |>)` The goal is for cell definitions to be
 language-agnostic, which we can do when the math is just sums, maxes, and mins, but
