@@ -201,6 +201,24 @@ m4_form(f1040sch1)
     Cell(other_in, 21,Other income.,, u)
     Cell(sch1_magi_subtotal, 22, Schedule 1 subtotal, <|SUM(taxable_tax_refunds, alimony, sched_c, cap_gains, farm_income, unemployment, other_in)|>)
 
+
+Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
+#23 Educator expenses . . . . . . . . . . . 23
+#24 Certain business expenses of reservists, performing artists, and fee-basis government officials. Attach Form 2106 or 2106-EZ 24
+#25 Health savings account deduction. Attach Form 8889 . 25
+#26 Moving expenses, Form 3903 . . . . . . 26
+#27 Deductible part of self-employment tax from Schedule SE . 27
+#28 Self-employed SEP, SIMPLE, and qualified plans . . 28
+#29 Self-employed health insurance deduction . . . . 29
+#30 Penalty on early withdrawal of savings . . . . . . 30
+#31a Alimony paid
+#32 IRA deduction . . . . . . . . . . . . . 32
+Cell(ira_deduction, 32, IRA deduction, ,u)
+Cell(student_loan_interest_ded, 33, Student loan interest deduction , <|CV(student_loan_ws_1040, final_credit)|>, s_loans)
+#tuition and fees subtraction, DPAD eliminated in 2017
+
+Cell(subtractions_from_income, 36,Sum of subtractions from gross income (UI), <|SUM(ira_deduction, student_loan_interest_ded)|>)
+
 m4_form(f1040)
 
 Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , 0)
@@ -216,29 +234,11 @@ Cell(total_in, 22,Total income, <|CV(magi_total_in) + CV(f1040sch1, rr_income)|>
 
 Cell(agi_divider,22.9, >>>>>>>>>>>> AGI                                   , 0)
 
-#23 Educator expenses . . . . . . . . . . . 23
-#24 Certain business expenses of reservists, performing artists, and
-#fee-basis government officials. Attach Form 2106 or 2106-EZ 24
-#25 Health savings account deduction. Attach Form 8889 . 25
-#26 Moving expenses. Attach Form 3903 . . . . . . 26
-#27 Deductible part of self-employment tax. Attach Schedule SE . 27
-#28 Self-employed SEP, SIMPLE, and qualified plans . . 28
-#29 Self-employed health insurance deduction . . . . 29
-#30 Penalty on early withdrawal of savings . . . . . . 30
-#31a Alimony paid b Recipient’s SSN ▶ 31a
-#32 IRA deduction . . . . . . . . . . . . . 32
-Cell(student_loan_interest_ded, 33, Student loan interest deduction , <|CV(student_loan_ws_1040, final_credit)|>, s_loans)
-#34 Tuition and fees. Attach Form 8917 . . . . . . . 34
-#35 Domestic production activities deduction. Attach Form 8903 35
-#36 Add lines 23 through 35 . . . . . . . . . . . . . . . . . . . 36
-
-Ce<||>ll(subtractions_from_income, 36,Sum of subtractions from gross income (UI), 0)
-
 Cell(t_and_i_divider, 36.9,>>>>>>>>>>>> Taxes and income                      , 0)
 
 no student loan deduction in MAGI---otherwise the law has an infinite loop
 Cell(MAGI, 0,Modified adjusted gross income, <|CV(magi_total_in)|>, have_rr)
-Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(student_loan_interest_ded)|>, critical)
+Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(f1040sch1, subtractions_from_income)|>, critical)
 
 #39 elderly, blind
 
@@ -289,14 +289,15 @@ Cell(tax_owed, 78,Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critic
 
 m4_form(student_loan_ws_1040)
 Cell(student_loan_interest, 1,Interest you paid in 2017 on qualified student loans,, u s_loans)
-Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
-line 3 is a sum of 1040 lines 23--32, all of which are UI
-line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
 
-Cell(income_limit, 5, Income phase-out, <|Fswitch((married, 130000), 65000)|>, s_loans)
-Cell(diff, 6, total income minus phase-out limit, <|max(CV(f1040, total_in) - CV(income_limit), 0)|>, s_loans)
-Cell(diff_divided, 7, <|total income minus phase-out limit/(30,000 if married joint, else 15,000)|>, <|(CV(diff)+0.0)/Fswitch((married, 30000), 15000)|>, s_loans)
-Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(diff_divided)|>, s_loans)
+Then the complicated phase-out calculation
+lines 2-4 are modified AGI before this point on the forms. With lines 23-32 unimplemented here,
+line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
+Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
+
+Cell(phase_out_pct, 6, total income minus phase-out limit, <|min(1, max(CV(f1040, total_in) - Fswitch((married, 135000), 65000), 0)/Fswitch((married, 30000), 15000))|>, s_loans)
+
+Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(phase_out_pct)|>, s_loans)
 Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
 
 m4_form(ctc_ws_1040)
