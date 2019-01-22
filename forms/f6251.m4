@@ -71,7 +71,7 @@ mort_interest_adjustment=cell(4, <|home mortgage interest adjustment, if any, fr
 
 Cell(misc_deductions, 5, Miscellaneous deductions from Schedule A, <|CV(f1040_sched_a, expenses_minus_agi_slice)|>, itemizing)
 amt_deduction_deduction=cell(6, <|Reduction for limited deductions (UI)|>, 0)
-Cell(amt_refund_deduction, 7, <|Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)|>, <|CV(f1040, taxable_tax_refunds)|>, itemizing)
+Cell(amt_refund_deduction, 7, <|Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)|>, <|CV(f1040sch1, taxable_tax_refunds)|>, itemizing)
 Cell(amt_investment_expense_deduction, 8, Investment interest expense (UI), 0, itemizing)
 Cell(amt_depletion_deduction, 9, Depletion (UI), 0, itemizing),
 Cell(nold, 10, NOLD (UI), 0, itemizing),
