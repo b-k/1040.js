@@ -203,7 +203,6 @@ m4_form(f1040sch1)
 
 m4_form(f1040)
 
-Cell(exemptions, 6, Exemptions,exemption_fn(), )
 Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , 0)
 Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
 Cell(interest, 2b,Taxable interest,  , u)
@@ -243,11 +242,10 @@ Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(student_loan_interest_de
 
 #39 elderly, blind
 
-Cell(std_deduction,39.9,Standard deductions, <|Fswitch((married, 6350), (single, 6350), (married filing jointly, 12700), (head of household, 9350), 0)|>, )
+Cell(std_deduction,39.9,Standard deductions, <|Fswitch((married, 12000), (single, 12000), (married filing jointly, 24000), (head of household, 18000), 0)|>, )
 Cell(deductions,40,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions)|>)
-Cell(exemption_amount, 42,Exemption amount (assuming income < $155k), <|CV(exemptions)*4050|>)
-Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions)-CV(exemption_amount), 0)|>, critical)
+Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions), 0)|>, critical)
 Cell(tax, 44,Tax, <|tax_calc(CV(taxable_income))|>, critical)
 Cell(amt_1040,45, Alternative minimum tax from Form 6251, <|CV(f6251, amt)|>)
 Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
