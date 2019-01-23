@@ -2,41 +2,47 @@ jsversion(<|
 //2017 tax rate schedules
 //Could be inlined, but not going to bother.
 // https://www.irs.gov/pub/irs-prior/f1040es--2017.pdf
-var tax_calc = function (inval){
+var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        if (inval < 9325) return inval * 0.1;
-        if (inval < 37950) return    932.50 + 0.15 * (inval - 9325);
-        if (inval < 91900) return   5226.25 + 0.25 * (inval - 37950);
-        if (inval < 191650) return 18713.75 + 0.28 * (inval - 91900);
-        if (inval < 416700) return 46643.75 + 0.33 * (inval - 191650);
-        if (inval < 418400) return 120910.25 + 0.35 * (inval - 416700);
-        return 121505.25 + 0.396 * (inval - 418400);
+        if (inval < 9525) return inval * 0.1;
+        if (inval < 38700) return    952.50 + 0.12 * (inval - 9525);
+        if (inval < 82500) return   4453.50 + 0.22 * (inval - 38700);
+        if (inval < 157500) return 14089.50 + 0.24 * (inval - 82500);
+        if (inval < 200000) return 32089.50 + 0.32 * (inval - 157500);
+        if (inval < 500000) return 45689.50 + 0.35 * (inval - 200000);
+        return 150689.50 + 0.37 * (inval - 500000);
     } else if (filing_status == "married filing jointly") {
-        if (inval < 18650) return inval * 0.1;
-        if (inval < 75900) return 1865 + 0.15 * (inval - 18650);
-        if (inval < 153100) return 10452.50 + 0.25 * (inval - 75900);
-        if (fnval < 233350) return 29752.50 + 0.28 * (inval - 153100);
-        if (inval < 416700) return 52222.50 + 0.33 * (inval - 233350);
-        if (inval < 470700) return 112728 + 0.35 * (inval - 416700);
-        return 131628 + 0.396 * (inval - 470700);
+        if (inval < 19050) return inval * 0.1;
+        if (inval < 77400) return 1905 + 0.12 * (inval - 19050);
+        if (inval < 165000) return 8907 + 0.22 * (inval - 77400);
+        if (fnval < 315000) return 28179 + 0.24 * (inval - 165000);
+        if (inval < 400000) return 64179 + 0.32 * (inval - 315000);
+        if (inval < 600000) return 91379 + 0.35 * (inval - 400000);
+        return 161379 + 0.37 * (inval - 600000);
     } else if (filing_status == "married") {
-        if (inval < 9325) return inval * 0.1;
-        if (inval < 37950) return 932.50 + 0.15 * (inval - 9325);
-        if (inval < 76550) return 5226.25 + 0.25 * (inval - 37950);
-        if (inval < 116675) return 14876.25 + 0.28 * (inval - 76550);
-        if (inval < 208350) return 26111.25 + 0.33 * (inval - 116675);
-        if (inval < 235350) return 56364 + 0.35 * (inval - 208350);
-        return 65814 + 0.396 * (inval - 235350);
+        if (inval < 9525) return inval * 0.1;
+        if (inval < 38700) return 952.50 + 0.12 * (inval - 9525);
+        if (inval < 82500) return 4453.50 + 0.22 * (inval - 38700);
+        if (inval < 157500) return 14089.50 + 0.24 * (inval - 82500);
+        if (inval < 200000) return 32089.50 + 0.32 * (inval - 157500);
+        if (inval < 300000) return 45689.50 + 0.35 * (inval - 200000);
+        return 80689.50 + 0.37 * (inval - 300000);
     } else if (filing_status == "head of household") {
-        if (inval < 13350) return inval * 0.1;
-        if (inval < 50800) return 1335 + 0.15 * (inval - 13350);
-        if (inval < 131200) return 6952.50 + 0.25 * (inval - 50800);
-        if (inval < 212500) return 27052.50 + 0.28 * (inval - 131200);
-        if (inval < 416700) return 49816.50 + 0.33 * (inval - 212500);
-        if (inval < 444550) return 117202.50 + 0.35 * (inval - 416700);
-        return 126950 + 0.396 * (inval - 444550);
+        if (inval < 13600) return inval * 0.1;
+        if (inval < 51800) return 1360 + 0.12 * (inval - 13600);
+        if (inval < 82500) return 5944 + 0.22 * (inval - 51800);
+        if (inval < 157500) return 12698 + 0.24 * (inval - 82500);
+        if (inval < 200000) return 30698 + 0.32 * (inval - 157500);
+        if (inval < 500000) return 44298 + 0.35 * (inval - 200000);
+        return 149298 + 0.37 * (inval - 500000);
     }
+}
+
+//The tax tables break income into $50 ranges, then uses the midpoint.
+var tax_calc = function (inval){
+    if (inval >=100000) return tax_table(inval)
+    return tax_table(Math.round(inval/50)*50 + 25)
 }
 
 var eitc = function(income, k){
@@ -115,40 +121,45 @@ def fstatus():
     return status
 
 #tax rate schedules---a reformat from the JS version above.
-def tax_calc(inval):
+def tax_table(inval):
     filing_status = fstatus()
     if filing_status == "single":
-        if inval < 9325: return inval * 0.1
-        if inval < 37950: return    932.50 + 0.15 * (inval - 9325)
-        if inval < 91900: return   5226.25 + 0.25 * (inval - 37950)
-        if inval < 191650: return 18713.75 + 0.28 * (inval - 91900)
-        if inval < 416700: return 46643.75 + 0.33 * (inval - 191650)
-        if inval < 418400: return 120910.25 + 0.35 * (inval - 416700)
-        return 121505.25 + 0.396 * (inval - 418400)
+        if inval < 9525: return inval * 0.1
+        if inval < 38700: return    952.50 + 0.12 * (inval - 9525)
+        if inval < 82500: return   4453.50 + 0.22 * (inval - 38700)
+        if inval < 157500: return 14089.50 + 0.24 * (inval - 82500)
+        if inval < 200000: return 32089.50 + 0.32 * (inval - 157500)
+        if inval < 500000: return 45689.50 + 0.35 * (inval - 200000)
+        return 150689.50 + 0.37 * (inval - 500000)
     if filing_status == "married filing jointly":
-        if inval < 18650: return inval * 0.1
-        if inval < 75900: return 1865 + 0.15 * (inval - 18650)
-        if inval < 153100: return 10452.50 + 0.25 * (inval - 75900)
-        if fnval < 233350: return 29752.50 + 0.28 * (inval - 153100)
-        if inval < 416700: return 52222.50 + 0.33 * (inval - 233350)
-        if inval < 470700: return 112728 + 0.35 * (inval - 416700)
-        return 131628 + 0.396 * (inval - 470700)
+        if inval < 19050: return inval * 0.1
+        if inval < 77400: return 1905 + 0.12 * (inval - 19050)
+        if inval < 165000: return 8907 + 0.22 * (inval - 77400)
+        if fnval < 315000: return 28179 + 0.24 * (inval - 165000)
+        if inval < 400000: return 64179 + 0.32 * (inval - 315000)
+        if inval < 600000: return 91379 + 0.35 * (inval - 400000)
+        return 161379 + 0.37 * (inval - 600000)
     if filing_status == "married":
-        if inval < 9325: return inval * 0.1
-        if inval < 37950: return 932.50 + 0.15 * (inval - 9325)
-        if inval < 76550: return 5226.25 + 0.25 * (inval - 37950)
-        if inval < 116675: return 14876.25 + 0.28 * (inval - 76550)
-        if inval < 208350: return 26111.25 + 0.33 * (inval - 116675)
-        if inval < 235350: return 56364 + 0.35 * (inval - 208350)
-        return 65814 + 0.396 * (inval - 235350)
+        if inval < 9525: return inval * 0.1
+        if inval < 38700: return 952.50 + 0.12 * (inval - 9525)
+        if inval < 82500: return 4453.50 + 0.22 * (inval - 38700)
+        if inval < 157500: return 14089.50 + 0.24 * (inval - 82500)
+        if inval < 200000: return 32089.50 + 0.32 * (inval - 157500)
+        if inval < 300000: return 45689.50 + 0.35 * (inval - 200000)
+        return 80689.50 + 0.37 * (inval - 300000)
     if filing_status == "head of household":
-        if inval < 13350: return inval * 0.1
-        if inval < 50800: return 1335 + 0.15 * (inval - 13350)
-        if inval < 131200: return 6952.50 + 0.25 * (inval - 50800)
-        if inval < 212500: return 27052.50 + 0.28 * (inval - 131200)
-        if inval < 416700: return 49816.50 + 0.33 * (inval - 212500)
-        if inval < 444550: return 117202.50 + 0.35 * (inval - 416700)
-        return 126950 + 0.396 * (inval - 444550)
+        if inval < 13600: return inval * 0.1
+        if inval < 51800: return 1360 + 0.12 * (inval - 13600)
+        if inval < 82500: return 5944 + 0.22 * (inval - 51800)
+        if inval < 157500: return 12698 + 0.24 * (inval - 82500)
+        if inval < 200000: return 30698 + 0.32 * (inval - 157500)
+        if inval < 500000: return 44298 + 0.35 * (inval - 200000)
+        return 149298 + 0.37 * (inval - 500000)
+
+# The tax tables break income into $50 ranges, then uses the midpoint.
+def tax_calc(inval):
+    if inval >=100000: return tax_table(inval)
+    return tax_table(round(inval/50)*50 + 25)
 
 def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
@@ -223,29 +234,29 @@ m4_form(f1040)
 
 Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , 0)
 Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
-Cell(interest, 2b,Taxable interest,  , u)
-Cell(dividends, 3b,Ordinary dividends,, u)
-Cell(iras_pensions, 4b,Taxable IRA distributions,, u)
+Cell(interest, 2.5,Taxable interest,  , u)
+Cell(dividends, 3.5,Ordinary dividends,, u)
+Cell(iras_pensions, 4.5,Taxable IRA distributions,, u)
 Cell(taxable_ss_benefits, 20.5,Taxable social security benefits,, u over_65 spouse_over_65)
 
-Cell(magi_total_in, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits)|>)
-Cell(total_in, 22,Total income, <|CV(magi_total_in) + CV(f1040sch1, rr_income)|>)
+Cell(MAGI, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits)|>)
+Cell(total_in, 22,Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
 
 
 Cell(agi_divider,22.9, >>>>>>>>>>>> AGI                                   , 0)
 
 Cell(t_and_i_divider, 36.9,>>>>>>>>>>>> Taxes and income                      , 0)
 
-no student loan deduction in MAGI---otherwise the law has an infinite loop
-Cell(MAGI, 0,Modified adjusted gross income, <|CV(magi_total_in)|>, have_rr)
-Cell(AGI, 37,Adjusted gross income, <|CV(total_in) - CV(f1040sch1, subtractions_from_income)|>, critical)
+Cell(AGI, 7,Adjusted gross income, <|CV(total_in) - CV(f1040sch1, subtractions_from_income)|>, critical)
 
-#39 elderly, blind
+Cell(std_deduction,8,Standard deductions, <|Fswitch((married, 12000), (single, 12000), (married filing jointly, 24000), (head of household, 18000), 0)|>, )
+Cell(deductions,8,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 
-Cell(std_deduction,39.9,Standard deductions, <|Fswitch((married, 12000), (single, 12000), (married filing jointly, 24000), (head of household, 18000), 0)|>, )
-Cell(deductions,40,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
-Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions)|>)
+Cell(qbi, 9, Qualified business income, , u)
+Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions) - CV(qbi)|>)
+
 Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions), 0)|>, critical)
+
 Cell(tax, 44,Tax, <|tax_calc(CV(taxable_income))|>, critical)
 Cell(amt_1040,45, Alternative minimum tax from Form 6251, <|CV(f6251, amt)|>)
 Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
