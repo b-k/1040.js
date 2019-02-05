@@ -300,15 +300,10 @@ Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
 Cell(interest, 2.5,Taxable interest,  , u)
 Cell(dividends, 3.5,Ordinary dividends,, u)
 Cell(iras_pensions, 4.5,Taxable IRA distributions,, u)
-Cell(taxable_ss_benefits, 20.5,Taxable social security benefits,, u over_65 spouse_over_65)
+Cell(taxable_ss_benefits, 5.5,Taxable social security benefits,, u over_65 spouse_over_65)
 
 Cell(MAGI, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits)|>)
-Cell(total_in, 22,Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
-
-
-Cell(agi_divider,22.9, >>>>>>>>>>>> AGI                                   , 0)
-
-Cell(t_and_i_divider, 36.9,>>>>>>>>>>>> Taxes and income                      , 0)
+Cell(total_in, 6,Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
 
 Cell(AGI, 7,Adjusted gross income, <|CV(total_in) - CV(f1040sch1, subtractions_from_income)|>, critical)
 
@@ -318,13 +313,11 @@ Cell(deductions,8,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_i
 Cell(qbi, 9, Qualified business income, , u)
 Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions) - CV(qbi)|>)
 
-Cell(taxable_income, 43,Taxable income, <|max(CV(agi_minus_deductions), 0)|>, critical)
+Cell(taxable_income, 10,Taxable income, <|max(CV(agi_minus_deductions), 0)|>, critical)
 
-Cell(tax, 44,Tax, <|tax_calc(CV(taxable_income))|>, critical)
-Cell(amt_1040,45, Alternative minimum tax (UI), <|0|>)
-Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
-Cell(pretotal_tax, 47,Tax + AMT + F8962, <|SUM(tax, amt_1040, credit_repayment)|>)
-Cell(ftc,48, Foreign tax credit, , u)
+Cell(tax, 11,Tax, <|tax_calc(CV(taxable_income))|>, critical)
+Cell(pretotal_tax, 47,Tax + AMT + F8962, <|CV(tax) + CV(f1040sch2, amt_1040) + CV(f1040sch2, credit_repayment)|>)
+Cell(ftc,48, Schedule 3: Foreign tax credit, , u)
 
 #49 Credit for child and dependent care expenses. Attach Form 2441 49
 #50 Education credits from Form 8863, line 19 . . . . . 50
@@ -335,20 +328,12 @@ Cell(ftc,48, Foreign tax credit, , u)
 #
 
 
-Cell(total_credits, 12.5,Total credits, CV(ftc)) #Still using FTC as a stand-in for the whole list
+Cell(total_credits, 12.5,Total nonrefundable credits, CV(ftc)) #Still using FTC as a stand-in for the whole list
 Cell(tax_minus_credits, 13,Tax minus credits, <|max(CV(pretotal_tax)-CV(total_credits) -CV(ctc_ws_1040, ctc), 0)|>, critical)
 
-#58 Unreported social security and Medicare tax from Form: a 4137 b 8919
-#59 Additional tax on IRAs, other qualified retirement plans, etc. Attach Form 5329 if required
-#60 a Household employment taxes from Schedule H
-#b First-time homebuyer credit repayment. Attach Form 5405 if required
-
-Cell(sch4_divider, 56.9,>>>>>>>>>>>> Schedule 4                            , 0)
-Cell(se_tax, 57,Self-employment tax,, u)
-Cell(aca_fee, 61,Health care individual responsibility,, u)
 
 #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
-Cell(total_tax, 15,Total tax, <|SUM(tax_minus_credits, aca_fee)|>)
+Cell(total_tax, 15,Total tax, <|CV(tax_minus_credits) + CV(f1040sch4, aca_fee)|>)
 
 Cell(payments_divider, 63.9,>>>>>>>>>>>> Payments                              , 0)
 Cell(federal_tax_withheld, 16,Federal income tax withheld from Forms W-2 and 1099,, u)
@@ -359,6 +344,13 @@ Cell(actc, 17.2, Refundable child tax credit, <|CV(ctc_sch8812, refundable_ctc)|
 Cell(total_payments, 18,Total payments, <|SUM(federal_tax_withheld, eitc, actc)|>)
 Cell(refund, 19, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
 Cell(tax_owed, 20,Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
+
+m4_form(f1040sch2)
+Cell(amt_1040, 45, Alternative minimum tax (UI), <|CV(f6251,amt)|>)
+Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
+
+m4_form(f1040sch4)
+Cell(aca_fee, 61,Health care individual responsibility,, u)
 
 m4_form(student_loan_ws_1040)
 Cell(student_loan_interest, 1,Interest you paid in 2017 on qualified student loans,, u s_loans)
@@ -381,7 +373,7 @@ Cell(credit_remaining, 6, <|$2,000 per child minus the subtraction|>, <|max(CV(t
 
 Line 8: Add the amounts from Form 1040, line 48, Form 1040, line 49, Form 1040, line 51, Form 5695, line 30, Form 1040, line 50, Form 8910, line 15, Form 8936, line 23, and Schedule R, line 22
 I just use FTC to stand in for all of that.
-Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, pretotal_tax) - CV(f1040, ftc)|>, )
+Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, tax) - CV(f1040, ftc)|>, )
 Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_remaining))|>, have_kids)
 
 m4_form(ctc_sch8812)
