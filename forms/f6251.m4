@@ -7,6 +7,7 @@ function get_amt_exemption(income){
     if (mfj && income) return 109400
     if (status=="married") return 54700
 
+    return 0
     //No longer calculating phase-out
 }
 
@@ -62,7 +63,7 @@ Cell(amt_depletion_deduction, 2.2, Depletion (UI), 0, itemizing),
 Cell(nold, 2.25, NOLD (UI), 0, itemizing),
 Cell(amt_nold, 2.3, Alt NOLD (UI), 0, itemizing),
 
-Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|CV(f1040, agi_minus_deductions) + CV(taxes_deducted) + CV(amt_refund_deduction) + CV(amt_investment_expense_deduction) + CV(amt_depletion_deduction) + CV(nold) + CV(amt_nold)|>, itemizing)
+Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|CV(agi_minus_ded) + CV(taxes_deducted) + CV(amt_refund_deduction) + CV(amt_investment_expense_deduction) + CV(amt_depletion_deduction) + CV(nold) + CV(amt_nold)|>, itemizing)
 
 Cell(amt_exemption, 5, AMT exemption, <|get_amt_exemption(CV(amt_income))|>, itemizing)
 Cell(amt_in_minus_exemption, 6, AMT income minus exemption, <|CV(amt_income)-CV(amt_exemption)|>, itemizing)
@@ -70,5 +71,5 @@ Cell(amt_in_minus_exemption, 6, AMT income minus exemption, <|CV(amt_income)-CV(
 Cell(amt_preftc, 7, Tentative AMT pre-FTC (Simplified), <|get_tamt(CV(amt_in_minus_exemption))|>, itemizing)
 Cell(amt_ftc, 8, AMT foreign tax credit (UI), 0, itemizing)
 Cell(amt_tentative, 9, Tentative AMT, <|CV(amt_preftc)-CV(amt_ftc)|>, itemizing)
-Cell(tax_from_1040, 10, Tax from F1040, <|CV(f1040, tax)+CV(f1040sch2, credit_repayment)-CV(f1040, ftc)|>, itemizing)
+Cell(tax_from_1040, 10, Tax from F1040, <|CV(f1040, tax)+CV(f1040sch2, credit_repayment)-CV(f1040sch3, ftc)|>, itemizing)
 Cell(amt, 11, AMT, <|max(CV(amt_tentative) - CV(tax_from_1040), 0)|>, itemizing)

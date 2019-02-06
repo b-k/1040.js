@@ -59,6 +59,19 @@ will handle if any of the contributors ever have that problem. The code is open 
 and you are encouraged to add cells or logical nuances that apply to your situation;
 see Contributing.md for details.
 
+Generally covered
+========
+
+* The overall flow of the 1040
+* Student loan interest deduction
+* Education Credits (f8863, up to 3 students)
+* Earned Income Credit
+* Child Tax Credit, including refundable portion
+* Schedule A, itemized deductions
+* Schedule E, rental/royalty income
+* Alternative minimum tax (f6251, but the simpler of the two calculations)
+* f8582, real estate loss carryover
+
 Citing it
 ========
 Here is some information for citing this project in an academic setting:

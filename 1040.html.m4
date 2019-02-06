@@ -88,7 +88,7 @@ m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="ch
 BOX(over_65, I am over 65.)
 
 BOX(spouse_over_65, My spouse is over 65.)
-BOX(s_loans, I have student loans.)
+BOX(s_loans, I have student loans or education expenses.)
 BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
 BOX(have_rr, I have rental or royalty income.)

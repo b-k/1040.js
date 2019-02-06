@@ -295,7 +295,6 @@ Cell(subtractions_from_income, 36,Sum of subtractions from gross income (UI), <|
 
 m4_form(f1040)
 
-Cell(income_divider, 6.9, >>>>>>>>>>>> Income                                   , 0)
 Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
 Cell(interest, 2.5,Taxable interest,  , u)
 Cell(dividends, 3.5,Ordinary dividends,, u)
@@ -316,38 +315,33 @@ Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions) -
 Cell(taxable_income, 10,Taxable income, <|max(CV(agi_minus_deductions), 0)|>, critical)
 
 Cell(tax, 11,Tax, <|tax_calc(CV(taxable_income))|>, critical)
-Cell(pretotal_tax, 47,Tax + AMT + F8962, <|CV(tax) + CV(f1040sch2, amt_1040) + CV(f1040sch2, credit_repayment)|>)
-Cell(ftc,48, Schedule 3: Foreign tax credit, , u)
+Cell(pretotal_tax, 47,Tax + AMT + F8962, <|CV(tax) + CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
 
-#49 Credit for child and dependent care expenses. Attach Form 2441 49
-#50 Education credits from Form 8863, line 19 . . . . . 50
-#51 Retirement savings contributions credit. Attach Form 8880 51
-#
-#53 Residential energy credits. Attach Form 5695 . . . . 53
-#54 Other credits from Form: a 3800 b 8801 c 54
-#
-
-
-Cell(total_credits, 12.5,Total nonrefundable credits, CV(ftc)) #Still using FTC as a stand-in for the whole list
-Cell(tax_minus_credits, 13,Tax minus credits, <|max(CV(pretotal_tax)-CV(total_credits) -CV(ctc_ws_1040, ctc), 0)|>, critical)
+Cell(tax_minus_credits, 13,Tax minus credits, <|max(CV(pretotal_tax)-CV(f1040sch3, nonrefundable_total) -CV(ctc_ws_1040, ctc), 0)|>, critical)
 
 
 #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
 Cell(total_tax, 15,Total tax, <|CV(tax_minus_credits) + CV(f1040sch4, aca_fee)|>)
 
-Cell(payments_divider, 63.9,>>>>>>>>>>>> Payments                              , 0)
 Cell(federal_tax_withheld, 16,Federal income tax withheld from Forms W-2 and 1099,, u)
 #65 2017 estimated tax payments and amount applied from 2015 return 65
 Cell(eitc, 17.1,Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
-Cell(actc, 17.2, Refundable child tax credit, <|CV(ctc_sch8812, refundable_ctc)|>)
+Cell(actc, 17.2, Refundable child tax credit, <|CV(ctc_sch8812, refundable_ctc)|>, kids)
+Cell(ed_tc, 17.3, Refundable education credits, <|CV(f8863, refundable_credit)|>)
 
-Cell(total_payments, 18,Total payments, <|SUM(federal_tax_withheld, eitc, actc)|>)
+Cell(total_payments, 18,Total payments, <|SUM(federal_tax_withheld, eitc, actc, ed_tc)|>)
 Cell(refund, 19, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
 Cell(tax_owed, 20,Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
 
 m4_form(f1040sch2)
-Cell(amt_1040, 45, Alternative minimum tax (UI), <|CV(f6251,amt)|>)
+Cell(amt, 45, Alternative minimum tax, <|CV(f6251,amt)|>, itemizing)
 Cell(credit_repayment, 46, Excess advance premium tax credit repayment. (UI), 0, u)
+
+m4_form(f1040sch3)
+Cell(ftc,48, Foreign tax credit, , u)
+Cell(child_care,49, Dependent care expenses, , u)
+Cell(ed_credits, 50, Education credits via f8863, <|CV(f8863, nonrefundable_credit)|>, s_loans)
+Cell(nonrefundable_total, 55, Total nonrefundable credits, <|CV(ftc)+CV(child_care)+CV(ed_credits)|>)
 
 m4_form(f1040sch4)
 Cell(aca_fee, 61,Health care individual responsibility,, u)
@@ -366,23 +360,19 @@ Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(phase_out_pct)|
 Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
 
 m4_form(ctc_ws_1040)
-Cell(two_thousand_per_child, 1, <|$2,000 per child under 17|>, <|thousandkids()|>, have_kids)
-Cell(ctc_subtraction, 5, <|5% of the rounded-up difference between AGI and a filing-status dependent number|>, <|ctc_status(CV(f1040, AGI))|>, have_kids)
-Cell(credit_remaining, 6, <|$2,000 per child minus the subtraction|>, <|max(CV(two_thousand_per_child) - CV(ctc_subtraction), 0)|>, have_kids)
-
-
-Line 8: Add the amounts from Form 1040, line 48, Form 1040, line 49, Form 1040, line 51, Form 5695, line 30, Form 1040, line 50, Form 8910, line 15, Form 8936, line 23, and Schedule R, line 22
-I just use FTC to stand in for all of that.
-Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, tax) - CV(f1040, ftc)|>, )
-Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_remaining))|>, have_kids)
+Cell(two_thousand_per_child, 1, <|$2,000 per child under 17|>, <|thousandkids()|>, kids)
+Cell(ctc_subtraction, 5, <|5% of the rounded-up difference between AGI and a filing-status dependent number|>, <|ctc_status(CV(f1040, AGI))|>, kids)
+Cell(credit_remaining, 6, <|$2,000 per child minus the subtraction|>, <|max(CV(two_thousand_per_child) - CV(ctc_subtraction), 0)|>, kids)
+Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, tax) - CV(f1040sch3, ed_credits)- CV(f1040sch3, ftc)|>, kids)
+Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_remaining))|>, kids)
 
 m4_form(ctc_sch8812)
-Cell(unused_ctc, 3, CTC not used, <|max(0, CV(ctc_ws_1040,credit_remaining) - CV(ctc_ws_1040, ctc))|>, have_kids)
-Cell(fourteen_kids, 4, <|$1,400 per kid|>, <|fourteenkids()|>, have_kids)
-Cell(limited_unused, 5, Limited unused CTC, <|min(CV(unused_ctc),CV(fourteen_kids))|>, have_kids)
-Cell(scaled_earned_income, 8, <|15 percent of earned income-2500|>, <|max(0, .15*(CV(f1040, wages)-2500))|>, have_kids)
-Cell(ss_and_medicare_withheld, 11, <|Social security and medicare withheld on W-2 lines 4 and 6|>, , u have_kids)
-Cell(refundable_ctc, 15, Refundable child tax credit, <|actc(CV(limited_unused), CV(scaled_earned_income), CV(ss_and_medicare_withheld), CV(f1040, eitc))|>, have_kids)
+Cell(unused_ctc, 3, CTC not used, <|max(0, CV(ctc_ws_1040,credit_remaining) - CV(ctc_ws_1040, ctc))|>, kids)
+Cell(fourteen_kids, 4, <|$1,400 per kid|>, <|fourteenkids()|>, kids)
+Cell(limited_unused, 5, Limited unused CTC, <|min(CV(unused_ctc),CV(fourteen_kids))|>, kids)
+Cell(scaled_earned_income, 8, <|15 percent of earned income-2500|>, <|max(0, .15*(CV(f1040, wages)-2500))|>, kids)
+Cell(ss_and_medicare_withheld, 11, <|Social security and medicare withheld on W-2 lines 4 and 6|>, , u kids)
+Cell(refundable_ctc, 15, Refundable child tax credit, <|actc(CV(limited_unused), CV(scaled_earned_income), CV(ss_and_medicare_withheld), CV(f1040, eitc))|>, kids)
 
 
 m4_form(f1040_tax_refund_ws)
