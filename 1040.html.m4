@@ -4,7 +4,6 @@ m4_changequote(<|,|>)
 <html>
 <title>The tax graph</title>
 
-<!--<link rel="stylesheet" href="demo.css">-->
 <script src="d3.v3.min.js" charset="utf-8"></script>
 <script src="dagre-d3.min.js" charset="utf-8"></script>
 <script>
@@ -24,11 +23,6 @@ text {
 
 input[type=checkbox]
 {
-   /* Double-sized Checkboxes, via https://stackoverflow.com/questions/306924/checkbox-size-in-html-css */
-   -ms-transform: scale(2); /* IE */
-   -moz-transform: scale(2); /* FF */
-   -webkit-transform: scale(2); /* Safari and Chrome */
-   -o-transform: scale(2); /* Opera */
    padding: 10px;
 }
 
@@ -287,9 +281,7 @@ function checkbox(id, checked){situations[id]=checked;
 function hidezeros(id, checked){
     if (!checked){
         checkbox(id, !checked);
-        //svg.selectAll(".a_node").filter(function(d){return g._nodes[d].val==0}).classed('hide_zeros', false)
     } else {
-//        svg.selectAll(".a_node").filter(function(d){return g._nodes[d].val==0}).classed('hide_zeros', true)
         for (i in g._nodes)  g._nodes[i].class.replace(/hide_zeros/g, "");
          for (i in nodestorage)  nodestorage[i].class.replace(/hide_zeros/g, "");
         for (i in g._nodes) if (g._nodes[i].val==0) g._nodes[i].class += " hide_zeros";
@@ -301,7 +293,7 @@ function hidezeros(id, checked){
 var kidcalc = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    checkbox('.have_kids', (kids>0 ? true : false)); recalc();
+    checkbox('.kids', (kids>0 ? true : false)); recalc();
 }
 
 document.getElementById(".have_rr").click()
@@ -310,7 +302,8 @@ document.getElementById(".mort").click()
 document.getElementById(".itemizing").click()
 document.getElementById(".over_65").click()
 document.getElementById(".spouse_over_65").click()
-checkbox(".have_kids", false)
+//checkbox(".kids", false)
+kidcalc()
 
 redrawIt()
 
