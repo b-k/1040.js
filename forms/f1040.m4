@@ -316,7 +316,7 @@ Cell(taxable_ss_benefits, 5.5,Taxable social security benefits,, u over_65 spous
 Cell(MAGI, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits)|>)
 Cell(total_in, 6,Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
 
-Cell(AGI, 7,Adjusted gross income, <|CV(total_in) - CV(f1040sch1, subtractions_from_income)|>, critical)
+Cell(AGI, 7,Adjusted gross income, <|max(CV(total_in) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
 
 Cell(std_deduction,8,Standard deductions, <|Fswitch((married, 12000), (single, 12000), (married filing jointly, 24000), (head of household, 18000), 0)|>, )
 Cell(deductions,8,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
