@@ -1,7 +1,7 @@
 jsversion(<|
-//2017 tax rate schedules
+//2018 tax rate schedules
 //Could be inlined, but not going to bother.
-// https://www.irs.gov/pub/irs-prior/f1040es--2017.pdf
+// https://www.irs.gov/pub/irs-prior/f1040es--2018.pdf
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
@@ -357,7 +357,7 @@ m4_form(f1040sch4)
 Cell(aca_fee, 61,Health care individual responsibility,, u)
 
 m4_form(student_loan_ws_1040)
-Cell(student_loan_interest, 1,Interest you paid in 2017 on qualified student loans,, u s_loans)
+Cell(student_loan_interest, 1,Interest you paid in 2018 on qualified student loans,, u s_loans)
 
 Then the complicated phase-out calculation
 lines 2-4 are modified AGI before this point on the forms. With lines 23-32 unimplemented here,
