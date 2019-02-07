@@ -53,7 +53,7 @@ def med_expenses(expenses, agi):
 |>)
 
 m4_form(f6251)
-Cell(agi_minus_ded, 1, AGI minus deductions, <|CV(f1040, agi_minus_deductions)|>, itemizing)
+Cell(taxable_income, 1, AGI minus deductions, <|CV(f1040, taxable_income)|>, itemizing)
 
 Cell(taxes_deducted, 2.05, State/local/other deducted on Schedule A or std deduction, <|IF(CV(f1040_sched_a, total_itemized_deductions)>0, CV(f1040_sched_a, total_taxes_deducted), CV(f1040,std_deduction))|>, itemizing)
 
@@ -63,7 +63,7 @@ Cell(amt_depletion_deduction, 2.2, Depletion (UI), 0, itemizing),
 Cell(nold, 2.25, NOLD (UI), 0, itemizing),
 Cell(amt_nold, 2.3, Alt NOLD (UI), 0, itemizing),
 
-Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|CV(agi_minus_ded) + CV(taxes_deducted) + CV(amt_refund_deduction) + CV(amt_investment_expense_deduction) + CV(amt_depletion_deduction) + CV(nold) + CV(amt_nold)|>, itemizing)
+Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|CV(taxable_income) + CV(taxes_deducted) + CV(amt_refund_deduction) + CV(amt_investment_expense_deduction) + CV(amt_depletion_deduction) + CV(nold) + CV(amt_nold)|>, itemizing)
 
 Cell(amt_exemption, 5, AMT exemption, <|get_amt_exemption(CV(amt_income))|>, itemizing)
 Cell(amt_in_minus_exemption, 6, AMT income minus exemption, <|CV(amt_income)-CV(amt_exemption)|>, itemizing)

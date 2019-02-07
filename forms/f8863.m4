@@ -19,7 +19,7 @@ Cell(pt1_divider, 0, >>>>>>>>>>>> Part I, Refundable                            
 
 Cell(total_limited_expenses, 1, Total limited expenses, <|SUM(rescaled_education_expenses_1,rescaled_education_expenses_2, rescaled_education_expenses_3)|>, s_loans)
 Cell(baseline, 2, 90 or 180k, <|Fswitch((married filing jointly, 180000), 90000)|>,  s_loans)
-Cell(ninety_k_minus_agi, 4, Remaining after AGI subtraction, <|CV(baseline) - CV(f1040, AGI)|>,  s_loans)
+Cell(ninety_k_minus_agi, 4, Remaining after AGI subtraction, <|max(0, CV(baseline) - CV(f1040, AGI))|>,  s_loans)
 Cell(fraction, 6, Fraction allowed, <|max(min(1, CV(ninety_k_minus_agi)/Fswitch((married filing jointly, 20000), 10000)), 0)|>, s_loans)
 Cell(unscaled_credit, 7, Unscaled credit, <|CV(total_limited_expenses)*CV(fraction)|>, s_loans)
 Cell(under_24, 7.5, <|If you're under 24, 1|>, , u s_loans)

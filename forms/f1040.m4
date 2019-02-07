@@ -52,25 +52,31 @@ var eitc = function(income, k){
     if (isNaN(kids)) kids = 0;
     //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     //and irs.gov/irb/2018-10_IRB#RP-2018-18
-    //phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
-    data=[[7.65, 6780, 519, 8490, 7.65, 15270, 14170, 20950],
-          [34, 10180, 3461,  18660, 15.98, 40320, 24350, 46010],
-          [40, 14290, 5716, 18660, 21.06, 45802, 24350, 51492],
-          [45, 14290, 6431, 18660, 21.06, 49194, 24350, 54884]]
+    //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
+    data=[[6780, 519, 8490, 15270, 14170, 20950],
+          [10180, 3461,  18660, 40320, 24350, 46010],
+          [14290, 5716, 18660, 45802, 24350, 51492],
+          [14290, 6431, 18660, 49194, 24350, 54884]]
      row = Math.min(kids,3);
 
+    plateu_start=0
+    plateu_value=1
+
     if (fstatus()=="married filing jointly"){
-        phaseout_start=6;
-        phaseout_end=7;
-    } else {
-        phaseout_start=3;
+        phaseout_start=4;
         phaseout_end=5;
+    } else {
+        phaseout_start=2;
+        phaseout_end=3;
     }
     
     if (income >= data[row][phaseout_end]) return 0;
-    if (income >= data[row][phaseout_start]) return income*data[row][4]/100.;
-    if (income <= data[row][1]) return income*data[row][0]/100.;
-    return data[row][2];
+    if (income >= data[row][phaseout_start])
+        return Math.round(100*data[row][plateu_value]*(1-(income-data[row][phaseout_start])
+                                            /(data[row][phaseout_end]-data[row][phaseout_start])))/100
+    if (income <= data[row][plateu_start])
+        return Math.round(income*data[row][plateu_value]/data[row][plateu_start])/100;
+    return data[row][plateu_value];
 }
 
 var actc = function(limited_unused, scaled_income, ss_med, eitc){
@@ -200,26 +206,32 @@ def tax_calc(inval):
 def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     #and irs.gov/irb/2018-10_IRB#RP-2018-18
-    #phase-in rate, plateu start, plateu value, plateu end, phase-out rate, zero point
-    data=[[7.65, 6780, 519, 8490, 7.65, 15270, 14170, 20950],
-          [34, 10180, 3461,  18660, 15.98, 40320, 24350, 46010],
-          [40, 14290, 5716, 18660, 21.06, 45802, 24350, 51492],
-          [45, 14290, 6431, 18660, 21.06, 49194, 24350, 54884]]
+    #plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
+    data=[[6780, 519, 8490, 15270, 14170, 20950],
+          [10180, 3461,  18660, 40320, 24350, 46010],
+          [14290, 5716, 18660, 45802, 24350, 51492],
+          [14290, 6431, 18660, 49194, 24350, 54884]]
     row=kids if kids <=3 else 3
+
+    plateu_start=0
+    plateu_value=1
 
     if status=="married": return 0
     if status=="married filing jointly":
         phaseout_start=6
         phaseout_end=7
     else:
-        phaseout_start=3
-        phaseout_end=5
+        phaseout_start=2
+        phaseout_end=3
 
     if income < 0: print("Negative income! (%s) Please fix." % (income,))
     if income >= data[row][phaseout_end]: return 0
-    if income >= data[row][phaseout_start]: return income*data[row][4]/100.
-    if income <= data[row][1]: return income*data[row][0]/100.
-    return data[row][2]
+    if income >= data[row][phaseout_start]:
+        return round(100*data[row][plateu_value]*(1-(income-data[row][phaseout_start])
+                                            /(data[row][phaseout_end]-data[row][phaseout_start])))/100
+    if income <= data[row][plateu_start]:
+        return round(income*data[row][plateu_value]/data[row][plateu_start])/100;
+    return data[row][plateu_value]
 
 def actc(limited_unused, scaled_income, ss_med, eitc):
     if kids >=3:
@@ -310,24 +322,22 @@ Cell(std_deduction,8,Standard deductions, <|Fswitch((married, 12000), (single, 1
 Cell(deductions,8,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 
 Cell(qbi, 9, Qualified business income, , u)
-Cell(agi_minus_deductions, 41,AGI minus deductions, <|CV(AGI) - CV(deductions) - CV(qbi)|>)
-
-Cell(taxable_income, 10,Taxable income, <|max(CV(agi_minus_deductions), 0)|>, critical)
+Cell(taxable_income, 10, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
 
 Cell(tax, 11,Tax, <|tax_calc(CV(taxable_income))|>, critical)
-Cell(pretotal_tax, 47,Tax + AMT + F8962, <|CV(tax) + CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
+Cell(other_taxes, 11.3,<|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
+Cell(pretotal_tax, 11.6,<|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
+Cell(credits, 12,<|CTC and Schedule 3, other credits|>, <|CV(f1040sch3, nonrefundable_total) + CV(ctc_ws_1040, ctc)|>, critical)
 
-Cell(tax_minus_credits, 13,Tax minus credits, <|max(CV(pretotal_tax)-CV(f1040sch3, nonrefundable_total) -CV(ctc_ws_1040, ctc), 0)|>, critical)
-
+Cell(tax_minus_credits, 13,Tax minus credits, <|max(CV(pretotal_tax)-CV(credits), 0)|>, critical)
 
 #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
 Cell(total_tax, 15,Total tax, <|CV(tax_minus_credits) + CV(f1040sch4, aca_fee)|>)
 
 Cell(federal_tax_withheld, 16,Federal income tax withheld from Forms W-2 and 1099,, u)
-#65 2017 estimated tax payments and amount applied from 2015 return 65
 Cell(eitc, 17.1,Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
 Cell(actc, 17.2, Refundable child tax credit, <|CV(ctc_sch8812, refundable_ctc)|>, kids)
-Cell(ed_tc, 17.3, Refundable education credits, <|CV(f8863, refundable_credit)|>)
+Cell(ed_tc, 17.3, Refundable education credits, <|CV(f8863, refundable_credit)|>, s_loans)
 
 Cell(total_payments, 18,Total payments, <|SUM(federal_tax_withheld, eitc, actc, ed_tc)|>)
 Cell(refund, 19, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
@@ -361,7 +371,7 @@ Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(p
 
 m4_form(ctc_ws_1040)
 Cell(two_thousand_per_child, 1, <|$2,000 per child under 17|>, <|thousandkids()|>, kids)
-Cell(ctc_subtraction, 5, <|5% of the rounded-up difference between AGI and a filing-status dependent number|>, <|ctc_status(CV(f1040, AGI))|>, kids)
+Cell(ctc_subtraction, 5, <|5% of AGI minus a filing-status dependent number|>, <|ctc_status(CV(f1040, AGI))|>, kids)
 Cell(credit_remaining, 6, <|$2,000 per child minus the subtraction|>, <|max(CV(two_thousand_per_child) - CV(ctc_subtraction), 0)|>, kids)
 Cell(tax_minus_some_credits, 9, Calculated tax minus some credits, <|CV(f1040, tax) - CV(f1040sch3, ed_credits)- CV(f1040sch3, ftc)|>, kids)
 Cell(ctc, 10, Child tax credit, <|min(CV(tax_minus_some_credits), CV(credit_remaining))|>, kids)
