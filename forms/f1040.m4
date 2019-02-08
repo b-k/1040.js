@@ -321,7 +321,7 @@ Cell(AGI, 7,Adjusted gross income, <|max(CV(total_in) - CV(f1040sch1, subtractio
 Cell(std_deduction,8,Standard deductions, <|Fswitch((married, 12000), (single, 12000), (married filing jointly, 24000), (head of household, 18000), 0)|>, )
 Cell(deductions,8,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 
-Cell(qbi, 9, Qualified business income, , u)
+Cell(qbi, 9, Qualified business income deduction, , u)
 Cell(taxable_income, 10, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
 
 Cell(tax, 11,Tax, <|tax_calc(CV(taxable_income))|>, critical)
