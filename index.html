@@ -69,6 +69,7 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 The 2018 U.S. tax graph<br>
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
+Or try <a href="https://github.com/b-k/py1040">the Python version</a><br>
 
 <table><tr><td>
 <input type="radio" name="spouse" size=3em checked onchange="recalc()"> I am single.<br>
@@ -313,7 +314,7 @@ g.setNode("f1040_total_in",  { label: "total_in", baselabel: "total_in", form: "
 g.setNode("f1040_AGI",  { label: "AGI", baselabel: "AGI", form: "f1040", fullname: "Adjusted gross income", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_total_in') - Cv('f1040sch1_subtractions_from_income'),0)", last_eval:0 });
 g.setNode("f1040_std_deduction",  { label: "std_deduction", baselabel: "std_deduction", form: "f1040", fullname: "Standard deductions", class: "a_node ", val:0 , eqn: "((fstatus()=='married') ? (12000) : (((fstatus()=='single') ? (12000) : (((fstatus()=='married filing jointly') ? (24000) : (((fstatus()=='head of household') ? (18000) : (0 )) )) )) )) ", last_eval:0 });
 g.setNode("f1040_deductions",  { label: "deductions", baselabel: "deductions", form: "f1040", fullname: "Deductions", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_std_deduction'), Cv('f1040_sched_a_total_itemized_deductions'))", last_eval:0 });
-g.setNode("f1040_qbi",  { label: "qbi", baselabel: "qbi", form: "f1040", fullname: "Qualified business income", class: "a_node u", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_qbi",  { label: "qbi", baselabel: "qbi", form: "f1040", fullname: "Qualified business income deduction", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_taxable_income",  { label: "taxable_income", baselabel: "taxable_income", form: "f1040", fullname: "Taxable income", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_AGI') - Cv('f1040_deductions') - Cv('f1040_qbi'), 0)", last_eval:0 });
 g.setNode("f1040_tax",  { label: "tax", baselabel: "tax", form: "f1040", fullname: "Tax", class: "a_node critical", val:0 , eqn: "tax_calc(Cv('f1040_taxable_income'))", last_eval:0 });
 g.setNode("f1040_other_taxes",  { label: "other_taxes", baselabel: "other_taxes", form: "f1040", fullname: "Sched 2, AMT + F8962", class: "a_node ", val:0 , eqn: "Cv('f1040sch2_amt') + Cv('f1040sch2_credit_repayment')", last_eval:0 });
