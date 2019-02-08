@@ -69,7 +69,8 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 The 2018 U.S. tax graph<br>
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
-Or try <a href="https://github.com/b-k/py1040">the Python version</a><br>
+Hover your mouse over a box to see a little more text and the form the box is from.<br>
+Or try <a href="https://github.com/b-k/py1040">the Python version</a>.<br>
 
 <table><tr><td>
 <input type="radio" name="spouse" size=3em checked onchange="recalc()"> I am single.<br>
