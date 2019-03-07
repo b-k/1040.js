@@ -218,8 +218,8 @@ def eitc(income, kids):
 
     if status=="married": return 0
     if status=="married filing jointly":
-        phaseout_start=6
-        phaseout_end=7
+        phaseout_start=4
+        phaseout_end=5
     else:
         phaseout_start=2
         phaseout_end=3
