@@ -285,7 +285,7 @@ m4_form(f1040sch1)
     Cell(farm_income, 18,Farm income from Schedule F (UI),, u)
     Cell(unemployment, 19,Unemployment compensation,, u)
     Cell(other_in, 21,Other income.,, u)
-    Cell(sch1_magi_subtotal, 22, Schedule 1 subtotal, <|SUM(taxable_tax_refunds, alimony, sched_c, cap_gains, farm_income, unemployment, other_in)|>)
+    Cell(sch1_magi_subtotal, 22, Schedule 1 subtotal w/o Rents/Royalties, <|SUM(taxable_tax_refunds, alimony, sched_c, cap_gains, farm_income, unemployment, other_in)|>)
 
 
 Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
