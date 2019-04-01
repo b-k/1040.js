@@ -46,6 +46,26 @@ var tax_calc = function (inval){
     return tax_table(Math.round(inval/50)*50 + 25)
 }
 
+
+//capital gains tax rate
+var cgrate = function(income){
+    var filing_status = fstatus();
+    if (filing_status == "single") {
+        if (income < 38600) return    0;
+        if (income < 425800) return   .15;
+    } else if (filing_status == "married filing jointly") {
+        if (income < 77200) return    0;
+        if (income < 479000) return   .15;
+    } else if (filing_status == "married") {
+        if (income < 38600) return    0;
+        if (income < 239500) return   .15;
+    } else if (filing_status == "head of household") {
+        if (income < 51700) return    0;
+        if (income < 452400) return   .15;
+    }
+    return .2;
+}
+
 var eitc = function(income, k){
     if (fstatus()=="married") return 0
     var kids = parseFloat(document.getElementById("kids").value)
@@ -203,6 +223,24 @@ def tax_calc(inval):
     if inval >=100000: return tax_table(inval)
     return tax_table(round(inval/50)*50 + 25)
 
+# capital gains tax rate
+def cgrate(income):
+    filing_status = fstatus()
+    if (filing_status == "single"):
+        if (income < 38600): return  0
+        if (income < 425800): return .15
+    if (filing_status == "married filing jointly"):
+        if (income < 77200): return    0
+        if (income < 479000): return   .15
+    if (filing_status == "married"):
+        if (income < 38600): return    0
+        if (income < 239500): return   .15
+    if (filing_status == "head of household"):
+        if (income < 51700): return    0
+        if (income < 452400): return   .15
+    return .2;
+
+
 def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     #and irs.gov/irb/2018-10_IRB#RP-2018-18
@@ -280,7 +318,7 @@ m4_form(f1040sch1)
     Cell(taxable_tax_refunds, 10,Taxable state/local income tax refunds/credits/offsets,<|CV(f1040_tax_refund_ws, taxable_refund)|>)
     Cell(alimony, 11,Alimony income received,, u)
     Cell(sched_c, 12,Schedule C business income (UI),, u)
-    Cell(cap_gains, 13,Capital gains,, u)
+    Cell(cap_gains, 13,<|Capital gains (all assumed to be long-term)|>,, u cap_gains)
     Cell(rr_income,17,Rents and royalties from Schedule E,<|CV(f1040_sched_e,rr_income)|>,have_rr)
     Cell(farm_income, 18,Farm income from Schedule F (UI),, u)
     Cell(unemployment, 19,Unemployment compensation,, u)
@@ -309,7 +347,8 @@ m4_form(f1040)
 
 Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
 Cell(interest, 2.5,Taxable interest,  , u)
-Cell(dividends, 3.5,Ordinary dividends,, u)
+Cell(qualified_dividends, 3.4,Dividends qualifying for the long-term cap gains rate,, u cap_gains)
+Cell(dividends, 3.5, Dividends taxed as normal income,, u)
 Cell(iras_pensions, 4.5,Taxable IRA distributions,, u)
 Cell(taxable_ss_benefits, 5.5,Taxable social security benefits,, u over_65 spouse_over_65)
 
@@ -324,7 +363,11 @@ Cell(deductions,8,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_i
 Cell(qbi, 9, Qualified business income deduction, , u)
 Cell(taxable_income, 10, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
 
-Cell(tax, 11,Tax, <|tax_calc(CV(taxable_income))|>, critical)
+Cell(ltcg, 10.2, Income taxed as long-term cap gains, <|CV(f1040sch1, cap_gains) + CV(qualified_dividends)|>, cap_gains)
+
+Cell(cap_gains_tax, 10.3, Tax on long-term cap gains or dividends, <|cgrate(CV(taxable_income))*CV(ltcg)|>, cap_gains)
+
+Cell(tax, 11,Tax, <|tax_calc(CV(taxable_income)-CV(ltcg))+CV(cap_gains_tax)|>, critical)
 Cell(other_taxes, 11.3,<|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
 Cell(pretotal_tax, 11.6,<|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
 Cell(credits, 12,<|CTC and Schedule 3, other credits|>, <|CV(f1040sch3, nonrefundable_total) + CV(ctc_ws_1040, ctc)|>, critical)

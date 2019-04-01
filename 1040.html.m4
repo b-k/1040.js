@@ -87,6 +87,7 @@ BOX(spouse_over_65, My spouse is over 65.)
 BOX(s_loans, I have student loans or education expenses.)
 BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
+BOX(cap_gains, I have long-term capital gains or associated dividends.)
 BOX(have_rr, I have rental or royalty income.)
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
 <a href="https://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
@@ -299,6 +300,7 @@ var kidcalc = function(){
 }
 
 document.getElementById(".have_rr").click()
+document.getElementById(".cap_gains").click()
 document.getElementById(".s_loans").click()
 document.getElementById(".mort").click()
 document.getElementById(".itemizing").click()
