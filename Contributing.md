@@ -1,10 +1,10 @@
 
-`1040.js.m4` is the main web page and Javascript. The original author (BK) is basically a
-novice with DOM+HTML+CSS, and there are certainly easy ways to make major improvements
+`1040.js.m4` is the main web page and Javascript. The original author (BK) is not an
+expert with DOM+HTML+CSS, and there are certainly easy ways to make major improvements
 here.
 
 The whole thing is put together via m4. If you have anything even vaguely POSIX-compliant,
-you have m4. Just type `make` on the command line to assemble the parts into tax.html.
+you have m4. Just type `make` on the command line to assemble the parts into `tax.html`.
 
 If you are using Windows, you will need to install [Cygwin](https://www.cygwin.com/) first
 to get the required tools. When running the Cygwin installer, select the `git`, `make`,

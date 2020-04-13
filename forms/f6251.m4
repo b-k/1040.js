@@ -3,9 +3,9 @@ function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
     var mfj = (status=="married filing jointly")
-    if (s_or_hh && income) return 70300
-    if (mfj && income) return 109400
-    if (status=="married") return 54700
+    if (s_or_hh && income) return 71700
+    if (mfj && income) return 111700
+    if (status=="married") return 55850
 
     return 0
     //No longer calculating phase-out
@@ -16,8 +16,8 @@ function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
     return (status=="married")
-       ? income * (income <=95550 ? .26 : .28) - 1911
-       : income * (income <=191100? .26 : .28) - 3822;
+       ? income * (income <=97400 ? .26 : .28) - 1948
+       : income * (income <=194800? .26 : .28) - 3896
 }
 
 function med_expenses(expenses, agi){
@@ -30,22 +30,22 @@ function med_expenses(expenses, agi){
 
 pyversion(<|
 def get_amt_exemption(income):
-    if (status=="single" or status=="head of household") and income < 500000:
-        return 70300
-    if (status=="married filing jointly") and income < 1e6:
-        return 109400
-    if (status=="married") and income < 500000:
-        return 54700
+    if (status=="single" or status=="head of household") and income < 510300:
+        return 71700
+    if (status=="married filing jointly") and income < 1020600:
+        return 111700
+    if (status=="married") and income < 510300:
+        return 55850
     print("AMT exemption is partially implemented.")
     return 0
 
 
 def get_tamt(income):
-    if income==0: return 0
+    if income<=0: return 0
     if status=="married":
-        return income * (.26 if  income <=95550 else .28) - 1911
+        return income * (.26 if  income <=97400 else .28) - 1948
     else:
-        return income * (.26 if  income <=191100 else .28) - 3822
+        return income * (.26 if  income <=194800 else .28) - 3896
 
 def med_expenses(expenses, agi):
     if (not (over_65 or  spouse_over_65)): return 0
@@ -53,7 +53,7 @@ def med_expenses(expenses, agi):
 |>)
 
 m4_form(f6251)
-Cell(taxable_income, 1, AGI minus deductions, <|CV(f1040, taxable_income)|>, itemizing)
+Cell(taxable_income, 1, AGI minus deductions, <|CV(f1040, AGI) - CV(f1040, deductions) - CV(f1040, qbi)|>, itemizing)
 
 Cell(taxes_deducted, 2.05, State/local/other deducted on Schedule A or std deduction, <|IF(CV(f1040_sched_a, total_itemized_deductions)>0, CV(f1040_sched_a, total_taxes_deducted), CV(f1040,std_deduction))|>, itemizing)
 
@@ -63,7 +63,7 @@ Cell(amt_depletion_deduction, 2.2, Depletion (UI), 0, itemizing),
 Cell(nold, 2.25, NOLD (UI), 0, itemizing),
 Cell(amt_nold, 2.3, Alt NOLD (UI), 0, itemizing),
 
-Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|CV(taxable_income) + CV(taxes_deducted) + CV(amt_refund_deduction) + CV(amt_investment_expense_deduction) + CV(amt_depletion_deduction) + CV(nold) + CV(amt_nold)|>, itemizing)
+Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|SUM(taxable_income, taxes_deducted, amt_refund_deduction, amt_investment_expense_deduction, amt_depletion_deduction, nold, amt_nold)|>, itemizing)
 
 Cell(amt_exemption, 5, AMT exemption, <|get_amt_exemption(CV(amt_income))|>, itemizing)
 Cell(amt_in_minus_exemption, 6, AMT income minus exemption, <|CV(amt_income)-CV(amt_exemption)|>, itemizing)
