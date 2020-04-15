@@ -57,7 +57,7 @@ Cell(taxable_income, 1, AGI minus deductions, <|CV(f1040, AGI) - CV(f1040, deduc
 
 Cell(taxes_deducted, 2.05, State/local/other deducted on Schedule A or std deduction, <|IF(CV(f1040_sched_a, total_itemized_deductions)>0, CV(f1040_sched_a, total_taxes_deducted), CV(f1040,std_deduction))|>, itemizing)
 
-Cell(amt_refund_deduction, 2.1, <|Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)|>, <|CV(f1040sch1, taxable_tax_refunds)|>, itemizing)
+Cell(amt_refund_deduction, 2.1, <|Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)|>, <|CV(f1040_tax_refund_ws, taxable_refund)|>, itemizing)
 Cell(amt_investment_expense_deduction, 2.15, Investment interest expense (UI), 0, itemizing)
 Cell(amt_depletion_deduction, 2.2, Depletion (UI), 0, itemizing),
 Cell(nold, 2.25, NOLD (UI), 0, itemizing),

@@ -284,7 +284,6 @@ def ctc_status(agi):
 |>)
 
 m4_form(f1040sch1)
-    Cell(taxable_tax_refunds, 1,<|Taxable state/local income tax refunds/credits/offsets|>,<|CV(f1040_tax_refund_ws, taxable_refund)|>)
     Cell(alimony, 2.1,Alimony income received,, u)
     Cell(sched_c, 3,Schedule C business income,, u)
     Cell(sale_of_biz, 4, <|Sale of business property (f4797)|>,,u)
@@ -292,7 +291,7 @@ m4_form(f1040sch1)
     Cell(farm_income, 6, Farm income from Schedule F,, u)
     Cell(unemployment, 7, Unemployment compensation,, u)
     Cell(other_in, 8,Other income,, u)
-    Cell(sch1_magi_subtotal, 22, Schedule 1 subtotal w/o Rents/Royalties, <|SUM(taxable_tax_refunds, alimony, sched_c, sale_of_biz, farm_income, unemployment, other_in)|>)
+    Cell(sch1_magi_subtotal, 22, Schedule 1 subtotal w/o Rents/Royalties, <|CV(f1040_tax_refund_ws, taxable_refund) + SUM(alimony, sched_c, sale_of_biz, farm_income, unemployment, other_in)|>)
 
 Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
 #23 Educator expenses . . . . . . . . . . . 23
@@ -360,9 +359,9 @@ Cell(credit_repayment, 46, Excess advance premium tax credit repayment, , u)
 
 m4_form(f1040sch3)
 Cell(ftc,48, Foreign tax credit, , u)
-Cell(child_care,49, Dependent care expenses, , u)
+Cell(dependent_care,49, Dependent care expenses, , u)
 Cell(ed_credits, 50, Education credits via f8863, <|CV(f8863, nonrefundable_credit)|>, s_loans)
-Cell(nonrefundable_total, 55, Total nonrefundable credits, <|CV(ftc)+CV(child_care)+CV(ed_credits)|>)
+Cell(nonrefundable_total, 55, Total nonrefundable credits, <|CV(ftc)+CV(dependent_care)+CV(ed_credits)|>)
 
 m4_form(student_loan_ws_1040)
 Cell(student_loan_interest, 1,Interest you paid in 2018 on qualified student loans,, u s_loans)
@@ -372,7 +371,7 @@ lines 2-4 are modified AGI before this point on the forms. With lines 23-32 unim
 line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
 Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
 
-Cell(phase_out_pct, 6, total income minus phase-out limit, <|min(1, max(CV(f1040, total_in) - Fswitch((married, 135000), 65000), 0)/Fswitch((married, 30000), 15000))|>, s_loans)
+Cell(phase_out_pct, 6, total income minus phase-out limit, <|min(1, max(CV(f1040, total_in) - Fswitch((married, 140000), 70000), 0)/Fswitch((married, 30000), 15000))|>, s_loans)
 
 Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(phase_out_pct)|>, s_loans)
 Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
@@ -394,8 +393,13 @@ Cell(refundable_ctc, 15, Refundable child tax credit, <|actc(CV(limited_unused),
 
 
 m4_form(f1040_tax_refund_ws)
-Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on last year's Schedule A|>,, u)
-Cell(last_year_itemized_deductions, 1, <|Enter line 29 of your 2017 Schedule A|>,, u)
-Cell(almost_std_deduction,3,Last year's standard deduction, <|Fswitch((married, 6350), (single, 6350), (married filing jointly, 12700), (head of household, 9350), 0)|>, )
-Cell(srblind,4, <|Senior or blind exemption (blind not implemented)|>,<|(Situation(over_65)+Situation(spouse_over_65)==1)* Fswitch((married, 7600), (single, 7900), (married filing jointly, 13950), (head of household, 10900), 0) + (Situation(over_65)+Situation(spouse_over_65)==2)* Fswitch((married, 8850), (single, 7900), (married filing jointly, 15200), (head of household, 12450), 0)|>)
-Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(last_year_refund), max(CV(last_year_itemized_deductions) - (CV(almost_std_deduction)+CV(srblind)), 0))|>, )
+Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on last year's Schedule A|>,, u ly_refund)
+Cell(last_year_5d, 1, <|Enter line 29 of your 2017 Schedule A|>,, u ly_refund)
+Cell(last_year_limited_deductions, 1.3, <|Enter line 5e of your 2017 Schedule A|>,, u ly_refund)
+Cell(last_year_reduced, 2, <|Last year's deductions, maybe reduced|>,<|max(CV(last_year_5d)-CV(last_year_limited_deductions), 0)|>, ly_refund)
+Cell(last_year_post_limit, 3, <|Last year's tax deducted, limited|>,<|max(CV(last_year_refund)-CV(last_year_reduced), 0)|>, ly_refund)
+Cell(last_year_total_deductions,4,<|Last year's itemized deductions|>, , u ly_refund)
+Cell(almost_std_deduction,5,<|Last year's standard deduction (under your current status)|>, <|Fswitch((married filing jointly, 24000), (head of household, 18000), 12000)|>, ly_refund)
+Cell(srblind,6, <|Senior or blind exemption (blind UI; mfj PI)|>,<|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))* Fswitch((married, 1300), (married filing jointly, 1300), 1600)|>, ly_refund)
+Cell(itemized_over_std, 6.5, Itemized deduction minus standard for last year, <|max(CV(last_year_total_deductions) - CV(almost_std_deduction) - CV(srblind), 0)|>, ly_refund)
+Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(itemized_over_std), CV(last_year_post_limit))|>, ly_refund)
