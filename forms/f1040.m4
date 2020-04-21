@@ -56,12 +56,15 @@ var eitc = function(income, k){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
-    //and irs.gov/irb/2018-10_IRB#RP-2018-18
+    //Or, search the internet for the phrase "For taxable years beginning in [20xxxx], the following
+    // amounts are used to determine the earned income credit under § 32(b)."
+    //For 2019: https://www.irs.gov/irb/2018-49_IRB
+    //For 2020: https://www.irs.gov/irb/2019-47_IRB
     //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    data=[[6920, 529, 8650, 15570, 14170, 20950],
-          [10370, 3526,  19030, 41094, 24350, 46010],
-          [14570, 5828, 19030, 46703, 24350, 51492],
-          [14570, 6557, 19030, 50162, 24350, 54884]]
+    data=[[6920, 529, 8650, 15570, 14450, 21370],
+          [10370, 3526,  19030, 41094, 24820, 46884],
+          [14570, 5828, 19030, 46703, 24820, 52493],
+          [14570, 6557, 19030, 50162, 24820, 55952]]
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -398,7 +401,7 @@ Cell(last_year_5d, 1, <|Enter line 29 of your 2017 Schedule A|>,, u ly_refund)
 Cell(last_year_limited_deductions, 1.3, <|Enter line 5e of your 2017 Schedule A|>,, u ly_refund)
 Cell(last_year_reduced, 2, <|Last year's deductions, maybe reduced|>,<|max(CV(last_year_5d)-CV(last_year_limited_deductions), 0)|>, ly_refund)
 Cell(last_year_post_limit, 3, <|Last year's tax deducted, limited|>,<|max(CV(last_year_refund)-CV(last_year_reduced), 0)|>, ly_refund)
-Cell(last_year_total_deductions,4,<|Last year's itemized deductions|>, , u ly_refund)
+Cell(last_year_total_deductions, 4, <|Last year's itemized deductions|>, , u ly_refund)
 Cell(almost_std_deduction,5,<|Last year's standard deduction (under your current status)|>, <|Fswitch((married filing jointly, 24000), (head of household, 18000), 12000)|>, ly_refund)
 Cell(srblind,6, <|Senior or blind exemption (blind UI; mfj PI)|>,<|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))* Fswitch((married, 1300), (married filing jointly, 1300), 1600)|>, ly_refund)
 Cell(itemized_over_std, 6.5, Itemized deduction minus standard for last year, <|max(CV(last_year_total_deductions) - CV(almost_std_deduction) - CV(srblind), 0)|>, ly_refund)
