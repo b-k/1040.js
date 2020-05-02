@@ -317,12 +317,12 @@ m4_form(f1040)
 Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
 Cell(interest, 2.5,Taxable interest,  , u)
 Cell(qualified_dividends, 3.4,Dividends qualifying for the long-term cap gains rate,, u cap_gains)
-Cell(dividends, 3.5, Dividends taxed as normal income,, u)
+Cell(dividends, 3.5, all dividends,, u)
 Cell(iras_pensions, 4.5,Taxable IRA distributions,, u)
 Cell(taxable_ss_benefits, 5.5,Taxable social security benefits,, u over_65 spouse_over_65)
-Cell(cap_gains, 6, <|Capital gains from Schedule D|>,, u cap_gains)
+Cell(capital_gains, 6, <|Capital gains from Schedule D|>,, u cap_gains)
 
-Cell(MAGI, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits,cap_gains)|>)
+Cell(MAGI, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits,capital_gains)|>)
 Cell(total_in, 7,Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
 
 Cell(AGI, 8,Adjusted gross income, <|max(CV(total_in) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
@@ -333,7 +333,7 @@ Cell(deductions,9,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_i
 Cell(qbi, 10, 20% discount on qualified business income (f8995), , u)
 Cell(taxable_income, 11, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
 
-Cell(tax, 12.1,Tax, <|tax_calc(CV(taxable_income))|>, critical)
+Cell(tax, 12.1,Tax, <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_ws, total_tax))|>, critical)
 Cell(other_taxes, 12.3,<|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
 Cell(pretotal_tax, 12.4,<|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
     
@@ -406,3 +406,22 @@ Cell(almost_std_deduction,5,<|Last year's standard deduction (under your current
 Cell(srblind,6, <|Senior or blind exemption (blind UI; mfj PI)|>,<|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))* Fswitch((married, 1300), (married filing jointly, 1300), 1600)|>, ly_refund)
 Cell(itemized_over_std, 6.5, Itemized deduction minus standard for last year, <|max(CV(last_year_total_deductions) - CV(almost_std_deduction) - CV(srblind), 0)|>, ly_refund)
 Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(itemized_over_std), CV(last_year_post_limit))|>, ly_refund)
+
+
+
+m4_form(qualified_dividends_ws)
+
+Cell(qualified_dividends_and_gains, 6, <|Qualified dividends plus cap gains|>, <|CV(f1040,qualified_dividends)+CV(f1040, capital_gains)|>, cap_gains)
+Cell(income_minus_gains, 7, <|Income minus gains|>, <|CV(f1040,taxable_income)-CV(qualified_dividends_and_gains)|>, cap_gains)
+Cell(limitation, 8, <|Limitation|>, <|Fswitch((head of household, 52750), (married filing jointly, 78750), 39375)|>, cap_gains)
+Cell(limited_income, 9, <|Limited income|>, <|min(CV(f1040,taxable_income), CV(limitation))|>, cap_gains)
+Cell(alt_limited_income, 10, <|Limited income again|>, <|min(CV(limited_income), CV(income_minus_gains))|>, cap_gains)
+Cell(untaxed, 11, <|Untaxed portion|>, <|CV(limited_income) - CV(alt_limited_income)|>, cap_gains)
+Cell(min_ded_or_gains_minus_zero, 14, <|Remove untaxed from min(income, gains)|>, <|min(CV(f1040,taxable_income), CV(income_minus_gains)) - CV(untaxed)|>, cap_gains)
+Cell(relimited_qualified, 19, <|qualified gains re-limited|>, <| min(CV(min_ded_or_gains_minus_zero), max( min(Fswitch((single, 434550), (married, 244425), (married filing jointly, 488850), 461700), CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>, cap_gains)
+Cell(fifteen_pct_tax, 20, <|15% tax on qualified gains|>, <|CV(relimited_qualified)*0.15|>, cap_gains)
+
+Cell(income_minus_fifteen, 22, <|Gains minus 15% taxed part|>, <|min(CV(f1040,taxable_income), CV(qualified_dividends_and_gains)) - (CV(untaxed) + CV(relimited_qualified))|>, cap_gains)
+Cell(twenty_pct_tax, 23, <|20% tax on dividends and gains|>, <|CV(income_minus_fifteen)*0.20|>, cap_gains)
+Cell(nongains_tax, 24, <|Tax on income without qualified gains|>, <|tax_calc(CV(income_minus_gains))|>, cap_gains)
+Cell(total_tax, 25, <|Total tax including qualified gains discounts|>, <|SUM(fifteen_pct_tax, twenty_pct_tax, nongains_tax)|>,cap_gains)
