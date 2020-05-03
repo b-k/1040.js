@@ -417,7 +417,7 @@ Cell(limitation, 8, <|Limitation|>, <|Fswitch((head of household, 52750), (marri
 Cell(limited_income, 9, <|Limited income|>, <|min(CV(f1040,taxable_income), CV(limitation))|>, cap_gains)
 Cell(alt_limited_income, 10, <|Limited income again|>, <|min(CV(limited_income), CV(income_minus_gains))|>, cap_gains)
 Cell(untaxed, 11, <|Untaxed portion|>, <|CV(limited_income) - CV(alt_limited_income)|>, cap_gains)
-Cell(min_ded_or_gains_minus_zero, 14, <|Remove untaxed from min(income, gains)|>, <|min(CV(f1040,taxable_income), CV(income_minus_gains)) - CV(untaxed)|>, cap_gains)
+Cell(min_ded_or_gains_minus_zero, 14, <|Remove untaxed from income|>, <|min(CV(f1040,taxable_income), CV(income_minus_gains)) - CV(untaxed)|>, cap_gains)
 Cell(relimited_qualified, 19, <|qualified gains re-limited|>, <| min(CV(min_ded_or_gains_minus_zero), max( min(Fswitch((single, 434550), (married, 244425), (married filing jointly, 488850), 461700), CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>, cap_gains)
 Cell(fifteen_pct_tax, 20, <|15% tax on qualified gains|>, <|CV(relimited_qualified)*0.15|>, cap_gains)
 
