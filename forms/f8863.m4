@@ -28,7 +28,7 @@ Cell(refundable_credit, 8, Refundable education credit, <|IF(CV(under_24)<0, CV(
 Cell(pt2_divider, 8.5, >>>>>>>>>>>> Part II, Nonrefundable                           , 0)
 Cell(remaining_credit, 9, <|Remaining tentative credit|>, <|CV(unscaled_credit) - CV(refundable_credit)|>, s_loans)
 Cell(aqe, 12, <|20% of Adjusted qualified expenses or 1k|>, <|min(1000, CV(adjusted_qualified_expenses)) *.2|>, s_loans)
-Cell(baseline2, 13, <|67k or 134k|>, <|Fswitch((married filing jointly, 136000), 68000)|>,  s_loans)
+Cell(baseline2, 13, <|67k or 134k|>, <|Fswitch((married filing jointly, 138000), 69000)|>,  s_loans)
 Cell(sixty_seven_k_less_agi, 15, <|Remaining after AGI subtraction|>, <|CV(baseline2)-CV(f1040, AGI)|>, s_loans)
 Cell(fraction2, 17, Fraction allowed, <|max(min(1, CV(sixty_seven_k_less_agi)/Fswitch((married filing jointly, 20000), 10000)), 0)|>, s_loans)
 Cell(ws_exclusions, 17.5, <|Exclusions from the worksheet in the instructions|>, , u s_loans)

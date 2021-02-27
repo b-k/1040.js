@@ -3,9 +3,9 @@ function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
     var mfj = (status=="married filing jointly")
-    if (s_or_hh && income) return 71700
-    if (mfj && income) return 111700
-    if (status=="married") return 55850
+    if (s_or_hh && income) return 72900
+    if (mfj && income) return 113400
+    if (status=="married") return 56700
 
     return 0
     //No longer calculating phase-out
@@ -16,8 +16,8 @@ function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
     return (status=="married")
-       ? income * (income <=97400 ? .26 : .28) - 1948
-       : income * (income <=194800? .26 : .28) - 3896
+       ? income * (income <=98950  ? .26 : .28) - 1979
+       : income * (income <=197900 ? .26 : .28) - 3958
 }
 
 function med_expenses(expenses, agi){
@@ -31,11 +31,11 @@ function med_expenses(expenses, agi){
 pyversion(<|
 def get_amt_exemption(income):
     if (status=="single" or status=="head of household") and income < 510300:
-        return 71700
+        return 72900
     if (status=="married filing jointly") and income < 1020600:
-        return 111700
+        return 113400
     if (status=="married") and income < 510300:
-        return 55850
+        return 56700
     print("AMT exemption is partially implemented.")
     return 0
 
@@ -43,9 +43,9 @@ def get_amt_exemption(income):
 def get_tamt(income):
     if income<=0: return 0
     if status=="married":
-        return income * (.26 if  income <=97400 else .28) - 1948
+        return income * (.26 if income <=98950  else .28) - 1979
     else:
-        return income * (.26 if  income <=194800 else .28) - 3896
+        return income * (.26 if income <=197900 else .28) - 3958
 
 def med_expenses(expenses, agi):
     if (not (over_65 or  spouse_over_65)): return 0
