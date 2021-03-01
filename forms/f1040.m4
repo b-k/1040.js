@@ -315,47 +315,52 @@ Cell(subtractions_from_income, 36,Sum of subtractions from gross income (PI), <|
 
 m4_form(f1040)
 
-Cell(wages,1,<|Wages, salaries, tips, from form W-2|>,  , u)
-Cell(interest, 2.5,Taxable interest,  , u)
+Cell(wages, 1, <|Wages, salaries, tips, from form W-2|>,  , u)
+Cell(interest, 2.5, Taxable interest,  , u)
 Cell(qualified_dividends, 3.4,Dividends qualifying for the long-term cap gains rate,, u cap_gains)
 Cell(dividends, 3.5, all dividends,, u)
-Cell(iras_pensions, 4.5,Taxable IRA distributions,, u)
-Cell(taxable_ss_benefits, 5.5,Taxable social security benefits,, u over_65 spouse_over_65)
-Cell(capital_gains, 6, <|Capital gains from Schedule D|>,, u cap_gains)
+Cell(iras, 4.5, Taxable IRA distributions,, u)
+Cell(pensions, 5.5, Taxable pension distributions,, u)
+Cell(taxable_ss_benefits, 6.5,Taxable social security benefits,, u over_65 spouse_over_65)
+Cell(capital_gains, 7, <|Capital gains from Schedule D|>,, u cap_gains)
 
-Cell(MAGI, 0,Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras_pensions, taxable_ss_benefits,capital_gains)|>)
-Cell(total_in, 7,Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
+Cell(MAGI, 0, Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras, pensions, taxable_ss_benefits,capital_gains)|>)
+Cell(total_in, 9, Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
 
-Cell(AGI, 8,Adjusted gross income, <|max(CV(total_in) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
+Cell(charitable_for_std_ded, 10.25, Charitable contributions if not itemizing, , u)
+Cell(charitable_for_std_ded_limited, 10.5, <|Charitable contributions if not itemizing, limited|>, <|min(CV(charitable_for_std_ded), Fswitch((married, 150), 300))|>)
 
-Cell(std_deduction,9,Standard deductions, <|Fswitch((married filing jointly, 24800), (head of household, 18650), 12400)|>, )
-Cell(deductions,9,Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 
-Cell(qbi, 10, 20% discount on qualified business income (f8995), , u)
-Cell(taxable_income, 11, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
+Cell(AGI, 11, Adjusted gross income, <|max(CV(total_in) + CV(charitable_for_std_ded_limited) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
 
-Cell(tax, 12.1,Tax, <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_ws, total_tax))|>, critical)
-Cell(other_taxes, 12.3,<|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
-Cell(pretotal_tax, 12.4,<|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
+Cell(std_deduction, 12, Standard deductions, <|Fswitch((married filing jointly, 24800), (head of household, 18650), 12400)|>, )
+Cell(deductions, 12, Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
+
+Cell(qbi, 13, 20% discount on qualified business income (f8995), , u)
+Cell(taxable_income, 15, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
+
+Cell(tax, 16.1, Tax, <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_ws, total_tax))|>, critical)
+Cell(other_taxes, 16.3, <|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
+Cell(pretotal_tax, 16.4, <|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
     
-Cell(credits, 13,<|CTC and Schedule 3, other credits|>, <|CV(f1040sch3, nonrefundable_total) + CV(ctc_ws_1040, ctc)|>, critical)
+Cell(credits, 19, <|CTC and Schedule 3, other credits|>, <|CV(f1040sch3, nonrefundable_total) + CV(ctc_ws_1040, ctc)|>, critical)
 
-Cell(tax_minus_credits, 14, Tax minus credits, <|max(CV(pretotal_tax)-CV(credits), 0)|>, critical)
+Cell(tax_minus_credits, 22, Tax minus credits, <|max(CV(pretotal_tax)-CV(credits), 0)|>, critical)
 
-Cell(postcredit_taxes, 15, <|Other taxes, incl. self-employment|>, , u)
+Cell(postcredit_taxes, 23, <|Other taxes, incl. self-employment|>, , u)
 
 #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
-Cell(total_tax, 15, Total tax, <|CV(tax_minus_credits)+CV(postcredit_taxes)|>)
+Cell(total_tax, 24, Total tax, <|CV(tax_minus_credits)+CV(postcredit_taxes)|>)
 
-Cell(federal_tax_withheld, 17,Federal income tax withheld from Forms W-2 and 1099,, u)
-Cell(eitc, 18.1,Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
-Cell(actc, 18.2, Refundable child tax credit, <|CV(ctc_sch8812, refundable_ctc)|>, kids)
-Cell(ed_tc, 18.3, Refundable education credits, <|CV(f8863, refundable_credit)|>, s_loans)
-Cell(other_tc, 18.4, <|Other asst credits from Sch 3|>, ,u)
+Cell(federal_tax_withheld, 25, Federal income tax withheld from Forms W-2 and 1099,, u)
+Cell(eitc, 27, Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
+Cell(actc, 28, Refundable child tax credit, <|CV(ctc_sch8812, refundable_ctc)|>, kids)
+Cell(ed_tc, 29, Refundable education credits, <|CV(f8863, refundable_credit)|>, s_loans)
+Cell(other_tc, 31, <|Other asst credits from Sch 3|>, ,u)
 
-Cell(total_payments, 18,Total payments, <|SUM(federal_tax_withheld, eitc, actc, ed_tc, other_tc)|>)
-Cell(refund, 19, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
-Cell(tax_owed, 20,Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
+Cell(total_payments, 33, Total payments, <|SUM(federal_tax_withheld, eitc, actc, ed_tc, other_tc)|>)
+Cell(refund, 34, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
+Cell(tax_owed, 37, Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
 
 m4_form(f1040sch2)
 Cell(amt, 1, Alternative minimum tax, <|CV(f6251,amt)|>, itemizing)
@@ -398,8 +403,8 @@ Cell(refundable_ctc, 15, Refundable child tax credit, <|actc(CV(limited_unused),
 
 m4_form(f1040_tax_refund_ws)
 Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on last year's Schedule A|>,, u ly_refund)
-Cell(last_year_5d, 1, <|Enter line 29 of your 2017 Schedule A|>,, u ly_refund)
-Cell(last_year_limited_deductions, 1.3, <|Enter line 5e of your 2017 Schedule A|>,, u ly_refund)
+Cell(last_year_5d, 1, <|Enter line 29 of your 2019 Schedule A|>,, u ly_refund)
+Cell(last_year_limited_deductions, 1.3, <|Enter line 5e of your 2019 Schedule A|>,, u ly_refund)
 Cell(last_year_reduced, 2, <|Last year's deductions, maybe reduced|>,<|max(CV(last_year_5d)-CV(last_year_limited_deductions), 0)|>, ly_refund)
 Cell(last_year_post_limit, 3, <|Last year's tax deducted, limited|>,<|max(CV(last_year_refund)-CV(last_year_reduced), 0)|>, ly_refund)
 Cell(last_year_total_deductions, 4, <|Last year's itemized deductions|>, , u ly_refund)
