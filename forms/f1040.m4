@@ -331,7 +331,7 @@ Cell(charitable_for_std_ded, 10.25, Charitable contributions if not itemizing, ,
 Cell(charitable_for_std_ded_limited, 10.5, <|Charitable contributions if not itemizing, limited|>, <|min(CV(charitable_for_std_ded), Fswitch((married, 150), 300))|>)
 
 
-Cell(AGI, 11, Adjusted gross income, <|max(CV(total_in) + CV(charitable_for_std_ded_limited) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
+Cell(AGI, 11, Adjusted gross income, <|max(CV(total_in) - CV(charitable_for_std_ded_limited) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
 
 Cell(std_deduction, 12, Standard deductions, <|Fswitch((married filing jointly, 24800), (head of household, 18650), 12400)|>, )
 Cell(deductions, 12, Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
