@@ -16,15 +16,15 @@ function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
     return (status=="married")
-       ? income * (income <=98950  ? .26 : .28) - 1979
-       : income * (income <=197900 ? .26 : .28) - 3958
+       ? income * (income <=98950  ? 0.26 : 0.28) - 1979
+       : income * (income <=197900 ? 0.26 : 0.28) - 3958
 }
 
 function med_expenses(expenses, agi){
     var over_65 = situations[".over_65"] ||situations[".spouse_over_65"]
 
     if (!over_65) return 0
-    return Math.max(Math.min(expenses, .025*agi), 0)
+    return Math.max(Math.min(expenses, 0.025*agi), 0)
 }
 |>)
 
@@ -43,13 +43,13 @@ def get_amt_exemption(income):
 def get_tamt(income):
     if income<=0: return 0
     if status=="married":
-        return income * (.26 if income <=98950  else .28) - 1979
+        return income * (0.26 if income <=98950  else 0.28) - 1979
     else:
-        return income * (.26 if income <=197900 else .28) - 3958
+        return income * (0.26 if income <=197900 else 0.28) - 3958
 
 def med_expenses(expenses, agi):
     if (not (over_65 or  spouse_over_65)): return 0
-    return max(min(expenses, .025*agi), 0)
+    return max(min(expenses, 0.025*agi), 0)
 |>)
 
 m4_form(f6251)

@@ -2,15 +2,15 @@ m4_form(f8863)
 
 Cell(pt3_divider, 0, >>>>>>>>>>>> Part III first                                   , 0)
 Cell(education_expenses_1, 27, <|Education expenses (student 1)|>, , u s_loans)
-Cell(scaled_education_expenses_1, 28, <|Limited Education expenses (s1)|>, <|max(.25*(min(CV(education_expenses_1), 4000)-2000),0)|> , s_loans)
+Cell(scaled_education_expenses_1, 28, <|Limited Education expenses (s1)|>, <|max(0.25*(min(CV(education_expenses_1), 4000)-2000),0)|> , s_loans)
 Cell(rescaled_education_expenses_1, 29, <|Relimited Education expenses (s1)|>, <|IF(CV(education_expenses_1)<=2000, CV(education_expenses_1), CV(scaled_education_expenses_1)+2000)|>, s_loans)
 
 Cell(education_expenses_2, 27, <|Education expenses (student 2)|>, , u s_loans)
-Cell(scaled_education_expenses_2, 28, <|Limited Education expenses (s2)|>, <|max(.25*(min(CV(education_expenses_2), 4000)-2000),0)|> , s_loans)
+Cell(scaled_education_expenses_2, 28, <|Limited Education expenses (s2)|>, <|max(0.25*(min(CV(education_expenses_2), 4000)-2000),0)|> , s_loans)
 Cell(rescaled_education_expenses_2, 29, <|Relimited Education expenses (s2)|>, <|IF(CV(education_expenses_2)<=2000, CV(education_expenses_2), CV(scaled_education_expenses_2)+2000)|>, s_loans)
 
 Cell(education_expenses_3, 27, <|Education expenses (student 3)|>, , u s_loans)
-Cell(scaled_education_expenses_3, 28, <|Limited Education expenses (s3)|>, <|max(0,.25*(min(CV(education_expenses_3), 4000)-2000),0)|> , s_loans)
+Cell(scaled_education_expenses_3, 28, <|Limited Education expenses (s3)|>, <|max(0,0.25*(min(CV(education_expenses_3), 4000)-2000),0)|> , s_loans)
 Cell(rescaled_education_expenses_3, 29, <|Relimited Education expenses (s3)|>, <|IF(CV(education_expenses_3)<=2000, CV(education_expenses_3), CV(scaled_education_expenses_3)+2000)|>, s_loans)
 
 Cell(adjusted_qualified_expenses, 31, <|Total adjusted qualified expenses, all students|>, , u s_loans)

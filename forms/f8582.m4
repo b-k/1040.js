@@ -26,7 +26,7 @@ Cell(f8582_min, 5, the smaller of the loss on line 1d or the loss on line 4, <|m
 
 Cell(magi, 7, MAGI, <|CV(f1040, MAGI)|>, have_rr)
 
-Cell(f8582_half, 9, <|Half of line 8, up to 25k|>, <|-min(25000, max(150000 - max(CV(magi), 0), 0)/2.)|>, have_rr)
+Cell(f8582_half, 9, <|Half of line 8, up to 25k|>, <|-min(25000, max(150000 - max(CV(magi), 0), 0)/2.0)|>, have_rr)
 Cell(allowed_extra_real_losses, 10, Allowed above-passive real estate losses, <|max(CV(f8582_min), CV(f8582_half))|>, have_rr)
 Cell(allowed_real_losses, 10, Total allowed real estate losses, <|CV(allowed_extra_real_losses)- CV(f8582_net_in)|>, have_rr)
 Cell(carryover_to_next_year, 10, Carry this over to next year, <|CV(ws1_8582_net_loss) + CV(ws1_8582_prior_loss) + CV(allowed_real_losses)|>, have_rr)

@@ -37,16 +37,16 @@ var cgrate = function(income){
     var filing_status = fstatus();
     if (filing_status == "single") {
         if (income < 38600) return    0;
-        if (income < 425800) return   .15;
+        if (income < 425800) return   0.15;
     } else if (filing_status == "married filing jointly") {
         if (income < 77200) return    0;
-        if (income < 479000) return   .15;
+        if (income < 479000) return   0.15;
     } else if (filing_status == "married") {
         if (income < 38600) return    0;
-        if (income < 239500) return   .15;
+        if (income < 239500) return   0.15;
     } else if (filing_status == "head of household") {
         if (income < 51700) return    0;
-        if (income < 452400) return   .15;
+        if (income < 452400) return   0.15;
     }
     return .2;
 }
@@ -201,16 +201,16 @@ def cgrate(income):
     filing_status = fstatus()
     if (filing_status == "single"):
         if (income < 38600): return  0
-        if (income < 425800): return .15
+        if (income < 425800): return 0.15
     if (filing_status == "married filing jointly"):
         if (income < 77200): return    0
-        if (income < 479000): return   .15
+        if (income < 479000): return   0.15
     if (filing_status == "married"):
         if (income < 38600): return    0
-        if (income < 239500): return   .15
+        if (income < 239500): return   0.15
     if (filing_status == "head of household"):
         if (income < 51700): return    0
-        if (income < 452400): return   .15
+        if (income < 452400): return   0.15
     return .2;
 
 
@@ -396,13 +396,13 @@ m4_form(ctc_sch8812)
 Cell(unused_ctc, 3, CTC not used, <|max(0, CV(ctc_ws_1040,credit_remaining) - CV(ctc_ws_1040, ctc))|>, kids)
 Cell(fourteen_kids, 4, <|$1,400 per kid|>, <|fourteenkids()|>, kids)
 Cell(limited_unused, 5, Limited unused CTC, <|min(CV(unused_ctc),CV(fourteen_kids))|>, kids)
-Cell(scaled_earned_income, 8, <|15 percent of earned income-2500|>, <|max(0, .15*(CV(f1040, wages)-2500))|>, kids)
+Cell(scaled_earned_income, 8, <|15 percent of earned income-2500|>, <|max(0, 0.15*(CV(f1040, wages)-2500))|>, kids)
 Cell(ss_and_medicare_withheld, 11, <|Social security and medicare withheld on W-2 lines 4 and 6|>, , u kids)
 Cell(refundable_ctc, 15, Refundable child tax credit, <|actc(CV(limited_unused), CV(scaled_earned_income), CV(ss_and_medicare_withheld), CV(f1040, eitc))|>, kids)
 
 
 m4_form(f1040_tax_refund_ws)
-Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099­G, up to income taxes on last year's Schedule A|>,, u ly_refund)
+Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099G, up to income taxes on last year's Schedule A|>,, u ly_refund)
 Cell(last_year_5d, 1, <|Enter line 29 of your 2019 Schedule A|>,, u ly_refund)
 Cell(last_year_limited_deductions, 1.3, <|Enter line 5e of your 2019 Schedule A|>,, u ly_refund)
 Cell(last_year_reduced, 2, <|Last year's deductions, maybe reduced|>,<|max(CV(last_year_5d)-CV(last_year_limited_deductions), 0)|>, ly_refund)
