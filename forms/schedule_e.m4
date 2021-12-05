@@ -38,16 +38,18 @@ Cell(total_rental_expenses, 20, Total expenses, <|SUM(rental_advertising, rental
 Cell(net_rents, 21, Rents minus expenses, <|CV(rents_received) - CV(total_rental_expenses)|>, have_rr)
 Cell(net_royalties, 21.1, Royalties minus expenses, <|CV(royalties_received) - CV(royalty_expenses)|>, have_rr)
 
-Cell(deductible_rr_losses, 22, Deductible rental real estate loss after limitation, <|CV(f8582, total_losses_8582)|>, have_rr)
+Cell(deductible_rr_losses, 22, Limited deductible rental real estate loss and/or prior year losses, <|CV(f8582, total_losses_8582)|>, have_rr)
+Cell(post_8582_net_rents, 22.5, Rental profit or loss after line 22, <|IF(CV(net_rents)>0, CV(net_rents) + CV(deductible_rr_losses), CV(deductible_rr_losses))|>, have_rr)
 
 Cell(sched_e_sum3, 23.0, Total for line 3 for all rentals, <|CV(rents_received)|>, have_rr)
 Cell(sched_e_sum4, 23.2, Total for line 4 for all royaltys, <|CV(royalties_received)|>, have_rr)
-Cell(sched_e_sum12, 23.4, Total for line 12 for all propertiess, <|CV(mortgage_interest)|>, have_rr)
-Cell(sched_e_sum18, 23.6, Total for line 18 for all propertiess, <|CV(depreciation)|>, have_rr)
-Cell(sched_e_sum20, 23.8, Total for line 20 for all propertiess, <|CV(total_rental_expenses)|>, have_rr)
+Cell(sched_e_sum12, 23.4, Total for line 12 for all properties, <|CV(mortgage_interest)|>, have_rr)
+Cell(sched_e_sum18, 23.6, Total for line 18 for all properties, <|CV(depreciation)|>, have_rr)
+Cell(sched_e_sum20, 23.8, Total for line 20 for all properties, <|CV(total_rental_expenses)|>, have_rr)
 
-Cell(sched_e_income, 24, Positive RR Income (PI), <|max(0,CV(net_rents)) + max(0,CV(net_royalties))|>, have_rr)
-Cell(rr_losses, 25, Royalty losses plus possibly limited rental losses (PI), <|IF(CV(rents_received) > 0, CV(deductible_rr_losses), <|min(0,CV(net_rents))|>) + min(CV(net_royalties),0)|>, have_rr)
+Cell(sched_e_income, 24, Positive RR Income (PI), <|max(0,CV(post_8582_net_rents)) + max(0,CV(net_royalties))|>, have_rr)
+Cell(rr_losses, 25, Royalty losses plus possibly limited rental losses (PI), <|min(0,CV(post_8582_net_rents)) + min(CV(net_royalties),0)|>, have_rr)
+Ce<||>ll(rr_losses, 25, Royalty losses plus possibly limited rental losses (PI), <|min(0,CV(post_8582_net_rents)) - min(CV(net_royalties),0)|>, have_rr)
 Cell(rr_income, 26, Total rents and royalties, <|SUM(sched_e_income, rr_losses)|>, have_rr)
 
 m4_form(f4562)
