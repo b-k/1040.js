@@ -1,18 +1,18 @@
 jsversion(<|
 //2018 tax rate schedules
 //Could be inlined, but not going to bother.
-// https://www.irs.gov/pub/irs-prior/f1040es--2020.pdf
+// https://www.irs.gov/pub/irs-prior/f1040es--2021.pdf
 
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 9875, 40125, 85525, 163300, 207350, 518400, 1e20]
+        cuts=[0, 9950, 40525, 86375, 164925, 209425, 523600, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 19750, 80250, 171050, 326600, 414700, 622050, 1e20]
+        cuts=[0, 19900, 81050, 172750, 329850, 418850, 628300, 1e20]
     } else if (filing_status == "married") {
-        cuts=[0, 9875, 40125, 85525, 163300, 207350, 311025, 1e20]
+        cuts=[0, 9950, 40525, 86375, 164925, 209425, 314150, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 14100, 53700, 85500, 163300, 207350, 518400 ,1e20]
+        cuts=[0, 14200, 54200, 86350, 164900, 209400, 523600 ,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -36,17 +36,17 @@ var tax_calc = function (inval){
 var cgrate = function(income){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        if (income < 38600) return    0;
-        if (income < 425800) return   0.15;
+        if (income < 40400) return    0;
+        if (income < 445850) return   0.15;
     } else if (filing_status == "married filing jointly") {
-        if (income < 77200) return    0;
-        if (income < 479000) return   0.15;
+        if (income < 80800) return    0;
+        if (income < 501600) return   0.15;
     } else if (filing_status == "married") {
-        if (income < 38600) return    0;
-        if (income < 239500) return   0.15;
+        if (income < 40400) return    0;
+        if (income < 250800) return   0.15;
     } else if (filing_status == "head of household") {
-        if (income < 51700) return    0;
-        if (income < 452400) return   0.15;
+        if (income < 54100) return    0;
+        if (income < 473750) return   0.15;
     }
     return .2;
 }
@@ -55,17 +55,16 @@ var eitc = function(income, k){
     if (fstatus()=="married") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    //See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     //Or, search the internet for the phrase "For taxable years beginning in 20xx, the following
     // amounts are used to determine the earned income credit under § 32(b)."
     //For 2019: https://www.irs.gov/irb/2018-49_IRB
     //For 2020: https://www.irs.gov/irb/2019-47_IRB
     //For 2022: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
     //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    data=[[7030, 538, 8790, 15820, 14680, 21710],
-          [10540, 3584, 19330, 41756, 25220, 47646],
-          [14800, 5920, 19330, 47440, 25220, 53330],
-          [14800, 6660, 19330, 50954, 25220, 56844]]
+    data=[[7100, 543, 8800, 15980, 14820, 21920],
+          [10640, 3681, 19520, 42158, 25470, 48108],
+          [14950, 5980, 19520, 47915, 25470, 53865],
+          [14950, 6728, 19520, 51464, 25470, 57414]]
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -174,13 +173,13 @@ def fstatus():
 def tax_table(inval):
     filing_status = fstatus()
     if filing_status == "single":
-        cuts=[0, 9875, 40125, 85525, 163300, 207350, 518400, 1e20]
+        cuts=[0, 9950, 40525, 86375, 164925, 209425, 523600, 1e20]
     if filing_status == "married filing jointly":
-        cuts=[0, 19750, 80250, 171050, 326600, 414700, 622050, 1e20]
+        cuts=[0, 19900, 81050, 172750, 329850, 418850, 628300, 1e20]
     if filing_status == "married":
-        cuts=[0, 9875, 40125, 85525, 163300, 207350, 311025, 1e20]
+        cuts=[0, 9950, 40525, 86375, 164925, 209425, 314150, 1e20]
     if filing_status == "head of household":
-        cuts=[0, 14100, 53700, 85500, 163300, 207350, 518400 ,1e20]
+        cuts=[0, 14200, 54200, 86350, 164900, 209400, 523600 ,1e20]
 
     rate=[0.1, 0.12, 0.22 , 0.24 ,0.32, 0.35, 0.37]
     i=0
@@ -200,17 +199,17 @@ def tax_calc(inval):
 def cgrate(income):
     filing_status = fstatus()
     if (filing_status == "single"):
-        if (income < 38600): return  0
-        if (income < 425800): return 0.15
+        if (income < 40400): return  0
+        if (income < 445850): return 0.15
     if (filing_status == "married filing jointly"):
-        if (income < 77200): return    0
-        if (income < 479000): return   0.15
+        if (income < 80800): return    0
+        if (income < 501600): return   0.15
     if (filing_status == "married"):
-        if (income < 38600): return    0
-        if (income < 239500): return   0.15
+        if (income < 40400): return    0
+        if (income < 250800): return   0.15
     if (filing_status == "head of household"):
-        if (income < 51700): return    0
-        if (income < 452400): return   0.15
+        if (income < 54100): return    0
+        if (income < 473750): return   0.15
     return .2;
 
 
@@ -218,10 +217,10 @@ def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
     #and irs.gov/irb/2018-10_IRB#RP-2018-18
     #plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    data=[[6780, 519, 8490, 15270, 14170, 20950],
-          [10180, 3461,  18660, 40320, 24350, 46010],
-          [14290, 5716, 18660, 45802, 24350, 51492],
-          [14290, 6431, 18660, 49194, 24350, 54884]]
+    data=[[7100, 543, 8800, 15980, 14820, 21920],
+          [10640, 3681, 19520, 42158, 25470, 48108],
+          [14950, 5980, 19520, 47915, 25470, 53865],
+          [14950, 6728, 19520, 51464, 25470, 57414]]
     row=kids if kids <=3 else 3
 
     plateu_start=0
