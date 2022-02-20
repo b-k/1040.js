@@ -293,24 +293,38 @@ m4_form(f1040sch1)
     Cell(rr_income,5, Rents and royalties from Schedule E,<|CV(f1040_sched_e,rr_income)|>,have_rr)
     Cell(farm_income, 6, Farm income from Schedule F,, u)
     Cell(unemployment, 7, Unemployment compensation,, u)
-    Cell(other_in, 8,Other income,, u)
-    Cell(sch1_magi_subtotal, 22, Schedule 1 subtotal w/o Rents/Royalties, <|CV(f1040_tax_refund_ws, taxable_refund) + SUM(alimony, sched_c, sale_of_biz, farm_income, unemployment, other_in)|>)
+    Cell(other_in, 8,
+        other income (see Sch 1 for the list), , u
+    )
+    Cell(sch1_magi_subtotal, 9,
+        Schedule 1 subtotal w/o Rents/Royalties,
+        <|CV(f1040_tax_refund_ws, taxable_refund) + SUM(alimony, sched_c, sale_of_biz, farm_income, unemployment, other_in)|>
+    )
 
 Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
 #23 Educator expenses . . . . . . . . . . . 23
 #24 Certain business expenses of reservists, performing artists, and fee-basis government officials. Attach Form 2106 or 2106-EZ 24
-#25 Health savings account deduction. Attach Form 8889 . 25
 #26 Moving expenses, Form 3903 . . . . . . 26
 #27 Deductible part of self-employment tax from Schedule SE . 27
 #28 Self-employed SEP, SIMPLE, and qualified plans . . 28
 #29 Self-employed health insurance deduction . . . . 29
 #30 Penalty on early withdrawal of savings . . . . . . 30
 #31a Alimony paid
-Cell(ira_deduction, 19, IRA deduction, ,u)
-Cell(student_loan_interest_ded, 20, Student loan interest deduction , <|CV(student_loan_ws_1040, final_credit)|>, s_loans)
-Cell(tuition_subtraction, 21, Tuition and fees from f8917, , u)
-
-Cell(subtractions_from_income, 36,Sum of subtractions from gross income (PI), <|SUM(ira_deduction, student_loan_interest_ded, tuition_subtraction)|>)
+    Cell(hsa_deduction, 13,
+        Health Savings Account deduction, , u
+    )
+    Cell(ira_deduction, 20,
+        IRA deduction, , u
+    )
+    Cell(student_loan_interest_ded, 21,
+        Student loan interest deduction,
+        <|CV(student_loan_ws_1040, final_credit)|>,
+        s_loans
+    )
+    Cell(subtractions_from_income, 26,
+        Sum of adjustments to income (PI, see Sch2 for list),
+        <|SUM(hsa_deduction, ira_deduction, student_loan_interest_ded)|>
+    )
 
 m4_form(f1040)
 
@@ -332,7 +346,7 @@ Cell(charitable_for_std_ded_limited, 10.5, <|Charitable contributions if not ite
 
 Cell(AGI, 11, Adjusted gross income, <|max(CV(total_in) - CV(charitable_for_std_ded_limited) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
 
-Cell(std_deduction, 12, Standard deductions, <|Fswitch((married filing jointly, 24800), (head of household, 18650), 12400)|>, )
+Cell(std_deduction, 12, Standard deductions, <|Fswitch((married filing jointly, 25100), (head of household, 18800), 12550)|>, )
 Cell(deductions, 12, Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 
 Cell(qbi, 13, 20% discount on qualified business income (f8995), , u)
