@@ -41,7 +41,7 @@ m4_form(f8582)
         have_rr
     )
     Cell(f8582_commercial_revitalization, 2,
-        Commercial revitalization deductions (UI), , have_rr u
+        Commercial revitalization deductions (UI), 0, have_rr
     )
     Cell(f8582_passive_activities, 3,
         Active plus Passive activity income (UI),

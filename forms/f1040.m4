@@ -51,6 +51,30 @@ var cgrate = function(income){
     return .2;
 }
 
+var std_ded_fn = function(){
+    var over_65_ct = situations[".over_65"] + situations[".spouse_over_65"];
+    if (fstatus() == "single"){
+         if (over65ct==0)      return 12550;
+         else if (over65ct==1) return 14250;
+         else                  return 15950;
+    }
+    if (fstatus() == "married filing jointly"){
+         if (over65ct==0)      return 25100;
+         else if (over65ct==1) return 26450;
+         else                  return 27800;
+    }
+    if (fstatus() == "married"){
+         if (over65ct==0)      return 18800;
+         else if (over65ct==1) return 26450;
+         else                  return 27800;
+    }
+    if (fstatus() == "head of household"){
+         if (over65ct==0)      return 18800;
+         else if (over65ct==1) return 20500;
+         else                  return 22200;
+    }
+}
+
 var eitc = function(income, k){
     if (fstatus()=="married") return 0
     var kids = parseFloat(document.getElementById("kids").value)
@@ -212,6 +236,28 @@ def cgrate(income):
         if (income < 473750): return   0.15
     return .2;
 
+def std_ded_fn():
+    over65ct = Situation(over_65) + Situation(spouse_over_65)
+    if fstatus() == "single":
+         if (over65ct==0): return 12550
+         if (over65ct==1): return 14250
+         return 15950
+
+    if fstatus() == "married filing jointly":
+         if (over65ct==0): return 25100
+         if (over65ct==1): return 26450
+         return 27800
+
+    if fstatus() == "married":
+         if (over65ct==0): return 18800
+         if (over65ct==1): return 26450
+         return 27800
+
+    if fstatus() == "head of household":
+         if (over65ct==0): return 18800
+         if (over65ct==1): return 20500
+         return 22200
+
 
 def eitc(income, kids):
     #See http://www.taxpolicycenter.org/taxfacts/displayafact.cfm?Docid=36
@@ -301,15 +347,15 @@ m4_form(f1040sch1)
         <|CV(f1040_tax_refund_ws, taxable_refund) + SUM(alimony, sched_c, sale_of_biz, farm_income, unemployment, other_in)|>
     )
 
-Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
-#23 Educator expenses . . . . . . . . . . . 23
-#24 Certain business expenses of reservists, performing artists, and fee-basis government officials. Attach Form 2106 or 2106-EZ 24
-#26 Moving expenses, Form 3903 . . . . . . 26
-#27 Deductible part of self-employment tax from Schedule SE . 27
-#28 Self-employed SEP, SIMPLE, and qualified plans . . 28
-#29 Self-employed health insurance deduction . . . . 29
-#30 Penalty on early withdrawal of savings . . . . . . 30
-#31a Alimony paid
+    Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
+    #23 Educator expenses . . . . . . . . . . . 23
+    #24 Certain business expenses of reservists, performing artists, and fee-basis government officials. Attach Form 2106 or 2106-EZ 24
+    #26 Moving expenses, Form 3903 . . . . . . 26
+    #27 Deductible part of self-employment tax from Schedule SE . 27
+    #28 Self-employed SEP, SIMPLE, and qualified plans . . 28
+    #29 Self-employed health insurance deduction . . . . 29
+    #30 Penalty on early withdrawal of savings . . . . . . 30
+    #31a Alimony paid
     Cell(hsa_deduction, 13,
         Health Savings Account deduction, , u
     )
@@ -321,9 +367,16 @@ Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                      
         <|CV(student_loan_ws_1040, final_credit)|>,
         s_loans
     )
+    Cell(other_adjustments, 25,
+        All other adjustments anywhere on Sch2 part II, , u
+    )
+    Cell(subtractions_from_income_wo_student_loans, 26.1,
+        Adjustments excluding student loans,
+        <|SUM(hsa_deduction, ira_deduction, other_adjustments)|>
+    )
     Cell(subtractions_from_income, 26,
-        Sum of adjustments to income (PI, see Sch2 for list),
-        <|SUM(hsa_deduction, ira_deduction, student_loan_interest_ded)|>
+        Sum of adjustments to income,
+        <|SUM(hsa_deduction, ira_deduction, student_loan_interest_ded, other_adjustments)|>
     )
 
 m4_form(f1040)
@@ -343,10 +396,16 @@ Cell(total_in, 9, Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
 Cell(charitable_for_std_ded, 10.25, Charitable contributions if not itemizing, , u)
 Cell(charitable_for_std_ded_limited, 10.5, <|Charitable contributions if not itemizing, limited|>, <|min(CV(charitable_for_std_ded), Fswitch((married, 150), 300))|>)
 
-
-Cell(AGI, 11, Adjusted gross income, <|max(CV(total_in) - CV(charitable_for_std_ded_limited) - CV(f1040sch1, subtractions_from_income),0)|>, critical)
-
-Cell(std_deduction, 12, Standard deductions, <|Fswitch((married filing jointly, 25100), (head of household, 18800), 12550)|>, )
+    Cell(AGI, 11,
+        Adjusted gross income,
+        <|max(CV(total_in) - CV(charitable_for_std_ded_limited) - CV(f1040sch1, subtractions_from_income),0)|>,
+        critical
+    )
+    Cell(std_deduction, 12,
+        Standard deductions,
+        <|std_ded_fn()|>,
+        critical
+    )
 Cell(deductions, 12, Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
 
 Cell(qbi, 13, 20% discount on qualified business income (f8995), , u)
@@ -356,9 +415,20 @@ Cell(tax, 16.1, Tax, <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_
 Cell(other_taxes, 16.3, <|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
 Cell(pretotal_tax, 16.4, <|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
     
-Cell(credits, 19, <|CTC and Schedule 3, other credits|>, <|CV(f1040sch3, nonrefundable_total) + CV(ctc_ws_1040, ctc)|>, critical)
-
-Cell(tax_minus_credits, 22, Tax minus credits, <|max(CV(pretotal_tax)-CV(credits), 0)|>, critical)
+    Cell(tax_plus_amt_and_repayment, 18,
+        <|Tax plus Sch2|>,
+        <|CV(pretotal_tax)+CV(f1040sch2, sch2_total)|>
+    )
+    Cell(credits, 19,
+        <|CTC and Schedule 3, other credits|>,
+        <|CV(f1040sch3, nonrefundable_total) + CV(ctc_ws_1040, ctc)|>,
+        critical
+    )
+    Cell(tax_minus_credits, 22,
+        Tax minus credits,
+        <|max(CV(tax_plus_amt_and_repayment)-CV(credits), 0)|>,
+        critical
+    )
 
 Cell(postcredit_taxes, 23, <|Other taxes, incl. self-employment|>, , u)
 
@@ -376,27 +446,66 @@ Cell(refund, 34, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
 Cell(tax_owed, 37, Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
 
 m4_form(f1040sch2)
-Cell(amt, 1, Alternative minimum tax, <|CV(f6251,amt)|>, itemizing)
-Cell(credit_repayment, 46, Excess advance premium tax credit repayment, , u)
+    Cell(amt, 1,
+        Alternative minimum tax,
+        <|CV(f6251,amt)|>,
+        itemizing
+    )
+    Cell(credit_repayment, 2,
+        Excess advance premium tax credit repayment, , u
+    )
+    Cell(sch2_total, 2,
+        <|CV(amt)+CV(credit_repayment)|>,
+        itemizing
+    )
 
 m4_form(f1040sch3)
-Cell(ftc, 1, Foreign tax credit, , u)
-Cell(dependent_care, 2, Dependent care expenses, , u)
-Cell(ed_credits, 3, Education credits via f8863, <|CV(f8863, nonrefundable_credit)|>, s_loans)
-Cell(nonrefundable_total, 7, Total nonrefundable credits, <|CV(ftc)+CV(dependent_care)+CV(ed_credits)|>)
+    Cell(ftc, 1,
+        Foreign tax credit, , u
+    )
+    Cell(dependent_care, 2, Dependent care expenses,
+        , u
+    )
+    Cell(ed_credits, 3,
+        Education credits via f8863,
+        <|CV(f8863, nonrefundable_credit)|>,
+        s_loans
+    )
+    Cell(elderly_disabled_credits, 6.4,
+        Elderly or disabled credit from Schedule R, , u
+    )
+    Cell(nonrefundable_total, 8,
+        Total nonrefundable credits,
+        <|CV(ftc)+CV(dependent_care)+CV(elderly_disabled_credits)+CV(ed_credits)|>
+    )
 
 m4_form(student_loan_ws_1040)
-Cell(student_loan_interest, 1,Interest you paid in 2018 on qualified student loans,, u s_loans)
-
-Then the complicated phase-out calculation
-lines 2-4 are modified AGI before this point on the forms. With lines 23-32 unimplemented here,
-line 4 is therefore == line 2 == 1040 line 22 == Cv(f1040, total_in)
-Cell(loans_maxed, 1.1, <|Student loan interest, maxed at $2,500|>, <|min(CV(student_loan_interest), 2500)|>, s_loans)
-
-Cell(phase_out_pct, 6, total income minus phase-out limit, <|min(1, max(CV(f1040, total_in) - Fswitch((married, 140000), 70000), 0)/Fswitch((married, 30000), 15000))|>, s_loans)
-
-Cell(phased_out_loans, 8, phased-out loans, <|CV(loans_maxed)*CV(phase_out_pct)|>, s_loans)
-Cell(final_credit, 9, Student loan interest credit, <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>, s_loans)
+    Cell(student_loan_interest, 1,
+        Interest you paid in 2021 on qualified student loans,
+        , u s_loans
+    )
+    Cell(loans_maxed, 1.1,
+        <|Student loan interest, maxed at $2,500|>,
+        <|min(CV(student_loan_interest), 2500)|>,
+        s_loans
+    )
+    Cell(phase_out_pct, 6,
+        total income minus phase-out limit,
+        <|min(1, m4_dnl
+            max(CV(f1040, total_in) - CV(f1040sch1, subtractions_from_income_wo_student_loans) m4_dnl
+                - Fswitch((married, 140000), 70000), 0)/Fswitch((married, 30000), 15000))|>,
+        s_loans
+    )
+    Cell(phased_out_loans, 8,
+        phased-out loans,
+        <|CV(loans_maxed)*CV(phase_out_pct)/15000.|>,
+        s_loans
+    )
+    Cell(final_credit, 9,
+        Student loan interest credit,
+        <|max(CV(loans_maxed) - CV(phased_out_loans), 0)|>,
+        s_loans
+    )
 
 m4_form(ctc_ws_1040)
 Cell(two_thousand_per_child, 1, <|$2,000 per child under 17|>, <|thousandkids()|>, kids)
@@ -413,34 +522,121 @@ Cell(scaled_earned_income, 8, <|15 percent of earned income-2500|>, <|max(0, 0.1
 Cell(ss_and_medicare_withheld, 11, <|Social security and medicare withheld on W-2 lines 4 and 6|>, , u kids)
 Cell(refundable_ctc, 15, Refundable child tax credit, <|actc(CV(limited_unused), CV(scaled_earned_income), CV(ss_and_medicare_withheld), CV(f1040, eitc))|>, kids)
 
-
 m4_form(f1040_tax_refund_ws)
-Cell(last_year_refund, 1, <|Enter the income tax refund from Form(s) 1099G, up to income taxes on last year's Schedule A|>,, u ly_refund)
-Cell(last_year_5d, 1, <|Enter line 29 of your 2019 Schedule A|>,, u ly_refund)
-Cell(last_year_limited_deductions, 1.3, <|Enter line 5e of your 2019 Schedule A|>,, u ly_refund)
-Cell(last_year_reduced, 2, <|Last year's deductions, maybe reduced|>,<|max(CV(last_year_5d)-CV(last_year_limited_deductions), 0)|>, ly_refund)
-Cell(last_year_post_limit, 3, <|Last year's tax deducted, limited|>,<|max(CV(last_year_refund)-CV(last_year_reduced), 0)|>, ly_refund)
-Cell(last_year_total_deductions, 4, <|Last year's itemized deductions|>, , u ly_refund)
-Cell(almost_std_deduction,5,<|Last year's standard deduction (under your current status)|>, <|Fswitch((married filing jointly, 24400), (head of household, 18350), 12200)|>, ly_refund)
-Cell(srblind,6, <|Senior or blind exemption (blind UI; mfj PI)|>,<|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))* Fswitch((married, 1300), (married filing jointly, 1300), 1650)|>, ly_refund)
-Cell(itemized_over_std, 6.5, Itemized deduction minus standard for last year, <|max(CV(last_year_total_deductions) - CV(almost_std_deduction) - CV(srblind), 0)|>, ly_refund)
-Cell(taxable_refund, 7, Taxable tax refund, <| min(CV(itemized_over_std), CV(last_year_post_limit))|>, ly_refund)
-
+    Cell(last_year_refund, 1,
+        <|Enter the income tax refund from Form(s) 1099G, up to income taxes on last year's Schedule A|>,,
+        u ly_refund
+    )
+    Cell(last_year_5d, 1,
+        <|Enter line 29 of your 2019 Schedule A|>,,
+        u ly_refund
+    )
+    Cell(last_year_limited_deductions, 1.3,
+        <|Enter line 5e of your 2019 Schedule A|>,,
+        u ly_refund
+    )
+    Cell(last_year_reduced, 2,
+        <|Last year's deductions, maybe reduced|>,
+        <|max(CV(last_year_5d)-CV(last_year_limited_deductions), 0)|>,
+        ly_refund
+    )
+    Cell(last_year_post_limit, 3,
+        <|Last year's tax deducted, limited|>,
+        <|max(CV(last_year_refund)-CV(last_year_reduced), 0)|>,
+        ly_refund
+    )
+    Cell(last_year_total_deductions, 4,
+        <|Last year's itemized deductions|>,,
+        u ly_refund
+    )
+    Cell(almost_std_deduction, 5,
+        <|Last year's standard deduction (under your current status)|>,
+        <|Fswitch((married filing jointly, 24800), (head of household, 18650), 12400)|>,
+        ly_refund
+    )
+    Cell(srblind, 6,
+        <|Senior or blind exemption (blind UI; mfj PI)|>,
+        <|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))*         m4_dnl
+          Fswitch((married, 1300), (married filing jointly, 1300), 1650)|>,
+        ly_refund
+    )
+    Cell(itemized_over_std, 6.5,
+        Itemized deduction minus standard for last year,
+        <|max(CV(last_year_total_deductions) - CV(almost_std_deduction) - CV(srblind), 0)|>,
+        ly_refund
+    )
+    Cell(taxable_refund, 7,
+        Taxable tax refund,
+        <|min(CV(itemized_over_std), CV(last_year_post_limit))|>,
+        ly_refund
+    )
 
 
 m4_form(qualified_dividends_ws)
-
-Cell(qualified_dividends_and_gains, 4, <|Qualified dividends plus cap gains|>, <|CV(f1040,qualified_dividends)+CV(f1040, capital_gains)|>, cap_gains)
-Cell(income_minus_gains, 5, <|Income minus gains|>, <|CV(f1040,taxable_income)-CV(qualified_dividends_and_gains)|>, cap_gains)
-Cell(limitation, 6, <|Limitation|>, <|Fswitch((head of household, 53600), (married filing jointly, 80000), 40000)|>, cap_gains)
-Cell(limited_income, 7, <|Limited income|>, <|min(CV(f1040,taxable_income), CV(limitation))|>, cap_gains)
-Cell(alt_limited_income, 8, <|Limited income again|>, <|min(CV(limited_income), CV(income_minus_gains))|>, cap_gains)
-Cell(untaxed, 9, <|Untaxed portion|>, <|CV(limited_income) - CV(alt_limited_income)|>, cap_gains)
-Cell(min_ded_or_gains_minus_zero, 12, <|Remove untaxed from income|>, <|min(CV(f1040,taxable_income), CV(income_minus_gains)) - CV(untaxed)|>, cap_gains)
-Cell(relimited_qualified, 13, <|qualified gains re-limited|>, <| min(CV(min_ded_or_gains_minus_zero), max( min(Fswitch((single, 441450), (married, 248300), (married filing jointly, 496600), 469050), CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>, cap_gains)
-Cell(fifteen_pct_tax, 18, <|15% tax on qualified gains|>, <|CV(relimited_qualified)*0.15|>, cap_gains)
-
-Cell(income_minus_fifteen, 20, <|Gains minus 15% taxed part|>, <|min(CV(f1040,taxable_income), CV(qualified_dividends_and_gains)) - (CV(untaxed) + CV(relimited_qualified))|>, cap_gains)
-Cell(twenty_pct_tax, 21, <|20% tax on dividends and gains|>, <|CV(income_minus_fifteen)*0.20|>, cap_gains)
-Cell(nongains_tax, 22, <|Tax on income without qualified gains|>, <|tax_calc(CV(income_minus_gains))|>, cap_gains)
-Cell(total_tax, 23, <|Total tax including qualified gains discounts|>, <|SUM(fifteen_pct_tax, twenty_pct_tax, nongains_tax)|>,cap_gains)
+    Cell(qualified_dividends_and_gains, 4,
+        <|Qualified dividends plus cap gains|>,
+        <|CV(f1040,qualified_dividends)+CV(f1040, capital_gains)|>,
+        cap_gains
+    )
+    Cell(income_minus_gains, 5,
+        <|Income minus gains|>,
+        <|CV(f1040,taxable_income)-CV(qualified_dividends_and_gains)|>,
+        cap_gains
+    )
+    Cell(limitation, 6,
+        <|Limitation|>,
+        <|Fswitch((head of household, 54100), (married filing jointly, 80800), 40400)|>,
+        cap_gains
+    )
+    Cell(limited_income, 7,
+        <|Limited income|>,
+        <|min(CV(f1040,taxable_income), CV(limitation))|>,
+        cap_gains
+    )
+    Cell(alt_limited_income, 8,
+        <|Limited income again|>,
+        <|min(CV(limited_income), CV(income_minus_gains))|>,
+        cap_gains
+    )
+    Cell(untaxed, 9,
+        <|Untaxed portion|>,
+        <|CV(limited_income) - CV(alt_limited_income)|>,
+        cap_gains
+    )
+    Cell(min_ded_or_gains_minus_zero, 12,
+        <|Remove untaxed from income|>,
+        <|min(CV(f1040,taxable_income), CV(income_minus_gains)) - CV(untaxed)|>,
+        cap_gains
+    )
+    Cell(relimited_qualified, 13,
+        <|qualified gains re-limited|>,
+        <| min(CV(min_ded_or_gains_minus_zero),            m4_dnl
+            max( min(Fswitch((single, 445850), (married, 250800), (married filing jointly, 501600), 473750), m4_dnl
+                CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>,
+        cap_gains
+    )
+    Cell(fifteen_pct_tax, 18,
+        <|15% tax on qualified gains|>,
+        <|CV(relimited_qualified)*0.15|>,
+        cap_gains
+    )
+    Cell(income_minus_fifteen, 20,
+        <|Gains minus 15% taxed part|>,
+        <|min(CV(f1040,taxable_income), CV(qualified_dividends_and_gains)) - (CV(untaxed) + CV(relimited_qualified))|>,
+        cap_gains
+    )
+    Cell(twenty_pct_tax, 21,
+        <|20% tax on dividends and gains|>,
+        <|CV(income_minus_fifteen)*0.20|>,
+        cap_gains
+    )
+    Cell(nongains_tax, 22,
+        <|Tax on income without qualified gains|>,
+        <|tax_calc(CV(income_minus_gains))|>,
+        cap_gains
+    )
+    Cell(total_tax, 23,
+        <|Total tax including qualified gains discounts|>,
+        <|SUM(fifteen_pct_tax, twenty_pct_tax, nongains_tax)|>,
+        ap_gains
+    )
