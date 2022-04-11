@@ -45,7 +45,7 @@ m4_form(f8582)
     )
     Cell(f8582_passive_activities, 3,
         Active plus Passive activity income (UI),
-        CV(f8582_total_real_in),
+        <|CV(f8582_total_real_in)|>,
         have_rr
     )
     Cell(f8582_total_in, 4,

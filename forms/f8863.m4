@@ -35,7 +35,6 @@ Cell(aqe, 12, <|20% of Adjusted qualified expenses or 1k|>, <|min(1000, CV(adjus
     )
 Cell(sixty_seven_k_less_agi, 15, <|Remaining after AGI subtraction|>, <|CV(baseline2)-CV(f1040, AGI)|>, s_loans)
 Cell(fraction2, 17, Fraction allowed, <|max(min(1, CV(sixty_seven_k_less_agi)/Fswitch((married filing jointly, 20000), 10000)), 0)|>, s_loans)
-Cell(ws_exclusions, 17.5, <|Exclusions from the worksheet in the instructions|>, , u s_loans)
 Cell(frac_allowed, 18, <|Fraction allowed|>, <|CV(fraction2)*CV(aqe)|>, s_loans)
 Cell(nonrefundable_credit, 19, <|Nonrefundable credit|>, <|CV(f8863ws, limited_credit)|>, s_loans)
 

@@ -52,7 +52,7 @@ var cgrate = function(income){
 }
 
 var std_ded_fn = function(){
-    var over_65_ct = situations[".over_65"] + situations[".spouse_over_65"];
+    var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
          if (over65ct==0)      return 12550;
          else if (over65ct==1) return 14250;
@@ -333,18 +333,37 @@ def ctc_status(agi):
 |>)
 
 m4_form(f1040sch1)
-    Cell(alimony, 2.1,Alimony income received,, u)
-    Cell(sched_c, 3,Schedule C business income,, u)
-    Cell(sale_of_biz, 4, <|Sale of business property (f4797)|>,,u)
-    Cell(rr_income,5, Rents and royalties from Schedule E,<|CV(f1040_sched_e,rr_income)|>,have_rr)
-    Cell(farm_income, 6, Farm income from Schedule F,, u)
-    Cell(unemployment, 7, Unemployment compensation,, u)
+    Cell(state_tax_refunds, 1,
+        Taxable state refunds,, u
+    )
+    Cell(alimony, 2.1,
+        alimony income received,, u
+    )
+    Cell(sched_c, 3,
+        Schedule C business income,, u
+    )
+    Cell(sale_of_biz, 4,
+        <|Sale of business property (f4797)|>,,u
+    )
+    Cell(rr_income,5,
+        Rents and royalties from Schedule E,
+        <|CV(f1040_sched_e,rr_income)|>,
+        have_rr
+    )
+    Cell(farm_income, 6,
+        Farm income from Schedule F,, u
+    )
+    Cell(unemployment, 7,
+        Unemployment compensation,, u
+    )
     Cell(other_in, 8,
         other income (see Sch 1 for the list), , u
     )
     Cell(sch1_magi_subtotal, 9,
         Schedule 1 subtotal w/o Rents/Royalties,
-        <|CV(f1040_tax_refund_ws, taxable_refund) + SUM(alimony, sched_c, sale_of_biz, farm_income, unemployment, other_in)|>
+        <|CV(f1040_tax_refund_ws, taxable_refund) +
+          SUM(state_tax_refunds, alimony, sched_c, sale_of_biz,
+              farm_income, unemployment, other_in)|>
     )
 
     Cell(subtractions_divider, 22.9, >>>>>>>>>>>> Subtractions                                   , 0)
@@ -528,11 +547,11 @@ m4_form(f1040_tax_refund_ws)
         u ly_refund
     )
     Cell(last_year_5d, 1,
-        <|Enter line 29 of your 2019 Schedule A|>,,
+        <|Enter line 29 of your 2020 Schedule A|>,,
         u ly_refund
     )
     Cell(last_year_limited_deductions, 1.3,
-        <|Enter line 5e of your 2019 Schedule A|>,,
+        <|Enter line 5e of your 2020 Schedule A|>,,
         u ly_refund
     )
     Cell(last_year_reduced, 2,
@@ -638,5 +657,5 @@ m4_form(qualified_dividends_ws)
     Cell(total_tax, 23,
         <|Total tax including qualified gains discounts|>,
         <|SUM(fifteen_pct_tax, twenty_pct_tax, nongains_tax)|>,
-        ap_gains
+        cap_gains
     )

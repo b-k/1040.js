@@ -19,9 +19,14 @@ Cell(rental_utilities, 17, Utilities,, u have_rr)
 Cell(rental_depreciation, 18, Depreciation expense or depletion, <|CV(f4562, rental_property_depreciation)|>, have_rr)
 Cell(rental_other_expenses, 19, Other,, u have_rr)
 Cell(royalty_expenses, 4.5, Other,, u have_rr)
-Cell(total_rental_expenses, 20, Total expenses, <|SUM(rental_advertising, rental_auto_and_travel, rental_cleaning_and_maintenance, rental_commissions, rental_insurance, rental_professional_fees, rental_management_fees, rental_mortgage_interest, rental_other_interest, rental_repairs, rental_supplies, rental_taxes, rental_utilities, rental_depreciation, rental_other_expenses)|>, have_rr)
+Cell(total_rental_expenses, 20, Total expenses, <|SUM(rental_advertising, 
+            rental_auto_and_travel, rental_cleaning_and_maintenance, 
+            rental_commissions, rental_insurance, rental_professional_fees,
+            rental_management_fees, rental_mortgage_interest, rental_other_interest,
+            rental_repairs, rental_supplies, rental_taxes, rental_utilities,
+            rental_depreciation, rental_other_expenses)|>, have_rr)
 
-    Doing that thing where only the part that was modified for content gets reformatted.
+    I'm doing that thing where only the part that was modified for content gets modified for formatting.
 
     Cell(net_rents, 21,
         Rents minus expenses,
@@ -40,32 +45,9 @@ Cell(total_rental_expenses, 20, Total expenses, <|SUM(rental_advertising, rental
     )
     Cell(post_8582_net_rents, 22.5,
         Rental profit or loss after line 22,
-        <|IF(CV(net_rents)>0, CV(net_rents) + CV(deductible_rr_losses), CV(deductible_rr_losses))|>,
-        have_rr
-    )
-    Cell(sched_e_sum3, 23.0,
-        Total for line 3 for all rentals,
-        <|CV(rents_received)|>,
-        have_rr
-    )
-    Cell(sched_e_sum4, 23.2,
-        Total for line 4 for all royaltys,
-        <|CV(royalties_received)|>,
-        have_rr
-    )
-    Cell(sched_e_sum12, 23.4,
-        Total for line 12 for all properties,
-        <|CV(mortgage_interest)|>,
-        have_rr
-    )
-    Cell(sched_e_sum18, 23.6,
-        Total for line 18 for all properties,
-        <|CV(depreciation)|>,
-        have_rr
-    )
-    Cell(sched_e_sum20, 23.8,
-        Total for line 20 for all properties,
-        <|CV(total_rental_expenses)|>,
+        <|IF(CV(net_rents)>0,
+               CV(net_rents) + CV(deductible_rr_losses),
+               CV(deductible_rr_losses))|>,
         have_rr
     )
     Cell(sched_e_income, 24,
