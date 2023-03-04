@@ -3,9 +3,9 @@ function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
     var mfj = (status=="married filing jointly")
-    if (s_or_hh && income<523600) return 73600
-    if (mfj && income<1047200) return 114600
-    if (status=="married" && income < 523600) return 57300
+    if (s_or_hh && income<539900) return 75900
+    if (mfj && income<1079800) return 118100
+    if (status=="married" && income < 539900) return 59050
 
     return 0
     //No longer calculating phase-out
@@ -16,8 +16,8 @@ function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
     return (status=="married")
-       ? income * (income <=99500  ? 0.26 : 0.28) - 1999
-       : income * (income <=199900 ? 0.26 : 0.28) - 3998
+       ? income * (income <=103050  ? 0.26 : 0.28) - 2061
+       : income * (income <=206100 ? 0.26 : 0.28) - 4122
 }
 
 function med_expenses(expenses, agi){
@@ -30,21 +30,21 @@ function med_expenses(expenses, agi){
 
 pyversion(<|
 def get_amt_exemption(income):
-    if (status=="single" or status=="head of household") and income < 523600:
-        return 73600
-    if (status=="married filing jointly") and income < 1047200:
-        return 114600
-    if (status=="married") and income < 523600:
-        return 57300
+    if (status=="single" or status=="head of household") and income < 539900:
+        return 75900
+    if (status=="married filing jointly") and income < 1079800:
+        return 118100
+    if (status=="married") and income < 539900:
+        return 59050
     print("AMT exemption is partially implemented.")
     return 0
 
 def get_tamt(income):
     if income<=0: return 0
     if status=="married":
-        return income * (0.26 if income <=99500  else 0.28) - 1999
+        return income * (0.26 if income <=103050  else 0.28) - 2061
     else:
-        return income * (0.26 if income <=199900 else 0.28) - 3998
+        return income * (0.26 if income <=206100 else 0.28) - 4122
 
 def med_expenses(expenses, agi):
     if (not (over_65 or  spouse_over_65)): return 0
