@@ -7,7 +7,7 @@ var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
         cuts=[0, 10275, 41775, 89075, 170050, 215950, 539900, 1e20]
-    } else if (filing_status == "married") {
+    } else if (filing_status == "married filing separately") {
         cuts=[0, 10275, 41775, 89075, 170050, 215950, 323925, 1e20]
     } else if (filing_status == "married filing jointly") {
         cuts=[0, 20550, 83550, 178150, 340100, 431900, 647850, 1e20]
@@ -45,7 +45,7 @@ var std_ded_fn = function(){
          else if (over65ct==3) return 30100;
          else                  return 31500;
     }
-    if (fstatus() == "married"){
+    if (fstatus() == "married filing separately"){
          if (over65ct==0)      return 12950;
          else if (over65ct==1) return 14350;
          else if (over65ct==2) return 15750;
@@ -60,7 +60,7 @@ var std_ded_fn = function(){
 }
 
 var eitc = function(income, k){
-    if (fstatus()=="married") return 0
+    if (fstatus()=="married filing separately") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     //Or, search the internet for the phrase "For taxable years beginning in 20xx, the following
@@ -124,7 +124,7 @@ var fstatus = function(){
     if (single && kids+deps) return "head of household";
     if (single && !(kids+deps)) return "single";
     if (document.getElementsByName("spouse")[1].checked) return "married filing jointly";
-    else return "married";
+    else return "married filing separately";
 }
 
 var max = function(a,b) { return Math.max(a,b)}
@@ -140,7 +140,7 @@ var exemption_fn = function(){
     if (isNaN(deps)) deps = 0;
     ct += kids + deps
     var status = fstatus()
-    if (status=="married" || status == "married filing jointly") ct += 1
+    if (status=="married filing separately" || status == "married filing jointly") ct += 1
     return ct;
 }
 
@@ -185,7 +185,7 @@ def tax_table(inval):
 
     if filing_status == "single":
         cuts=[0, 10275, 41775, 89075, 170050, 215950, 539900, 1e20]
-    if filing_status == "married":
+    if filing_status == "married filing separately":
         cuts=[0, 10275, 41775, 89075, 170050, 215950, 323925, 1e20]
     if filing_status == "married filing jointly":
         cuts=[0, 20550, 83550, 178150, 340100, 431900, 647850, 1e20]
@@ -221,7 +221,7 @@ def std_ded_fn():
          if (over65ct==3): return 30100
          return 31500
 
-    if fstatus() == "married":
+    if fstatus() == "married filing separately":
          if (over65ct==0): return 12950
          if (over65ct==1): return 14350
          if (over65ct==2): return 15750
@@ -246,7 +246,7 @@ def eitc(income, kids):
     plateu_start=0
     plateu_value=1
 
-    if status=="married": return 0
+    if status=="married filing separately": return 0
     if status=="married filing jointly":
         phaseout_start=4
         phaseout_end=5
@@ -280,7 +280,7 @@ def actc(limited_unused, scaled_income, ss_med, eitc):
 
 def exemption_fn():
     status = fstatus()
-    spouse = 1 if (status=="married" or status == "married filing jointly") else 0
+    spouse = 1 if (status=="married filing separately" or status == "married filing jointly") else 0
     return 1 + kids + dependents + spouse
 
 # CTC
@@ -603,9 +603,9 @@ m4_form(f1040_tax_refund_ws)
         ly_refund
     )
     Cell(srblind, 6,
-        <|Senior or blind exemption (blind UI; mfj PI)|>,
+        <|Senior or blind exemption (blind UI; married filing jointly PI)|>,
         <|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))*         m4_dnl
-          Fswitch((married, 1350), (married filing jointly, 1350), 1700)|>,
+          Fswitch((married filing separately, 1350), (married filing jointly, 1350), 1700)|>,
         ly_refund
     )
     Cell(itemized_over_std, 6.5,
@@ -659,7 +659,7 @@ m4_form(qualified_dividends_ws)
     Cell(relimited_qualified, 13,
         <|qualified gains re-limited|>,
         <| min(CV(min_ded_or_gains_minus_zero),            m4_dnl
-            max( min(Fswitch((single, 459750), (married, 258600), (married filing jointly, 517200), 488500), m4_dnl
+            max( min(Fswitch((single, 459750), (married filing separately, 258600), (married filing jointly, 517200), 488500), m4_dnl
                 CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>,
         cap_gains
     )

@@ -2,10 +2,10 @@ jsversion(<|
 function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
-    var mfj = (status=="married filing jointly")
+    var mfj= (status=="married filing jointly")
     if (s_or_hh && income<539900) return 75900
     if (mfj && income<1079800) return 118100
-    if (status=="married" && income < 539900) return 59050
+    if (status=="married filing separately" && income < 539900) return 59050
 
     return 0
     //No longer calculating phase-out
@@ -15,7 +15,7 @@ function get_amt_exemption(income){
 function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
-    return (status=="married")
+    return (status=="married filing separately")
        ? income * (income <=103050  ? 0.26 : 0.28) - 2061
        : income * (income <=206100 ? 0.26 : 0.28) - 4122
 }
@@ -34,14 +34,14 @@ def get_amt_exemption(income):
         return 75900
     if (status=="married filing jointly") and income < 1079800:
         return 118100
-    if (status=="married") and income < 539900:
+    if (status=="married filing separately") and income < 539900:
         return 59050
     print("AMT exemption is partially implemented.")
     return 0
 
 def get_tamt(income):
     if income<=0: return 0
-    if status=="married":
+    if status=="married filing separately":
         return income * (0.26 if income <=103050  else 0.28) - 2061
     else:
         return income * (0.26 if income <=206100 else 0.28) - 4122
