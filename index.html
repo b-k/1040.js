@@ -66,7 +66,7 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 </style>
 
 <body>
-The 2021 U.S. tax graph<br>
+The 2022 U.S. tax graph<br>
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
 Hover your mouse over a box to see a little more text and the form the box is from.<br>
@@ -104,20 +104,20 @@ var over_65 = 0;
 var spouse_over_65 = 0;
 
 
-//2018 tax rate schedules
+//tax rate schedules
 //Could be inlined, but not going to bother.
-// https://www.irs.gov/pub/irs-prior/f1040es--2021.pdf
+//Buried in i1040gi.pdf, or use https://www.irs.gov/pub/irs-prior/f1040es--2022.pdf
 
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 9950, 40525, 86375, 164925, 209425, 523600, 1e20]
+        cuts=[0, 10275, 41775, 89075, 170050, 215950, 539900, 1e20]
+    } else if (filing_status == "married filing separately") {
+        cuts=[0, 10275, 41775, 89075, 170050, 215950, 323925, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 19900, 81050, 172750, 329850, 418850, 628300, 1e20]
-    } else if (filing_status == "married") {
-        cuts=[0, 9950, 40525, 86375, 164925, 209425, 314150, 1e20]
+        cuts=[0, 20550, 83550, 178150, 340100, 431900, 647850, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 14200, 54200, 86350, 164900, 209400, 523600 ,1e20]
+        cuts=[0, 14650, 55900, 89050, 170050, 215950, 539900 ,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -136,64 +136,50 @@ var tax_calc = function (inval){
     return tax_table(Math.round(inval/50)*50 + 25)
 }
 
-
-//capital gains tax rate
-var cgrate = function(income){
-    var filing_status = fstatus();
-    if (filing_status == "single") {
-        if (income < 40400) return    0;
-        if (income < 445850) return   0.15;
-    } else if (filing_status == "married filing jointly") {
-        if (income < 80800) return    0;
-        if (income < 501600) return   0.15;
-    } else if (filing_status == "married") {
-        if (income < 40400) return    0;
-        if (income < 250800) return   0.15;
-    } else if (filing_status == "head of household") {
-        if (income < 54100) return    0;
-        if (income < 473750) return   0.15;
-    }
-    return .2;
-}
-
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 12550;
-         else if (over65ct==1) return 14250;
-         else                  return 15950;
+         if (over65ct==0)      return 12950;
+         else if (over65ct==1) return 14700;
+         else                  return 16450;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 25100;
-         else if (over65ct==1) return 26450;
-         else                  return 27800;
+         if (over65ct==0)      return 25900;
+         else if (over65ct==1) return 27300;
+         else if (over65ct==2) return 28700;
+         else if (over65ct==3) return 30100;
+         else                  return 31500;
     }
-    if (fstatus() == "married"){
-         if (over65ct==0)      return 18800;
-         else if (over65ct==1) return 26450;
-         else                  return 27800;
+    if (fstatus() == "married filing separately"){
+         if (over65ct==0)      return 12950;
+         else if (over65ct==1) return 14350;
+         else if (over65ct==2) return 15750;
+         else if (over65ct==3) return 17150;
+         else                  return 18550;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 18800;
-         else if (over65ct==1) return 20500;
-         else                  return 22200;
+         if (over65ct==0)      return 19400;
+         else if (over65ct==1) return 21150;
+         else                  return 22900;
     }
 }
 
 var eitc = function(income, k){
-    if (fstatus()=="married") return 0
+    if (fstatus()=="married filing separately") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     //Or, search the internet for the phrase "For taxable years beginning in 20xx, the following
     // amounts are used to determine the earned income credit under § 32(b)."
     //For 2019: https://www.irs.gov/irb/2018-49_IRB
     //For 2020: https://www.irs.gov/irb/2019-47_IRB
-    //For 2022: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
+    //For 2021: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
+    //For 2022: https://www.taxpolicycenter.org/statistics/eitc-parameters
     //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    data=[[7100, 543, 8800, 15980, 14820, 21920],
-          [10640, 3681, 19520, 42158, 25470, 48108],
-          [14950, 5980, 19520, 47915, 25470, 53865],
-          [14950, 6728, 19520, 51464, 25470, 57414]]
+    mfj_add=6130 //See TPC footnote.
+    data=[[7320, 560, 9160, 16480,    9160+mfj_add,  16480+mfj_add],
+          [10980, 3733, 20130, 43492, 20130+mfj_add, 43492+mfj_add],
+          [15410, 6164, 20130, 49399, 20130+mfj_add, 49399+mfj_add],
+          [15410, 6935, 20130, 53057, 20130+mfj_add, 53057+mfj_add]]
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -216,7 +202,7 @@ var eitc = function(income, k){
     return data[row][plateu_value];
 }
 
-var actc = function(limited_unused, scaled_income, ss_med, eitc){
+var actc = function(limited_unused, scaled_income, ss_med, eitc){ //ss_med now also include self-employment tax
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
 
@@ -243,7 +229,7 @@ var fstatus = function(){
     if (single && kids+deps) return "head of household";
     if (single && !(kids+deps)) return "single";
     if (document.getElementsByName("spouse")[1].checked) return "married filing jointly";
-    else return "married";
+    else return "married filing separately";
 }
 
 var max = function(a,b) { return Math.max(a,b)}
@@ -259,7 +245,7 @@ var exemption_fn = function(){
     if (isNaN(deps)) deps = 0;
     ct += kids + deps
     var status = fstatus()
-    if (status=="married" || status == "married filing jointly") ct += 1
+    if (status=="married filing separately" || status == "married filing jointly") ct += 1
     return ct;
 }
 
@@ -272,10 +258,10 @@ var thousandkids = function(){
     return kids*2000 + deps*500
 }
 
-var fourteenkids = function(){
+var fifteenkids = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    return kids*1400
+    return kids*1500
 }
 
 var ctc_status = function(agi){
@@ -293,10 +279,10 @@ var ctc_status = function(agi){
 function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
-    var mfj = (status=="married filing jointly")
-    if (s_or_hh && income<523600) return 73600
-    if (mfj && income<1047200) return 114600
-    if (status=="married" && income < 523600) return 57300
+    var mfj= (status=="married filing jointly")
+    if (s_or_hh && income<539900) return 75900
+    if (mfj && income<1079800) return 118100
+    if (status=="married filing separately" && income < 539900) return 59050
 
     return 0
     //No longer calculating phase-out
@@ -306,9 +292,9 @@ function get_amt_exemption(income){
 function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
-    return (status=="married")
-       ? income * (income <=99500  ? 0.26 : 0.28) - 1999
-       : income * (income <=199900 ? 0.26 : 0.28) - 3998
+    return (status=="married filing separately")
+       ? income * (income <=103050  ? 0.26 : 0.28) - 2061
+       : income * (income <=206100 ? 0.26 : 0.28) - 4122
 }
 
 function med_expenses(expenses, agi){
@@ -337,12 +323,13 @@ g.setNode("f1040sch1_unemployment",  { label: "unemployment", baselabel: "unempl
 g.setNode("f1040sch1_other_in",  { label: "other_in", baselabel: "other_in", form: "f1040sch1", fullname: "other income (see Sch 1 for the list)", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040sch1_sch1_magi_subtotal",  { label: "sch1_magi_subtotal", baselabel: "sch1_magi_subtotal", form: "f1040sch1", fullname: "Schedule 1 subtotal w/o Rents/Royalties", class: "a_node ", val:0 , eqn: "Cv('f1040_tax_refund_ws_taxable_refund') +          Cv('f1040sch1_state_tax_refunds') + Cv('f1040sch1_alimony') + Cv('f1040sch1_sched_c') + Cv('f1040sch1_sale_of_biz') + Cv('f1040sch1_farm_income') + Cv('f1040sch1_unemployment') + Cv('f1040sch1_other_in') + 0    ", last_eval:0 });
 g.setNode("f1040sch1_hsa_deduction",  { label: "hsa_deduction", baselabel: "hsa_deduction", form: "f1040sch1", fullname: "Health Savings Account deduction", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040sch1_self_employment_deductible",  { label: "self_employment_deductible", baselabel: "self_employment_deductible", form: "f1040sch1", fullname: "Deductible part of self-employment tax (Sch SE)", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040sch1_ira_deduction",  { label: "ira_deduction", baselabel: "ira_deduction", form: "f1040sch1", fullname: "IRA deduction", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040sch1_student_loan_interest_ded",  { label: "student_loan_interest_ded", baselabel: "student_loan_interest_ded", form: "f1040sch1", fullname: "Student loan interest deduction", class: "a_node s_loans    ", val:0 , eqn: "Cv('student_loan_ws_1040_final_credit')", last_eval:0 });
 g.setNode("f1040sch1_other_adjustments",  { label: "other_adjustments", baselabel: "other_adjustments", form: "f1040sch1", fullname: "All other adjustments anywhere on Sch2 part II", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040sch1_subtractions_from_income_wo_student_loans",  { label: "subtractions_from_income_wo_student_loans", baselabel: "subtractions_from_income_wo_student_loans", form: "f1040sch1", fullname: "Adjustments excluding student loans", class: "a_node ", val:0 , eqn: "Cv('f1040sch1_hsa_deduction') + Cv('f1040sch1_ira_deduction') + Cv('f1040sch1_other_adjustments') + 0    ", last_eval:0 });
+g.setNode("f1040sch1_subtractions_from_income_wo_student_loans",  { label: "subtractions_from_income_wo_student_loans", baselabel: "subtractions_from_income_wo_student_loans", form: "f1040sch1", fullname: "Adjustments excluding student loans", class: "a_node ", val:0 , eqn: "Cv('f1040sch1_hsa_deduction') + Cv('f1040sch1_self_employment_deductible') + Cv('f1040sch1_ira_deduction') + Cv('f1040sch1_other_adjustments') + 0    ", last_eval:0 });
 g.setNode("f1040sch1_subtractions_from_income",  { label: "subtractions_from_income", baselabel: "subtractions_from_income", form: "f1040sch1", fullname: "Sum of adjustments to income", class: "a_node ", val:0 , eqn: "Cv('f1040sch1_hsa_deduction') + Cv('f1040sch1_ira_deduction') + Cv('f1040sch1_student_loan_interest_ded') + Cv('f1040sch1_other_adjustments') + 0    ", last_eval:0 });
-g.setNode("f1040_wages",  { label: "wages", baselabel: "wages", form: "f1040", fullname: "Wages, salaries, tips, from form W-2", class: "a_node u", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_wages",  { label: "wages", baselabel: "wages", form: "f1040", fullname: "Wages, salaries, tips, etc. primarily from form W-2", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_interest",  { label: "interest", baselabel: "interest", form: "f1040", fullname: "Taxable interest", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_qualified_dividends",  { label: "qualified_dividends", baselabel: "qualified_dividends", form: "f1040", fullname: "Dividends qualifying for the long-term cap gains rate", class: "a_node u cap_gains", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_dividends",  { label: "dividends", baselabel: "dividends", form: "f1040", fullname: "all dividends", class: "a_node u", val:0 , eqn: "", last_eval:0 });
@@ -352,104 +339,97 @@ g.setNode("f1040_taxable_ss_benefits",  { label: "taxable_ss_benefits", baselabe
 g.setNode("f1040_capital_gains",  { label: "capital_gains", baselabel: "capital_gains", form: "f1040", fullname: "Capital gains from Schedule D", class: "a_node u cap_gains", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_MAGI",  { label: "MAGI", baselabel: "MAGI", form: "f1040", fullname: "Total income for MAGI (PI)", class: "a_node ", val:0 , eqn: "Cv('f1040sch1_sch1_magi_subtotal') + Cv('f1040_wages') + Cv('f1040_interest') + Cv('f1040_dividends') + Cv('f1040_iras') + Cv('f1040_pensions') + Cv('f1040_taxable_ss_benefits') + Cv('f1040_capital_gains') + 0", last_eval:0 });
 g.setNode("f1040_total_in",  { label: "total_in", baselabel: "total_in", form: "f1040", fullname: "Total income", class: "a_node ", val:0 , eqn: "Cv('f1040_MAGI') + Cv('f1040sch1_rr_income')", last_eval:0 });
-g.setNode("f1040_charitable_for_std_ded",  { label: "charitable_for_std_ded", baselabel: "charitable_for_std_ded", form: "f1040", fullname: "Charitable contributions if not itemizing", class: "a_node u", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_charitable_for_std_ded_limited",  { label: "charitable_for_std_ded_limited", baselabel: "charitable_for_std_ded_limited", form: "f1040", fullname: "Charitable contributions if not itemizing, limited", class: "a_node ", val:0 , eqn: "min(Cv('f1040_charitable_for_std_ded'), ((fstatus()=='married') ? (150) : (300 )) )", last_eval:0 });
-g.setNode("f1040_AGI",  { label: "AGI", baselabel: "AGI", form: "f1040", fullname: "Adjusted gross income", class: "a_node critical    ", val:0 , eqn: "max(Cv('f1040_total_in') - Cv('f1040_charitable_for_std_ded_limited') - Cv('f1040sch1_subtractions_from_income'),0)", last_eval:0 });
+g.setNode("f1040_AGI",  { label: "AGI", baselabel: "AGI", form: "f1040", fullname: "Adjusted gross income", class: "a_node critical    ", val:0 , eqn: "max(Cv('f1040_total_in') - Cv('f1040sch1_subtractions_from_income'),0)", last_eval:0 });
 g.setNode("f1040_std_deduction",  { label: "std_deduction", baselabel: "std_deduction", form: "f1040", fullname: "Standard deductions", class: "a_node critical    ", val:0 , eqn: "std_ded_fn()", last_eval:0 });
-g.setNode("f1040_deductions",  { label: "deductions", baselabel: "deductions", form: "f1040", fullname: "Deductions", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_std_deduction'), Cv('f1040_sched_a_total_itemized_deductions'))", last_eval:0 });
-g.setNode("f1040_qbi",  { label: "qbi", baselabel: "qbi", form: "f1040", fullname: "20% discount on qualified business income (f8995)", class: "a_node u", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_taxable_income",  { label: "taxable_income", baselabel: "taxable_income", form: "f1040", fullname: "Taxable income", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_AGI') - Cv('f1040_deductions') - Cv('f1040_qbi'), 0)", last_eval:0 });
-g.setNode("f1040_tax",  { label: "tax", baselabel: "tax", form: "f1040", fullname: "Tax", class: "a_node critical", val:0 , eqn: "min(tax_calc(Cv('f1040_taxable_income')), Cv('qualified_dividends_ws_total_tax'))", last_eval:0 });
-g.setNode("f1040_other_taxes",  { label: "other_taxes", baselabel: "other_taxes", form: "f1040", fullname: "Sched 2, AMT + F8962", class: "a_node ", val:0 , eqn: "Cv('f1040sch2_amt') + Cv('f1040sch2_credit_repayment')", last_eval:0 });
-g.setNode("f1040_pretotal_tax",  { label: "pretotal_tax", baselabel: "pretotal_tax", form: "f1040", fullname: "Tax + Sched 2, AMT + F8962", class: "a_node ", val:0 , eqn: "Cv('f1040_tax') + Cv('f1040_other_taxes')", last_eval:0 });
-g.setNode("f1040_tax_plus_amt_and_repayment",  { label: "tax_plus_amt_and_repayment", baselabel: "tax_plus_amt_and_repayment", form: "f1040", fullname: "Tax plus Sch2", class: "a_node ", val:0 , eqn: "Cv('f1040_pretotal_tax')+Cv('f1040sch2_sch2_total')    ", last_eval:0 });
-g.setNode("f1040_credits",  { label: "credits", baselabel: "credits", form: "f1040", fullname: "CTC and Schedule 3, other credits", class: "a_node critical    ", val:0 , eqn: "Cv('f1040sch3_nonrefundable_total') + Cv('ctc_ws_1040_ctc')", last_eval:0 });
+g.setNode("f1040_deductions",  { label: "deductions", baselabel: "deductions", form: "f1040", fullname: "Deductions", class: "a_node critical    ", val:0 , eqn: "max(Cv('f1040_std_deduction'), Cv('f1040_sched_a_total_itemized_deductions'))", last_eval:0 });
+g.setNode("f1040_qbi",  { label: "qbi", baselabel: "qbi", form: "f1040", fullname: "20% discount on qualified business income (f8995)", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_taxable_income",  { label: "taxable_income", baselabel: "taxable_income", form: "f1040", fullname: "Taxable income", class: "a_node critical    ", val:0 , eqn: "max(Cv('f1040_AGI') - Cv('f1040_deductions') - Cv('f1040_qbi'), 0)", last_eval:0 });
+g.setNode("f1040_base_tax",  { label: "base_tax", baselabel: "base_tax", form: "f1040", fullname: "Tax", class: "a_node critical    ", val:0 , eqn: "min(tax_calc(Cv('f1040_taxable_income')), Cv('qualified_dividends_ws_total_tax'))", last_eval:0 });
+g.setNode("f1040_tax_plus_amt_and_repayment",  { label: "tax_plus_amt_and_repayment", baselabel: "tax_plus_amt_and_repayment", form: "f1040", fullname: "Tax plus Sch2", class: "a_node ", val:0 , eqn: "Cv('f1040_base_tax')+Cv('f1040sch2_sch2_total')    ", last_eval:0 });
+g.setNode("f1040_credits",  { label: "credits", baselabel: "credits", form: "f1040", fullname: "CTC and Schedule 3, other credits", class: "a_node critical    ", val:0 , eqn: "Cv('f1040sch3_nonrefundable_total') + Cv('ctc_sch8812_I_ctc')", last_eval:0 });
 g.setNode("f1040_tax_minus_credits",  { label: "tax_minus_credits", baselabel: "tax_minus_credits", form: "f1040", fullname: "Tax minus credits", class: "a_node critical    ", val:0 , eqn: "max(Cv('f1040_tax_plus_amt_and_repayment')-Cv('f1040_credits'), 0)", last_eval:0 });
 g.setNode("f1040_postcredit_taxes",  { label: "postcredit_taxes", baselabel: "postcredit_taxes", form: "f1040", fullname: "Other taxes, incl. self-employment", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_total_tax",  { label: "total_tax", baselabel: "total_tax", form: "f1040", fullname: "Total tax", class: "a_node ", val:0 , eqn: "Cv('f1040_tax_minus_credits')+Cv('f1040_postcredit_taxes')", last_eval:0 });
 g.setNode("f1040_federal_tax_withheld",  { label: "federal_tax_withheld", baselabel: "federal_tax_withheld", form: "f1040", fullname: "Federal income tax withheld from Forms W-2 and 1099", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_eitc",  { label: "eitc", baselabel: "eitc", form: "f1040", fullname: "Earned income credit (EIC)", class: "a_node ", val:0 , eqn: "eitc(Cv('f1040_AGI'), kids)", last_eval:0 });
-g.setNode("f1040_actc",  { label: "actc", baselabel: "actc", form: "f1040", fullname: "Refundable child tax credit", class: "a_node kids", val:0 , eqn: "Cv('ctc_sch8812_refundable_ctc')", last_eval:0 });
+g.setNode("f1040_actc",  { label: "actc", baselabel: "actc", form: "f1040", fullname: "Refundable child tax credit", class: "a_node kids", val:0 , eqn: "Cv('ctc_sch8812_IIA_refundable_ctc')", last_eval:0 });
 g.setNode("f1040_ed_tc",  { label: "ed_tc", baselabel: "ed_tc", form: "f1040", fullname: "Refundable education credits", class: "a_node s_loans", val:0 , eqn: "Cv('f8863_refundable_credit')", last_eval:0 });
 g.setNode("f1040_other_tc",  { label: "other_tc", baselabel: "other_tc", form: "f1040", fullname: "Other asst credits from Sch 3", class: "a_node u", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_total_payments",  { label: "total_payments", baselabel: "total_payments", form: "f1040", fullname: "Total payments", class: "a_node ", val:0 , eqn: "Cv('f1040_federal_tax_withheld') + Cv('f1040_eitc') + Cv('f1040_actc') + Cv('f1040_ed_tc') + Cv('f1040_other_tc') + 0", last_eval:0 });
 g.setNode("f1040_refund",  { label: "refund", baselabel: "refund", form: "f1040", fullname: "Refund", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_total_payments')-Cv('f1040_total_tax'), 0)", last_eval:0 });
 g.setNode("f1040_tax_owed",  { label: "tax_owed", baselabel: "tax_owed", form: "f1040", fullname: "Tax owed", class: "a_node critical", val:0 , eqn: "max(Cv('f1040_total_tax')-Cv('f1040_total_payments'), 0)", last_eval:0 });
 g.setNode("f1040sch2_amt",  { label: "amt", baselabel: "amt", form: "f1040sch2", fullname: "Alternative minimum tax", class: "a_node itemizing    ", val:0 , eqn: "Cv('f6251_amt')", last_eval:0 });
-g.setNode("f1040sch2_credit_repayment",  { label: "credit_repayment", baselabel: "credit_repayment", form: "f1040sch2", fullname: "Excess advance premium tax credit repayment", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040sch2_sch2_total",  { label: "sch2_total", baselabel: "sch2_total", form: "f1040sch2", fullname: "Cv('f1040sch2_amt')+Cv('f1040sch2_credit_repayment')", class: "a_node ", val:0 , eqn: "itemizing    ", last_eval:0 });
+g.setNode("f1040sch2_credit_repayment",  { label: "credit_repayment", baselabel: "credit_repayment", form: "f1040sch2", fullname: "Excess advance premium tax credit repayment", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040sch2_sch2_total",  { label: "sch2_total", baselabel: "sch2_total", form: "f1040sch2", fullname: "Schedule 2 total", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040sch2_amt')+Cv('f1040sch2_credit_repayment')", last_eval:0 });
 g.setNode("f1040sch3_ftc",  { label: "ftc", baselabel: "ftc", form: "f1040sch3", fullname: "Foreign tax credit", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040sch3_dependent_care",  { label: "dependent_care", baselabel: "dependent_care", form: "f1040sch3", fullname: "Dependent care expenses", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040sch3_ed_credits",  { label: "ed_credits", baselabel: "ed_credits", form: "f1040sch3", fullname: "Education credits via f8863", class: "a_node s_loans    ", val:0 , eqn: "Cv('f8863_nonrefundable_credit')", last_eval:0 });
+g.setNode("f1040sch3_retirement_savings",  { label: "retirement_savings", baselabel: "retirement_savings", form: "f1040sch3", fullname: "Retirement savings contribution credits", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040sch3_elderly_disabled_credits",  { label: "elderly_disabled_credits", baselabel: "elderly_disabled_credits", form: "f1040sch3", fullname: "Elderly or disabled credit from Schedule R", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040sch3_nonrefundable_total",  { label: "nonrefundable_total", baselabel: "nonrefundable_total", form: "f1040sch3", fullname: "Total nonrefundable credits", class: "a_node ", val:0 , eqn: "Cv('f1040sch3_ftc')+Cv('f1040sch3_dependent_care')+Cv('f1040sch3_elderly_disabled_credits')+Cv('f1040sch3_ed_credits')    ", last_eval:0 });
+g.setNode("f1040sch3_alt_motor_vehicle",  { label: "alt_motor_vehicle", baselabel: "alt_motor_vehicle", form: "f1040sch3", fullname: "Alternative motor vehicle credit", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040sch3_plug_in_motor_vehicle",  { label: "plug_in_motor_vehicle", baselabel: "plug_in_motor_vehicle", form: "f1040sch3", fullname: "Qualified plug-in motor vehicle credit", class: "a_node u    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040sch3_nonrefundable_total",  { label: "nonrefundable_total", baselabel: "nonrefundable_total", form: "f1040sch3", fullname: "Total nonrefundable credits", class: "a_node ", val:0 , eqn: "Cv('f1040sch3_ftc')+Cv('f1040sch3_dependent_care')+Cv('f1040sch3_retirement_savings') +Cv('f1040sch3_elderly_disabled_credits') + Cv('f1040sch3_alt_motor_vehicle') + Cv('f1040sch3_plug_in_motor_vehicle') +Cv('f1040sch3_ed_credits')    ", last_eval:0 });
 g.setNode("student_loan_ws_1040_student_loan_interest",  { label: "student_loan_interest", baselabel: "student_loan_interest", form: "student_loan_ws_1040", fullname: "Interest you paid in 2021 on qualified student loans", class: "a_node u s_loans    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("student_loan_ws_1040_loans_maxed",  { label: "loans_maxed", baselabel: "loans_maxed", form: "student_loan_ws_1040", fullname: "Student loan interest, maxed at $2,500", class: "a_node s_loans    ", val:0 , eqn: "min(Cv('student_loan_ws_1040_student_loan_interest'), 2500)", last_eval:0 });
-g.setNode("student_loan_ws_1040_phase_out_pct",  { label: "phase_out_pct", baselabel: "phase_out_pct", form: "student_loan_ws_1040", fullname: "total income minus phase-out limit", class: "a_node s_loans    ", val:0 , eqn: "min(1,             max(Cv('f1040_total_in') - Cv('f1040sch1_subtractions_from_income_wo_student_loans')                 - ((fstatus()=='married') ? (140000) : (70000 )) , 0)/((fstatus()=='married') ? (30000) : (15000 )) )", last_eval:0 });
+g.setNode("student_loan_ws_1040_phase_out_pct",  { label: "phase_out_pct", baselabel: "phase_out_pct", form: "student_loan_ws_1040", fullname: "total income minus phase-out limit", class: "a_node s_loans    ", val:0 , eqn: "min(1,             max(Cv('f1040_total_in') - Cv('f1040sch1_subtractions_from_income_wo_student_loans')                 - ((fstatus()=='married filing jointly') ? (145000) : (70000 )) , 0)/((fstatus()=='married filing jointly') ? (30000) : (15000 )) )", last_eval:0 });
 g.setNode("student_loan_ws_1040_phased_out_loans",  { label: "phased_out_loans", baselabel: "phased_out_loans", form: "student_loan_ws_1040", fullname: "phased-out loans", class: "a_node s_loans    ", val:0 , eqn: "Cv('student_loan_ws_1040_loans_maxed')*Cv('student_loan_ws_1040_phase_out_pct')/15000.", last_eval:0 });
 g.setNode("student_loan_ws_1040_final_credit",  { label: "final_credit", baselabel: "final_credit", form: "student_loan_ws_1040", fullname: "Student loan interest credit", class: "a_node s_loans    ", val:0 , eqn: "max(Cv('student_loan_ws_1040_loans_maxed') - Cv('student_loan_ws_1040_phased_out_loans'), 0)", last_eval:0 });
-g.setNode("ctc_ws_1040_two_thousand_per_child",  { label: "two_thousand_per_child", baselabel: "two_thousand_per_child", form: "ctc_ws_1040", fullname: "$2,000 per child under 17", class: "a_node kids", val:0 , eqn: "thousandkids()", last_eval:0 });
-g.setNode("ctc_ws_1040_ctc_subtraction",  { label: "ctc_subtraction", baselabel: "ctc_subtraction", form: "ctc_ws_1040", fullname: "5% of AGI minus a filing-status dependent number", class: "a_node kids", val:0 , eqn: "ctc_status(Cv('f1040_AGI'))", last_eval:0 });
-g.setNode("ctc_ws_1040_credit_remaining",  { label: "credit_remaining", baselabel: "credit_remaining", form: "ctc_ws_1040", fullname: "$2,000 per child minus the subtraction", class: "a_node kids", val:0 , eqn: "max(Cv('ctc_ws_1040_two_thousand_per_child') - Cv('ctc_ws_1040_ctc_subtraction'), 0)", last_eval:0 });
-g.setNode("ctc_ws_1040_tax_minus_some_credits",  { label: "tax_minus_some_credits", baselabel: "tax_minus_some_credits", form: "ctc_ws_1040", fullname: "Calculated tax minus some credits", class: "a_node kids", val:0 , eqn: "Cv('f1040_tax') - Cv('f1040sch3_ed_credits')- Cv('f1040sch3_ftc')", last_eval:0 });
-g.setNode("ctc_ws_1040_ctc",  { label: "ctc", baselabel: "ctc", form: "ctc_ws_1040", fullname: "Child tax credit", class: "a_node kids", val:0 , eqn: "min(Cv('ctc_ws_1040_tax_minus_some_credits'), Cv('ctc_ws_1040_credit_remaining'))", last_eval:0 });
-g.setNode("ctc_sch8812_unused_ctc",  { label: "unused_ctc", baselabel: "unused_ctc", form: "ctc_sch8812", fullname: "CTC not used", class: "a_node kids", val:0 , eqn: "max(0, Cv('ctc_ws_1040_credit_remaining') - Cv('ctc_ws_1040_ctc'))", last_eval:0 });
-g.setNode("ctc_sch8812_fourteen_kids",  { label: "fourteen_kids", baselabel: "fourteen_kids", form: "ctc_sch8812", fullname: "$1,400 per kid", class: "a_node kids", val:0 , eqn: "fourteenkids()", last_eval:0 });
-g.setNode("ctc_sch8812_limited_unused",  { label: "limited_unused", baselabel: "limited_unused", form: "ctc_sch8812", fullname: "Limited unused CTC", class: "a_node kids", val:0 , eqn: "min(Cv('ctc_sch8812_unused_ctc'),Cv('ctc_sch8812_fourteen_kids'))", last_eval:0 });
-g.setNode("ctc_sch8812_scaled_earned_income",  { label: "scaled_earned_income", baselabel: "scaled_earned_income", form: "ctc_sch8812", fullname: "15 percent of earned income-2500", class: "a_node kids", val:0 , eqn: "max(0, 0.15*(Cv('f1040_wages')-2500))", last_eval:0 });
-g.setNode("ctc_sch8812_ss_and_medicare_withheld",  { label: "ss_and_medicare_withheld", baselabel: "ss_and_medicare_withheld", form: "ctc_sch8812", fullname: "Social security and medicare withheld on W-2 lines 4 and 6", class: "a_node u kids", val:0 , eqn: "", last_eval:0 });
-g.setNode("ctc_sch8812_refundable_ctc",  { label: "refundable_ctc", baselabel: "refundable_ctc", form: "ctc_sch8812", fullname: "Refundable child tax credit", class: "a_node kids", val:0 , eqn: "actc(Cv('ctc_sch8812_limited_unused'), Cv('ctc_sch8812_scaled_earned_income'), Cv('ctc_sch8812_ss_and_medicare_withheld'), Cv('f1040_eitc'))", last_eval:0 });
+g.setNode("ctc_sch8812_I_two_thousand_per_child",  { label: "two_thousand_per_child", baselabel: "two_thousand_per_child", form: "ctc_sch8812_I", fullname: "$2,000 per child under 17 w/an SSN ($500 for other children unimplemented)", class: "a_node kids    ", val:0 , eqn: "thousandkids()", last_eval:0 });
+g.setNode("ctc_sch8812_I_ctc_subtraction",  { label: "ctc_subtraction", baselabel: "ctc_subtraction", form: "ctc_sch8812_I", fullname: "5% of AGI minus a filing-status dependent number", class: "a_node kids    ", val:0 , eqn: "ctc_status(Cv('f1040_AGI'))", last_eval:0 });
+g.setNode("ctc_sch8812_I_credit_remaining",  { label: "credit_remaining", baselabel: "credit_remaining", form: "ctc_sch8812_I", fullname: "$2,000 per child minus the subtraction", class: "a_node kids    ", val:0 , eqn: "max(Cv('ctc_sch8812_I_two_thousand_per_child') - Cv('ctc_sch8812_I_ctc_subtraction'), 0)", last_eval:0 });
+g.setNode("ctc_sch8812_I_tax_minus_some_credits",  { label: "tax_minus_some_credits", baselabel: "tax_minus_some_credits", form: "ctc_sch8812_I", fullname: "                Calculated tax minus some credits", class: "a_node kids    ", val:0 , eqn: "Cv('f1040_base_tax')          - Cv('f1040sch3_ftc') - Cv('f1040sch3_dependent_care')- Cv('f1040sch3_ed_credits')          - Cv('f1040sch3_retirement_savings') - Cv('f1040sch3_elderly_disabled_credits')          - Cv('f1040sch3_alt_motor_vehicle')  - Cv('f1040sch3_plug_in_motor_vehicle')", last_eval:0 });
+g.setNode("ctc_sch8812_I_ctc",  { label: "ctc", baselabel: "ctc", form: "ctc_sch8812_I", fullname: "Nonrefundable child tax credit", class: "a_node kids    ", val:0 , eqn: "min(Cv('ctc_sch8812_I_tax_minus_some_credits'), Cv('ctc_sch8812_I_credit_remaining'))", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_unused_ctc",  { label: "unused_ctc", baselabel: "unused_ctc", form: "ctc_sch8812_IIA", fullname: "CTC not used", class: "a_node kids     ", val:0 , eqn: "max(0, Cv('ctc_sch8812_I_credit_remaining') - Cv('ctc_sch8812_I_ctc'))", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_fifteen_kids",  { label: "fifteen_kids", baselabel: "fifteen_kids", form: "ctc_sch8812_IIA", fullname: "$1,500 per kid", class: "a_node kids    ", val:0 , eqn: "fifteenkids()", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_limited_unused",  { label: "limited_unused", baselabel: "limited_unused", form: "ctc_sch8812_IIA", fullname: "Limited unused CTC", class: "a_node kids    ", val:0 , eqn: "min(Cv('ctc_sch8812_IIA_unused_ctc'), Cv('ctc_sch8812_IIA_fifteen_kids'))", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_scaled_earned_income",  { label: "scaled_earned_income", baselabel: "scaled_earned_income", form: "ctc_sch8812_IIA", fullname: "15 percent of earned income-2500", class: "a_node kids    ", val:0 , eqn: "max(0, 0.15*(Cv('f1040_wages')-2500))", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_ss_and_medicare_withheld",  { label: "ss_and_medicare_withheld", baselabel: "ss_and_medicare_withheld", form: "ctc_sch8812_IIA", fullname: "Social security and medicare withheld on W-2 lines 4 and 6", class: "a_node u kids    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_refundable_ctc",  { label: "refundable_ctc", baselabel: "refundable_ctc", form: "ctc_sch8812_IIA", fullname: "Refundable child tax credit", class: "a_node kids    ", val:0 , eqn: "actc(Cv('ctc_sch8812_IIA_limited_unused'), Cv('ctc_sch8812_IIA_scaled_earned_income'),Cv('f1040sch1_self_employment_deductible') + Cv('ctc_sch8812_IIA_ss_and_medicare_withheld'), Cv('f1040_eitc'))", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_refund",  { label: "last_year_refund", baselabel: "last_year_refund", form: "f1040_tax_refund_ws", fullname: "Enter the income tax refund from Form(s) 1099G, up to income taxes on last year's Schedule A", class: "a_node u ly_refund    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_5d",  { label: "last_year_5d", baselabel: "last_year_5d", form: "f1040_tax_refund_ws", fullname: "Enter line 29 of your 2020 Schedule A", class: "a_node u ly_refund    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_limited_deductions",  { label: "last_year_limited_deductions", baselabel: "last_year_limited_deductions", form: "f1040_tax_refund_ws", fullname: "Enter line 5e of your 2020 Schedule A", class: "a_node u ly_refund    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_reduced",  { label: "last_year_reduced", baselabel: "last_year_reduced", form: "f1040_tax_refund_ws", fullname: "Last year's deductions, maybe reduced", class: "a_node ly_refund    ", val:0 , eqn: "max(Cv('f1040_tax_refund_ws_last_year_5d')-Cv('f1040_tax_refund_ws_last_year_limited_deductions'), 0)", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_post_limit",  { label: "last_year_post_limit", baselabel: "last_year_post_limit", form: "f1040_tax_refund_ws", fullname: "Last year's tax deducted, limited", class: "a_node ly_refund    ", val:0 , eqn: "max(Cv('f1040_tax_refund_ws_last_year_refund')-Cv('f1040_tax_refund_ws_last_year_reduced'), 0)", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_total_deductions",  { label: "last_year_total_deductions", baselabel: "last_year_total_deductions", form: "f1040_tax_refund_ws", fullname: "Last year's itemized deductions", class: "a_node u ly_refund    ", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_tax_refund_ws_almost_std_deduction",  { label: "almost_std_deduction", baselabel: "almost_std_deduction", form: "f1040_tax_refund_ws", fullname: "Last year's standard deduction (under your current status)", class: "a_node ly_refund    ", val:0 , eqn: "((fstatus()=='married filing jointly') ? (24800) : (((fstatus()=='head of household') ? (18650) : (12400 )) )) ", last_eval:0 });
-g.setNode("f1040_tax_refund_ws_srblind",  { label: "srblind", baselabel: "srblind", form: "f1040_tax_refund_ws", fullname: "Senior or blind exemption (blind UI; mfj PI)", class: "a_node ly_refund    ", val:0 , eqn: "(( situations['.over_65'] ==1)+( situations['.spouse_over_65'] ==1))*                   ((fstatus()=='married') ? (1300) : (((fstatus()=='married filing jointly') ? (1300) : (1650 )) )) ", last_eval:0 });
+g.setNode("f1040_tax_refund_ws_almost_std_deduction",  { label: "almost_std_deduction", baselabel: "almost_std_deduction", form: "f1040_tax_refund_ws", fullname: "Last year's standard deduction (under your current status)", class: "a_node ly_refund    ", val:0 , eqn: "((fstatus()=='married filing jointly') ? (25100) : (((fstatus()=='head of household') ? (18800) : (12550 )) )) ", last_eval:0 });
+g.setNode("f1040_tax_refund_ws_srblind",  { label: "srblind", baselabel: "srblind", form: "f1040_tax_refund_ws", fullname: "Senior or blind exemption (blind UI; married filing jointly PI)", class: "a_node ly_refund    ", val:0 , eqn: "(( situations['.over_65'] ==1)+( situations['.spouse_over_65'] ==1))*                   ((fstatus()=='married filing separately') ? (1350) : (((fstatus()=='married filing jointly') ? (1350) : (1700 )) )) ", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_itemized_over_std",  { label: "itemized_over_std", baselabel: "itemized_over_std", form: "f1040_tax_refund_ws", fullname: "Itemized deduction minus standard for last year", class: "a_node ly_refund    ", val:0 , eqn: "max(Cv('f1040_tax_refund_ws_last_year_total_deductions') - Cv('f1040_tax_refund_ws_almost_std_deduction') - Cv('f1040_tax_refund_ws_srblind'), 0)", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_taxable_refund",  { label: "taxable_refund", baselabel: "taxable_refund", form: "f1040_tax_refund_ws", fullname: "Taxable tax refund", class: "a_node ly_refund    ", val:0 , eqn: "min(Cv('f1040_tax_refund_ws_itemized_over_std'), Cv('f1040_tax_refund_ws_last_year_post_limit'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_qualified_dividends_and_gains",  { label: "qualified_dividends_and_gains", baselabel: "qualified_dividends_and_gains", form: "qualified_dividends_ws", fullname: "Qualified dividends plus cap gains", class: "a_node cap_gains    ", val:0 , eqn: "Cv('f1040_qualified_dividends')+Cv('f1040_capital_gains')", last_eval:0 });
 g.setNode("qualified_dividends_ws_income_minus_gains",  { label: "income_minus_gains", baselabel: "income_minus_gains", form: "qualified_dividends_ws", fullname: "Income minus gains", class: "a_node cap_gains    ", val:0 , eqn: "Cv('f1040_taxable_income')-Cv('qualified_dividends_ws_qualified_dividends_and_gains')", last_eval:0 });
-g.setNode("qualified_dividends_ws_limitation",  { label: "limitation", baselabel: "limitation", form: "qualified_dividends_ws", fullname: "Limitation", class: "a_node cap_gains    ", val:0 , eqn: "((fstatus()=='head of household') ? (54100) : (((fstatus()=='married filing jointly') ? (80800) : (40400 )) )) ", last_eval:0 });
+g.setNode("qualified_dividends_ws_limitation",  { label: "limitation", baselabel: "limitation", form: "qualified_dividends_ws", fullname: "Limitation", class: "a_node cap_gains    ", val:0 , eqn: "((fstatus()=='head of household') ? (55800) : (((fstatus()=='married filing jointly') ? (83350) : (41675 )) )) ", last_eval:0 });
 g.setNode("qualified_dividends_ws_limited_income",  { label: "limited_income", baselabel: "limited_income", form: "qualified_dividends_ws", fullname: "Limited income", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('f1040_taxable_income'), Cv('qualified_dividends_ws_limitation'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_alt_limited_income",  { label: "alt_limited_income", baselabel: "alt_limited_income", form: "qualified_dividends_ws", fullname: "Limited income again", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('qualified_dividends_ws_limited_income'), Cv('qualified_dividends_ws_income_minus_gains'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_untaxed",  { label: "untaxed", baselabel: "untaxed", form: "qualified_dividends_ws", fullname: "Untaxed portion", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_limited_income') - Cv('qualified_dividends_ws_alt_limited_income')", last_eval:0 });
 g.setNode("qualified_dividends_ws_min_ded_or_gains_minus_zero",  { label: "min_ded_or_gains_minus_zero", baselabel: "min_ded_or_gains_minus_zero", form: "qualified_dividends_ws", fullname: "Remove untaxed from income", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('f1040_taxable_income'), Cv('qualified_dividends_ws_income_minus_gains')) - Cv('qualified_dividends_ws_untaxed')", last_eval:0 });
-g.setNode("qualified_dividends_ws_relimited_qualified",  { label: "relimited_qualified", baselabel: "relimited_qualified", form: "qualified_dividends_ws", fullname: "qualified gains re-limited", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('qualified_dividends_ws_min_ded_or_gains_minus_zero'),                        max( min(((fstatus()=='single') ? (445850) : (((fstatus()=='married') ? (250800) : (((fstatus()=='married filing jointly') ? (501600) : (473750 )) )) )) ,                 Cv('f1040_taxable_income')) - (Cv('qualified_dividends_ws_income_minus_gains') + Cv('qualified_dividends_ws_untaxed')) , 0))", last_eval:0 });
-g.setNode("qualified_dividends_ws_fifteen_pct_tax",  { label: "fifteen_pct_tax", baselabel: "fifteen_pct_tax", form: "qualified_dividends_ws", fullname: "15% tax on qualified gains", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_relimited_qualified')*0.15", last_eval:0 });
+g.setNode("qualified_dividends_ws_relimited_qualified",  { label: "relimited_qualified", baselabel: "relimited_qualified", form: "qualified_dividends_ws", fullname: "qualified gains re-limited", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('qualified_dividends_ws_min_ded_or_gains_minus_zero'),                        max( min(((fstatus()=='single') ? (459750) : (((fstatus()=='married filing separately') ? (258600) : (((fstatus()=='married filing jointly') ? (517200) : (488500 )) )) )) ,                 Cv('f1040_taxable_income')) - (Cv('qualified_dividends_ws_income_minus_gains') + Cv('qualified_dividends_ws_untaxed')) , 0))", last_eval:0 });
 g.setNode("qualified_dividends_ws_income_minus_fifteen",  { label: "income_minus_fifteen", baselabel: "income_minus_fifteen", form: "qualified_dividends_ws", fullname: "Gains minus 15% taxed part", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('f1040_taxable_income'), Cv('qualified_dividends_ws_qualified_dividends_and_gains')) - (Cv('qualified_dividends_ws_untaxed') + Cv('qualified_dividends_ws_relimited_qualified'))", last_eval:0 });
-g.setNode("qualified_dividends_ws_twenty_pct_tax",  { label: "twenty_pct_tax", baselabel: "twenty_pct_tax", form: "qualified_dividends_ws", fullname: "20% tax on dividends and gains", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_income_minus_fifteen')*0.20", last_eval:0 });
 g.setNode("qualified_dividends_ws_nongains_tax",  { label: "nongains_tax", baselabel: "nongains_tax", form: "qualified_dividends_ws", fullname: "Tax on income without qualified gains", class: "a_node cap_gains    ", val:0 , eqn: "tax_calc(Cv('qualified_dividends_ws_income_minus_gains'))", last_eval:0 });
-g.setNode("qualified_dividends_ws_total_tax",  { label: "total_tax", baselabel: "total_tax", form: "qualified_dividends_ws", fullname: "Total tax including qualified gains discounts", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_fifteen_pct_tax') + Cv('qualified_dividends_ws_twenty_pct_tax') + Cv('qualified_dividends_ws_nongains_tax') + 0", last_eval:0 });
+g.setNode("qualified_dividends_ws_total_tax",  { label: "total_tax", baselabel: "total_tax", form: "qualified_dividends_ws", fullname: "Total tax including qualified gains discounts", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_relimited_qualified')*0.15 +Cv('qualified_dividends_ws_income_minus_fifteen')*0.20 + Cv('qualified_dividends_ws_nongains_tax')", last_eval:0 });
 g.setNode("f1040_sched_a_medical_expenses",  { label: "medical_expenses", baselabel: "medical_expenses", form: "f1040_sched_a", fullname: "Medical and dental expenses", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_agi_scaled",  { label: "agi_scaled", baselabel: "agi_scaled", form: "f1040_sched_a", fullname: "AGI scaled", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_AGI')* (( situations['.over_65'] + situations['.spouse_over_65'] ) ? (.075) : (.1))", last_eval:0 });
-g.setNode("f1040_sched_a_excess_medical",  { label: "excess_medical", baselabel: "excess_medical", form: "f1040_sched_a", fullname: "Medical expenses minus fraction of AGI", class: "a_node itemizing", val:0 , eqn: "max(Cv('f1040_sched_a_medical_expenses') - Cv('f1040_sched_a_agi_scaled'), 0)", last_eval:0 });
-g.setNode("f1040_sched_a_local_taxes",  { label: "local_taxes", baselabel: "local_taxes", form: "f1040_sched_a", fullname: "State/local Income OR general sales tax", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_real_estate_taxes",  { label: "real_estate_taxes", baselabel: "real_estate_taxes", form: "f1040_sched_a", fullname: "Real estate taxes", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_property_taxes",  { label: "property_taxes", baselabel: "property_taxes", form: "f1040_sched_a", fullname: "Personal property taxes", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_other_taxes",  { label: "other_taxes", baselabel: "other_taxes", form: "f1040_sched_a", fullname: "Other taxes", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_total_taxes_deducted",  { label: "total_taxes_deducted", baselabel: "total_taxes_deducted", form: "f1040_sched_a", fullname: "Total taxes paid to be deducted", class: "a_node itemizing", val:0 , eqn: "min(10000, Cv('f1040_sched_a_local_taxes') + Cv('f1040_sched_a_real_estate_taxes') + Cv('f1040_sched_a_property_taxes') + Cv('f1040_sched_a_other_taxes') + 0)", last_eval:0 });
-g.setNode("f1040_sched_a_reported_mort_interest",  { label: "reported_mort_interest", baselabel: "reported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest/points reported on Form 1099", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_unreported_mort_interest",  { label: "unreported_mort_interest", baselabel: "unreported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest not reported on Form 1098", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_unreported_mort_points",  { label: "unreported_mort_points", baselabel: "unreported_mort_points", form: "f1040_sched_a", fullname: "Home mortgage points not reported on Form 1098", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_mort_insurance_premiums_in",  { label: "mort_insurance_premiums_in", baselabel: "mort_insurance_premiums_in", form: "f1040_sched_a", fullname: "Mortgage insurance premiums in", class: "a_node u itemizing mort", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_mort_insurance_limit",  { label: "mort_insurance_limit", baselabel: "mort_insurance_limit", form: "f1040_sched_a", fullname: "mort insurance limit", class: "a_node itemizing mort", val:0 , eqn: "(((Cv('f1040_AGI') - ((fstatus()=='married') ? (50000) : (100000 )) ) < 0) ? (1) : (max(0,min(1,1-Ceil((Cv('f1040_AGI') - ((fstatus()=='married') ? (50000) : (100000 )) )/1000)/10.0))))", last_eval:0 });
-g.setNode("f1040_sched_a_mort_insurance_premiums",  { label: "mort_insurance_premiums", baselabel: "mort_insurance_premiums", form: "f1040_sched_a", fullname: "Mortgage insurance premiums claimed", class: "a_node itemizing mort", val:0 , eqn: "Cv('f1040_sched_a_mort_insurance_premiums_in')*Cv('f1040_sched_a_mort_insurance_limit')", last_eval:0 });
-g.setNode("f1040_sched_a_investment_interest",  { label: "investment_interest", baselabel: "investment_interest", form: "f1040_sched_a", fullname: "Investment interest", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_total_interest_deduction",  { label: "total_interest_deduction", baselabel: "total_interest_deduction", form: "f1040_sched_a", fullname: "Total interest to deduct", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_sched_a_reported_mort_interest') + Cv('f1040_sched_a_unreported_mort_interest') + Cv('f1040_sched_a_unreported_mort_points') + Cv('f1040_sched_a_mort_insurance_premiums') + Cv('f1040_sched_a_investment_interest') + 0", last_eval:0 });
-g.setNode("f1040_sched_a_charity_cash",  { label: "charity_cash", baselabel: "charity_cash", form: "f1040_sched_a", fullname: "Gifts to charity by cash or check", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_charity_noncash",  { label: "charity_noncash", baselabel: "charity_noncash", form: "f1040_sched_a", fullname: "Gifts to charity other than by cash or check", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_charity_carryover",  { label: "charity_carryover", baselabel: "charity_carryover", form: "f1040_sched_a", fullname: "Gifts to charity, carryover from prior year", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_charity_total",  { label: "charity_total", baselabel: "charity_total", form: "f1040_sched_a", fullname: "Gifts to charity, total", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_sched_a_charity_cash') + Cv('f1040_sched_a_charity_noncash') + Cv('f1040_sched_a_charity_carryover') + 0", last_eval:0 });
-g.setNode("f1040_sched_a_casualty_or_theft_losses",  { label: "casualty_or_theft_losses", baselabel: "casualty_or_theft_losses", form: "f1040_sched_a", fullname: "Casualty and Theft Losses", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_employee_expenses",  { label: "employee_expenses", baselabel: "employee_expenses", form: "f1040_sched_a", fullname: "Unreimbursed employee expenses—job travel, union dues, job education, etc.", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_tax_prep_fees",  { label: "tax_prep_fees", baselabel: "tax_prep_fees", form: "f1040_sched_a", fullname: "Tax prep fees", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_other_work_expenses",  { label: "other_work_expenses", baselabel: "other_work_expenses", form: "f1040_sched_a", fullname: "Other expenses—investment, safe deposit box, etc.", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_total_expenses",  { label: "total_expenses", baselabel: "total_expenses", form: "f1040_sched_a", fullname: "Total expenses", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_sched_a_employee_expenses') + Cv('f1040_sched_a_tax_prep_fees') + Cv('f1040_sched_a_other_work_expenses') + 0", last_eval:0 });
-g.setNode("f1040_sched_a_expenses_minus_agi_slice",  { label: "expenses_minus_agi_slice", baselabel: "expenses_minus_agi_slice", form: "f1040_sched_a", fullname: "Expenses minus fraction of AGI", class: "a_node itemizing", val:0 , eqn: "max(Cv('f1040_sched_a_total_expenses') - (Cv('f1040_AGI')* 0.02), 0)", last_eval:0 });
-g.setNode("f1040_sched_a_other_deductions",  { label: "other_deductions", baselabel: "other_deductions", form: "f1040_sched_a", fullname: "Other deductions", class: "a_node u itemizing", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_total_itemized_deductions",  { label: "total_itemized_deductions", baselabel: "total_itemized_deductions", form: "f1040_sched_a", fullname: "Total itemized deductions (assuming income < $155k)", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_sched_a_excess_medical') + Cv('f1040_sched_a_total_taxes_deducted') + Cv('f1040_sched_a_total_interest_deduction') + Cv('f1040_sched_a_charity_total') + Cv('f1040_sched_a_casualty_or_theft_losses') + Cv('f1040_sched_a_expenses_minus_agi_slice') + Cv('f1040_sched_a_other_deductions') + 0", last_eval:0 });
+g.setNode("f1040_sched_a_agi_scaled",  { label: "agi_scaled", baselabel: "agi_scaled", form: "f1040_sched_a", fullname: "AGI scaled", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_AGI')* (( situations['.over_65'] + situations['.spouse_over_65'] ) ? (.075) : (.1))        ", last_eval:0 });
+g.setNode("f1040_sched_a_excess_medical",  { label: "excess_medical", baselabel: "excess_medical", form: "f1040_sched_a", fullname: "Medical expenses minus fraction of AGI", class: "a_node itemizing    ", val:0 , eqn: "max(Cv('f1040_sched_a_medical_expenses') - Cv('f1040_sched_a_agi_scaled'), 0)", last_eval:0 });
+g.setNode("f1040_sched_a_local_taxes",  { label: "local_taxes", baselabel: "local_taxes", form: "f1040_sched_a", fullname: "State/local Income OR general sales tax", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_real_estate_taxes",  { label: "real_estate_taxes", baselabel: "real_estate_taxes", form: "f1040_sched_a", fullname: "Real estate taxes", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_property_taxes",  { label: "property_taxes", baselabel: "property_taxes", form: "f1040_sched_a", fullname: "Personal property taxes", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_other_taxes",  { label: "other_taxes", baselabel: "other_taxes", form: "f1040_sched_a", fullname: "Other taxes", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_total_taxes_deducted",  { label: "total_taxes_deducted", baselabel: "total_taxes_deducted", form: "f1040_sched_a", fullname: "Total taxes paid to be deducted", class: "a_node itemizing    ", val:0 , eqn: "min(10000, Cv('f1040_sched_a_local_taxes') + Cv('f1040_sched_a_real_estate_taxes') + Cv('f1040_sched_a_property_taxes') + Cv('f1040_sched_a_other_taxes') + 0)", last_eval:0 });
+g.setNode("f1040_sched_a_reported_mort_interest",  { label: "reported_mort_interest", baselabel: "reported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest/points reported on Form 1099", class: "a_node u itemizing mort    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_unreported_mort_interest",  { label: "unreported_mort_interest", baselabel: "unreported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest not reported on Form 1098", class: "a_node u itemizing mort    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_unreported_mort_points",  { label: "unreported_mort_points", baselabel: "unreported_mort_points", form: "f1040_sched_a", fullname: "Home mortgage points not reported on Form 1098", class: "a_node u itemizing mort    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_investment_interest",  { label: "investment_interest", baselabel: "investment_interest", form: "f1040_sched_a", fullname: "Investment interest", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_total_interest_deduction",  { label: "total_interest_deduction", baselabel: "total_interest_deduction", form: "f1040_sched_a", fullname: "Total interest to deduct", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_sched_a_reported_mort_interest') + Cv('f1040_sched_a_unreported_mort_interest') + Cv('f1040_sched_a_unreported_mort_points') + Cv('f1040_sched_a_investment_interest') + 0", last_eval:0 });
+g.setNode("f1040_sched_a_charity_cash",  { label: "charity_cash", baselabel: "charity_cash", form: "f1040_sched_a", fullname: "Gifts to charity by cash or check", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_charity_noncash",  { label: "charity_noncash", baselabel: "charity_noncash", form: "f1040_sched_a", fullname: "Gifts to charity other than by cash or check", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_charity_carryover",  { label: "charity_carryover", baselabel: "charity_carryover", form: "f1040_sched_a", fullname: "Gifts to charity, carryover from prior year", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_charity_total",  { label: "charity_total", baselabel: "charity_total", form: "f1040_sched_a", fullname: "Gifts to charity, total", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_sched_a_charity_cash') + Cv('f1040_sched_a_charity_noncash') + Cv('f1040_sched_a_charity_carryover') + 0", last_eval:0 });
+g.setNode("f1040_sched_a_casualty_or_theft_losses",  { label: "casualty_or_theft_losses", baselabel: "casualty_or_theft_losses", form: "f1040_sched_a", fullname: "Casualty and Theft Losses", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_employee_expenses",  { label: "employee_expenses", baselabel: "employee_expenses", form: "f1040_sched_a", fullname: "Unreimbursed employee expenses—job travel, union dues, job education, etc.", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_tax_prep_fees",  { label: "tax_prep_fees", baselabel: "tax_prep_fees", form: "f1040_sched_a", fullname: "Tax prep fees", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_other_work_expenses",  { label: "other_work_expenses", baselabel: "other_work_expenses", form: "f1040_sched_a", fullname: "Other expenses—investment, safe deposit box, etc.", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_expenses_minus_agi_slice",  { label: "expenses_minus_agi_slice", baselabel: "expenses_minus_agi_slice", form: "f1040_sched_a", fullname: "Expenses minus fraction of AGI", class: "a_node itemizing    ", val:0 , eqn: "max(Cv('f1040_sched_a_employee_expenses') + Cv('f1040_sched_a_tax_prep_fees') + Cv('f1040_sched_a_other_work_expenses') + 0 - (Cv('f1040_AGI')* 0.02), 0)", last_eval:0 });
+g.setNode("f1040_sched_a_other_deductions",  { label: "other_deductions", baselabel: "other_deductions", form: "f1040_sched_a", fullname: "Other deductions", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
+g.setNode("f1040_sched_a_total_itemized_deductions",  { label: "total_itemized_deductions", baselabel: "total_itemized_deductions", form: "f1040_sched_a", fullname: "Total itemized deductions", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_sched_a_excess_medical') + Cv('f1040_sched_a_total_taxes_deducted') + Cv('f1040_sched_a_total_interest_deduction') + Cv('f1040_sched_a_charity_total') + Cv('f1040_sched_a_casualty_or_theft_losses') + Cv('f1040_sched_a_expenses_minus_agi_slice') + Cv('f1040_sched_a_other_deductions') + 0", last_eval:0 });
 g.setNode("f1040_sched_e_rents_received",  { label: "rents_received", baselabel: "rents_received", form: "f1040_sched_e", fullname: "Rents received", class: "a_node u have_rr", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_e_royalties_received",  { label: "royalties_received", baselabel: "royalties_received", form: "f1040_sched_e", fullname: "Royalties received", class: "a_node u have_rr", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_e_rental_advertising",  { label: "rental_advertising", baselabel: "rental_advertising", form: "f1040_sched_e", fullname: "Advertising", class: "a_node u have_rr", val:0 , eqn: "", last_eval:0 });
@@ -490,26 +470,22 @@ g.setNode("f8582_f8582_commercial_revitalization",  { label: "f8582_commercial_r
 g.setNode("f8582_f8582_passive_activities",  { label: "f8582_passive_activities", baselabel: "f8582_passive_activities", form: "f8582", fullname: "Active plus Passive activity income (UI)", class: "a_node have_rr    ", val:0 , eqn: "Cv('f8582_f8582_total_real_in')", last_eval:0 });
 g.setNode("f8582_f8582_total_in",  { label: "f8582_total_in", baselabel: "f8582_total_in", form: "f8582", fullname: "Total in", class: "a_node have_rr    ", val:0 , eqn: "Cv('f8582_f8582_total_real_in') + Cv('f8582_f8582_commercial_revitalization') + Cv('f8582_f8582_passive_activities') + 0", last_eval:0 });
 g.setNode("f8582_f8582_min",  { label: "f8582_min", baselabel: "f8582_min", form: "f8582", fullname: "the smaller of the loss on line 1d or the loss on line 4", class: "a_node have_rr    ", val:0 , eqn: "max(min(Cv('f8582_f8582_total_real_in'),0), min(Cv('f8582_f8582_total_in'),0))", last_eval:0 });
-g.setNode("f8582_magi",  { label: "magi", baselabel: "magi", form: "f8582", fullname: "MAGI", class: "a_node have_rr    ", val:0 , eqn: "Cv('f1040_MAGI')", last_eval:0 });
-g.setNode("f8582_f8582_half",  { label: "f8582_half", baselabel: "f8582_half", form: "f8582", fullname: "Half of line 8, up to 25k", class: "a_node have_rr    ", val:0 , eqn: "-min(25000, max(150000 - max(Cv('f8582_magi'), 0), 0)/2.0)", last_eval:0 });
+g.setNode("f8582_f8582_half",  { label: "f8582_half", baselabel: "f8582_half", form: "f8582", fullname: "Half of line 8, up to 25k", class: "a_node have_rr    ", val:0 , eqn: "-min(25000, max(150000 - max(Cv('f1040_MAGI'), 0), 0)/2.0)", last_eval:0 });
 g.setNode("f8582_allowed_extra_real_losses",  { label: "allowed_extra_real_losses", baselabel: "allowed_extra_real_losses", form: "f8582", fullname: "Allowed above-passive real estate losses", class: "a_node have_rr    ", val:0 , eqn: "max(Cv('f8582_f8582_min'), Cv('f8582_f8582_half'))", last_eval:0 });
 g.setNode("f8582_allowed_real_losses",  { label: "allowed_real_losses", baselabel: "allowed_real_losses", form: "f8582", fullname: "Total allowed real estate losses", class: "a_node have_rr    ", val:0 , eqn: "Cv('f8582_allowed_extra_real_losses')- Cv('f8582_f8582_net_in')", last_eval:0 });
 g.setNode("f8582_carryover_to_next_year",  { label: "carryover_to_next_year", baselabel: "carryover_to_next_year", form: "f8582", fullname: "Carry this over to next year", class: "a_node have_rr    ", val:0 , eqn: "max(0,Cv('f8582_ws1_8582_prior_loss') + Cv('f8582_total_losses_8582'))", last_eval:0 });
 g.setNode("f8582_total_losses_8582",  { label: "total_losses_8582", baselabel: "total_losses_8582", form: "f8582", fullname: "Total loss", class: "a_node have_rr    ", val:0 , eqn: "((Cv('f8582_f8582_total_real_in')>0) ? (Cv('f8582_f8582_net_loss') - Cv('f8582_ws1_8582_prior_loss')) : (min(Cv('f8582_allowed_real_losses'), 0)))", last_eval:0 });
 g.setNode("f6251_taxable_income",  { label: "taxable_income", baselabel: "taxable_income", form: "f6251", fullname: "AGI minus deductions", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_AGI') - Cv('f1040_deductions') - Cv('f1040_qbi')", last_eval:0 });
 g.setNode("f6251_taxes_deducted",  { label: "taxes_deducted", baselabel: "taxes_deducted", form: "f6251", fullname: "State/local/other deducted on Schedule A or std deduction", class: "a_node itemizing", val:0 , eqn: "((Cv('f1040_sched_a_total_itemized_deductions')>0) ? (Cv('f1040_sched_a_total_taxes_deducted')) : (Cv('f1040_std_deduction')))", last_eval:0 });
-g.setNode("f6251_amt_refund_deduction",  { label: "amt_refund_deduction", baselabel: "amt_refund_deduction", form: "f6251", fullname: "Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)", class: "a_node itemizing", val:0 , eqn: "Cv('f1040_tax_refund_ws_taxable_refund')", last_eval:0 });
-g.setNode("f6251_amt_investment_expense_deduction",  { label: "amt_investment_expense_deduction", baselabel: "amt_investment_expense_deduction", form: "f6251", fullname: "Investment interest expense (UI)", class: "a_node itemizing", val:0 , eqn: "0", last_eval:0 });
-g.setNode("f6251_amt_depletion_deduction",  { label: "amt_depletion_deduction", baselabel: "amt_depletion_deduction", form: "f6251", fullname: "Depletion (UI)", class: "a_node itemizing", val:0 , eqn: "0", last_eval:0 });
+g.setNode("f6251_amt_refund_deduction",  { label: "amt_refund_deduction", baselabel: "amt_refund_deduction", form: "f6251", fullname: "Tax refund from Form 1040, Sch A L7 or 1040 L12", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_tax_refund_ws_taxable_refund')", last_eval:0 });
 g.setNode("f6251_nold",  { label: "nold", baselabel: "nold", form: "f6251", fullname: "NOLD (UI)", class: "a_node itemizing", val:0 , eqn: "0", last_eval:0 });
-g.setNode("f6251_amt_nold",  { label: "amt_nold", baselabel: "amt_nold", form: "f6251", fullname: "Alt NOLD (UI)", class: "a_node itemizing", val:0 , eqn: "0", last_eval:0 });
-g.setNode("f6251_amt_income",  { label: "amt_income", baselabel: "amt_income", form: "f6251", fullname: "Alternative minimum taxable income. (PI)", class: "a_node itemizing", val:0 , eqn: "Cv('f6251_taxable_income') + Cv('f6251_taxes_deducted') + Cv('f6251_amt_refund_deduction') + Cv('f6251_amt_investment_expense_deduction') + Cv('f6251_amt_depletion_deduction') + Cv('f6251_nold') + Cv('f6251_amt_nold') + 0", last_eval:0 });
+g.setNode("f6251_amt_income",  { label: "amt_income", baselabel: "amt_income", form: "f6251", fullname: "Alternative minimum taxable income. (PI)", class: "a_node itemizing    ", val:0 , eqn: "Cv('f6251_taxable_income') + Cv('f6251_taxes_deducted') + Cv('f6251_amt_refund_deduction') + Cv('f6251_nold') + 0", last_eval:0 });
 g.setNode("f6251_amt_exemption",  { label: "amt_exemption", baselabel: "amt_exemption", form: "f6251", fullname: "AMT exemption (phase-out not implemented)", class: "a_node itemizing    ", val:0 , eqn: "get_amt_exemption(Cv('f6251_amt_income'))", last_eval:0 });
 g.setNode("f6251_amt_in_minus_exemption",  { label: "amt_in_minus_exemption", baselabel: "amt_in_minus_exemption", form: "f6251", fullname: "AMT income minus exemption", class: "a_node itemizing    ", val:0 , eqn: "max(0, Cv('f6251_amt_income')-Cv('f6251_amt_exemption'))", last_eval:0 });
 g.setNode("f6251_amt_preftc",  { label: "amt_preftc", baselabel: "amt_preftc", form: "f6251", fullname: "Tentative AMT pre-FTC (Simplified)", class: "a_node itemizing    ", val:0 , eqn: "get_tamt(Cv('f6251_amt_in_minus_exemption'))", last_eval:0 });
 g.setNode("f6251_amt_ftc",  { label: "amt_ftc", baselabel: "amt_ftc", form: "f6251", fullname: "AMT foreign tax credit (UI)", class: "a_node itemizing    ", val:0 , eqn: "0", last_eval:0 });
 g.setNode("f6251_amt_tentative",  { label: "amt_tentative", baselabel: "amt_tentative", form: "f6251", fullname: "Tentative AMT", class: "a_node itemizing    ", val:0 , eqn: "Cv('f6251_amt_preftc')-Cv('f6251_amt_ftc')", last_eval:0 });
-g.setNode("f6251_tax_from_1040",  { label: "tax_from_1040", baselabel: "tax_from_1040", form: "f6251", fullname: "Tax from F1040 (and f8978 losses, not implemented)", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_tax')+Cv('f1040sch2_credit_repayment')-Cv('f1040sch3_ftc')", last_eval:0 });
+g.setNode("f6251_tax_from_1040",  { label: "tax_from_1040", baselabel: "tax_from_1040", form: "f6251", fullname: "Tax from F1040 (and f8978 losses, not implemented)", class: "a_node itemizing    ", val:0 , eqn: "Cv('f1040_base_tax')+Cv('f1040sch2_credit_repayment')-Cv('f1040sch3_ftc')", last_eval:0 });
 g.setNode("f6251_amt",  { label: "amt", baselabel: "amt", form: "f6251", fullname: "AMT", class: "a_node itemizing    ", val:0 , eqn: "max(Cv('f6251_amt_tentative') - Cv('f6251_tax_from_1040'), 0)", last_eval:0 });
 g.setNode("f8863_education_expenses_1",  { label: "education_expenses_1", baselabel: "education_expenses_1", form: "f8863", fullname: "Education expenses (student 1)", class: "a_node u s_loans", val:0 , eqn: "", last_eval:0 });
 g.setNode("f8863_scaled_education_expenses_1",  { label: "scaled_education_expenses_1", baselabel: "scaled_education_expenses_1", form: "f8863", fullname: "Limited Education expenses (s1)", class: "a_node s_loans", val:0 , eqn: "max(0.25*(min(Cv('f8863_education_expenses_1'), 4000)-2000),0) ", last_eval:0 });
@@ -531,15 +507,13 @@ g.setNode("f8863_refundable_credit",  { label: "refundable_credit", baselabel: "
 g.setNode("f8863_remaining_credit",  { label: "remaining_credit", baselabel: "remaining_credit", form: "f8863", fullname: "Remaining tentative credit", class: "a_node s_loans", val:0 , eqn: "Cv('f8863_unscaled_credit') - Cv('f8863_refundable_credit')", last_eval:0 });
 g.setNode("f8863_aqe",  { label: "aqe", baselabel: "aqe", form: "f8863", fullname: "20% of Adjusted qualified expenses or 1k", class: "a_node s_loans", val:0 , eqn: "min(1000, Cv('f8863_adjusted_qualified_expenses')) *.2", last_eval:0 });
 g.setNode("f8863_baseline2",  { label: "baseline2", baselabel: "baseline2", form: "f8863", fullname: "67k or 134k", class: "a_node s_loans    ", val:0 , eqn: "((fstatus()=='married filing jointly') ? (180000) : (90000 )) ", last_eval:0 });
-g.setNode("f8863_sixty_seven_k_less_agi",  { label: "sixty_seven_k_less_agi", baselabel: "sixty_seven_k_less_agi", form: "f8863", fullname: "Remaining after AGI subtraction", class: "a_node s_loans", val:0 , eqn: "Cv('f8863_baseline2')-Cv('f1040_AGI')", last_eval:0 });
-g.setNode("f8863_fraction2",  { label: "fraction2", baselabel: "fraction2", form: "f8863", fullname: "Fraction allowed", class: "a_node s_loans", val:0 , eqn: "max(min(1, Cv('f8863_sixty_seven_k_less_agi')/((fstatus()=='married filing jointly') ? (20000) : (10000 )) ), 0)", last_eval:0 });
+g.setNode("f8863_fraction2",  { label: "fraction2", baselabel: "fraction2", form: "f8863", fullname: "Fraction allowed", class: "a_node s_loans", val:0 , eqn: "max(min(1, (Cv('f8863_baseline2')-Cv('f1040_AGI'))/((fstatus()=='married filing jointly') ? (20000) : (10000 )) ), 0)", last_eval:0 });
 g.setNode("f8863_frac_allowed",  { label: "frac_allowed", baselabel: "frac_allowed", form: "f8863", fullname: "Fraction allowed", class: "a_node s_loans", val:0 , eqn: "Cv('f8863_fraction2')*Cv('f8863_aqe')", last_eval:0 });
-g.setNode("f8863_nonrefundable_credit",  { label: "nonrefundable_credit", baselabel: "nonrefundable_credit", form: "f8863", fullname: "Nonrefundable credit", class: "a_node s_loans", val:0 , eqn: "Cv('f8863ws_limited_credit')", last_eval:0 });
+g.setNode("f8863_nonrefundable_credit",  { label: "nonrefundable_credit", baselabel: "nonrefundable_credit", form: "f8863", fullname: "Nonrefundable credit", class: "a_node s_loans", val:0 , eqn: "min(Cv('f8863ws_diff'), Cv('f8863ws_credit_sum'))", last_eval:0 });
 g.setNode("f8863ws_credit_sum",  { label: "credit_sum", baselabel: "credit_sum", form: "f8863ws", fullname: "Lines 9 plus 18", class: "a_node s_loans    ", val:0 , eqn: "Cv('f8863_remaining_credit')+Cv('f8863_frac_allowed')", last_eval:0 });
 g.setNode("f8863ws_tax",  { label: "tax", baselabel: "tax", form: "f8863ws", fullname: "Tax minus some credits from 1040", class: "a_node s_loans    ", val:0 , eqn: "Cv('f1040_tax_plus_amt_and_repayment')", last_eval:0 });
 g.setNode("f8863ws_other_credits",  { label: "other_credits", baselabel: "other_credits", form: "f8863ws", fullname: "FTC plus child care plus elderly credit", class: "a_node s_loans    ", val:0 , eqn: "Cv('f1040sch3_ftc') + Cv('f1040sch3_dependent_care')+ Cv('f1040sch3_elderly_disabled_credits')", last_eval:0 });
 g.setNode("f8863ws_diff",  { label: "diff", baselabel: "diff", form: "f8863ws", fullname: "Tax minus credits", class: "a_node s_loans    ", val:0 , eqn: "max(0, Cv('f8863ws_tax')-Cv('f8863ws_other_credits'))", last_eval:0 });
-g.setNode("f8863ws_limited_credit",  { label: "limited_credit", baselabel: "limited_credit", form: "f8863ws", fullname: "Limited nonrefundable credit", class: "a_node s_loans    ", val:0 , eqn: "min(Cv('f8863ws_diff'), Cv('f8863ws_credit_sum'))", last_eval:0 });
 
 
 var nodestorage=[]
@@ -575,42 +549,40 @@ var reedge = function(){
 set_edges("f1040sch1_rr_income", ["f1040_sched_e_rr_income",  ""])
 set_edges("f1040sch1_sch1_magi_subtotal", ["f1040_tax_refund_ws_taxable_refund", "f1040sch1_state_tax_refunds", "f1040sch1_alimony", "f1040sch1_sched_c", "f1040sch1_sale_of_biz", "f1040sch1_farm_income", "f1040sch1_unemployment", "f1040sch1_other_in",  ""])
 set_edges("f1040sch1_student_loan_interest_ded", ["student_loan_ws_1040_final_credit",  ""])
-set_edges("f1040sch1_subtractions_from_income_wo_student_loans", ["f1040sch1_hsa_deduction", "f1040sch1_ira_deduction", "f1040sch1_other_adjustments",  ""])
+set_edges("f1040sch1_subtractions_from_income_wo_student_loans", ["f1040sch1_hsa_deduction", "f1040sch1_self_employment_deductible", "f1040sch1_ira_deduction", "f1040sch1_other_adjustments",  ""])
 set_edges("f1040sch1_subtractions_from_income", ["f1040sch1_hsa_deduction", "f1040sch1_ira_deduction", "f1040sch1_student_loan_interest_ded", "f1040sch1_other_adjustments",  ""])
 set_edges("f1040_MAGI", ["f1040sch1_sch1_magi_subtotal", "f1040_wages", "f1040_interest", "f1040_dividends", "f1040_iras", "f1040_pensions", "f1040_taxable_ss_benefits", "f1040_capital_gains",  ""])
 set_edges("f1040_total_in", ["f1040_MAGI", "f1040sch1_rr_income",  ""])
-set_edges("f1040_charitable_for_std_ded_limited", ["f1040_charitable_for_std_ded",  ""])
-set_edges("f1040_AGI", ["f1040_total_in", "f1040_charitable_for_std_ded_limited", "f1040sch1_subtractions_from_income",  ""])
+set_edges("f1040_AGI", ["f1040_total_in", "f1040sch1_subtractions_from_income",  ""])
 set_edges("f1040_deductions", ["f1040_std_deduction", "f1040_sched_a_total_itemized_deductions",  ""])
 set_edges("f1040_taxable_income", ["f1040_AGI", "f1040_deductions", "f1040_qbi",  ""])
-set_edges("f1040_tax", ["f1040_taxable_income", "qualified_dividends_ws_total_tax",  ""])
-set_edges("f1040_other_taxes", ["f1040sch2_amt", "f1040sch2_credit_repayment",  ""])
-set_edges("f1040_pretotal_tax", ["f1040_tax", "f1040_other_taxes",  ""])
-set_edges("f1040_tax_plus_amt_and_repayment", ["f1040_pretotal_tax", "f1040sch2_sch2_total",  ""])
-set_edges("f1040_credits", ["f1040sch3_nonrefundable_total", "ctc_ws_1040_ctc",  ""])
+set_edges("f1040_base_tax", ["f1040_taxable_income", "qualified_dividends_ws_total_tax",  ""])
+set_edges("f1040_tax_plus_amt_and_repayment", ["f1040_base_tax", "f1040sch2_sch2_total",  ""])
+set_edges("f1040_credits", ["f1040sch3_nonrefundable_total", "ctc_sch8812_I_ctc",  ""])
 set_edges("f1040_tax_minus_credits", ["f1040_tax_plus_amt_and_repayment", "f1040_credits",  ""])
 set_edges("f1040_total_tax", ["f1040_tax_minus_credits", "f1040_postcredit_taxes",  ""])
 set_edges("f1040_eitc", ["f1040_AGI",  ""])
-set_edges("f1040_actc", ["ctc_sch8812_refundable_ctc",  ""])
+set_edges("f1040_actc", ["ctc_sch8812_IIA_refundable_ctc",  ""])
 set_edges("f1040_ed_tc", ["f8863_refundable_credit",  ""])
 set_edges("f1040_total_payments", ["f1040_federal_tax_withheld", "f1040_eitc", "f1040_actc", "f1040_ed_tc", "f1040_other_tc",  ""])
 set_edges("f1040_refund", ["f1040_total_payments", "f1040_total_tax",  ""])
 set_edges("f1040_tax_owed", ["f1040_total_tax", "f1040_total_payments",  ""])
 set_edges("f1040sch2_amt", ["f6251_amt",  ""])
+set_edges("f1040sch2_sch2_total", ["f1040sch2_amt", "f1040sch2_credit_repayment",  ""])
 set_edges("f1040sch3_ed_credits", ["f8863_nonrefundable_credit",  ""])
-set_edges("f1040sch3_nonrefundable_total", ["f1040sch3_ftc", "f1040sch3_dependent_care", "f1040sch3_elderly_disabled_credits", "f1040sch3_ed_credits",  ""])
+set_edges("f1040sch3_nonrefundable_total", ["f1040sch3_ftc", "f1040sch3_dependent_care", "f1040sch3_retirement_savings", "f1040sch3_elderly_disabled_credits", "f1040sch3_alt_motor_vehicle", "f1040sch3_plug_in_motor_vehicle", "f1040sch3_ed_credits",  ""])
 set_edges("student_loan_ws_1040_loans_maxed", ["student_loan_ws_1040_student_loan_interest",  ""])
 set_edges("student_loan_ws_1040_phase_out_pct", ["f1040_total_in", "f1040sch1_subtractions_from_income_wo_student_loans",  ""])
 set_edges("student_loan_ws_1040_phased_out_loans", ["student_loan_ws_1040_loans_maxed", "student_loan_ws_1040_phase_out_pct",  ""])
 set_edges("student_loan_ws_1040_final_credit", ["student_loan_ws_1040_loans_maxed", "student_loan_ws_1040_phased_out_loans",  ""])
-set_edges("ctc_ws_1040_ctc_subtraction", ["f1040_AGI",  ""])
-set_edges("ctc_ws_1040_credit_remaining", ["ctc_ws_1040_two_thousand_per_child", "ctc_ws_1040_ctc_subtraction",  ""])
-set_edges("ctc_ws_1040_tax_minus_some_credits", ["f1040_tax", "f1040sch3_ed_credits", "f1040sch3_ftc",  ""])
-set_edges("ctc_ws_1040_ctc", ["ctc_ws_1040_tax_minus_some_credits", "ctc_ws_1040_credit_remaining",  ""])
-set_edges("ctc_sch8812_unused_ctc", ["ctc_ws_1040_credit_remaining", "ctc_ws_1040_ctc",  ""])
-set_edges("ctc_sch8812_limited_unused", ["ctc_sch8812_unused_ctc", "ctc_sch8812_fourteen_kids",  ""])
-set_edges("ctc_sch8812_scaled_earned_income", ["f1040_wages",  ""])
-set_edges("ctc_sch8812_refundable_ctc", ["ctc_sch8812_limited_unused", "ctc_sch8812_scaled_earned_income", "ctc_sch8812_ss_and_medicare_withheld", "f1040_eitc",  ""])
+set_edges("ctc_sch8812_I_ctc_subtraction", ["f1040_AGI",  ""])
+set_edges("ctc_sch8812_I_credit_remaining", ["ctc_sch8812_I_two_thousand_per_child", "ctc_sch8812_I_ctc_subtraction",  ""])
+set_edges("ctc_sch8812_I_tax_minus_some_credits", ["f1040_base_tax", "f1040sch3_ftc", "f1040sch3_dependent_care", "f1040sch3_ed_credits", "f1040sch3_retirement_savings", "f1040sch3_elderly_disabled_credits", "f1040sch3_alt_motor_vehicle", "f1040sch3_plug_in_motor_vehicle",  ""])
+set_edges("ctc_sch8812_I_ctc", ["ctc_sch8812_I_tax_minus_some_credits", "ctc_sch8812_I_credit_remaining",  ""])
+set_edges("ctc_sch8812_IIA_unused_ctc", ["ctc_sch8812_I_credit_remaining", "ctc_sch8812_I_ctc",  ""])
+set_edges("ctc_sch8812_IIA_limited_unused", ["ctc_sch8812_IIA_unused_ctc", "ctc_sch8812_IIA_fifteen_kids",  ""])
+set_edges("ctc_sch8812_IIA_scaled_earned_income", ["f1040_wages",  ""])
+set_edges("ctc_sch8812_IIA_refundable_ctc", ["ctc_sch8812_IIA_limited_unused", "ctc_sch8812_IIA_scaled_earned_income", "f1040sch1_self_employment_deductible", "ctc_sch8812_IIA_ss_and_medicare_withheld", "f1040_eitc",  ""])
 set_edges("f1040_tax_refund_ws_last_year_reduced", ["f1040_tax_refund_ws_last_year_5d", "f1040_tax_refund_ws_last_year_limited_deductions",  ""])
 set_edges("f1040_tax_refund_ws_last_year_post_limit", ["f1040_tax_refund_ws_last_year_refund", "f1040_tax_refund_ws_last_year_reduced",  ""])
 set_edges("f1040_tax_refund_ws_itemized_over_std", ["f1040_tax_refund_ws_last_year_total_deductions", "f1040_tax_refund_ws_almost_std_deduction", "f1040_tax_refund_ws_srblind",  ""])
@@ -622,20 +594,15 @@ set_edges("qualified_dividends_ws_alt_limited_income", ["qualified_dividends_ws_
 set_edges("qualified_dividends_ws_untaxed", ["qualified_dividends_ws_limited_income", "qualified_dividends_ws_alt_limited_income",  ""])
 set_edges("qualified_dividends_ws_min_ded_or_gains_minus_zero", ["f1040_taxable_income", "qualified_dividends_ws_income_minus_gains", "qualified_dividends_ws_untaxed",  ""])
 set_edges("qualified_dividends_ws_relimited_qualified", ["qualified_dividends_ws_min_ded_or_gains_minus_zero", "f1040_taxable_income", "qualified_dividends_ws_income_minus_gains", "qualified_dividends_ws_untaxed",  ""])
-set_edges("qualified_dividends_ws_fifteen_pct_tax", ["qualified_dividends_ws_relimited_qualified",  ""])
 set_edges("qualified_dividends_ws_income_minus_fifteen", ["f1040_taxable_income", "qualified_dividends_ws_qualified_dividends_and_gains", "qualified_dividends_ws_untaxed", "qualified_dividends_ws_relimited_qualified",  ""])
-set_edges("qualified_dividends_ws_twenty_pct_tax", ["qualified_dividends_ws_income_minus_fifteen",  ""])
 set_edges("qualified_dividends_ws_nongains_tax", ["qualified_dividends_ws_income_minus_gains",  ""])
-set_edges("qualified_dividends_ws_total_tax", ["qualified_dividends_ws_fifteen_pct_tax", "qualified_dividends_ws_twenty_pct_tax", "qualified_dividends_ws_nongains_tax",  ""])
+set_edges("qualified_dividends_ws_total_tax", ["qualified_dividends_ws_relimited_qualified", "qualified_dividends_ws_income_minus_fifteen", "qualified_dividends_ws_nongains_tax",  ""])
 set_edges("f1040_sched_a_agi_scaled", ["f1040_AGI",  ""])
 set_edges("f1040_sched_a_excess_medical", ["f1040_sched_a_medical_expenses", "f1040_sched_a_agi_scaled",  ""])
 set_edges("f1040_sched_a_total_taxes_deducted", ["f1040_sched_a_local_taxes", "f1040_sched_a_real_estate_taxes", "f1040_sched_a_property_taxes", "f1040_sched_a_other_taxes",  ""])
-set_edges("f1040_sched_a_mort_insurance_limit", ["f1040_AGI", "f1040_AGI",  ""])
-set_edges("f1040_sched_a_mort_insurance_premiums", ["f1040_sched_a_mort_insurance_premiums_in", "f1040_sched_a_mort_insurance_limit",  ""])
-set_edges("f1040_sched_a_total_interest_deduction", ["f1040_sched_a_reported_mort_interest", "f1040_sched_a_unreported_mort_interest", "f1040_sched_a_unreported_mort_points", "f1040_sched_a_mort_insurance_premiums", "f1040_sched_a_investment_interest",  ""])
+set_edges("f1040_sched_a_total_interest_deduction", ["f1040_sched_a_reported_mort_interest", "f1040_sched_a_unreported_mort_interest", "f1040_sched_a_unreported_mort_points", "f1040_sched_a_investment_interest",  ""])
 set_edges("f1040_sched_a_charity_total", ["f1040_sched_a_charity_cash", "f1040_sched_a_charity_noncash", "f1040_sched_a_charity_carryover",  ""])
-set_edges("f1040_sched_a_total_expenses", ["f1040_sched_a_employee_expenses", "f1040_sched_a_tax_prep_fees", "f1040_sched_a_other_work_expenses",  ""])
-set_edges("f1040_sched_a_expenses_minus_agi_slice", ["f1040_sched_a_total_expenses", "f1040_AGI",  ""])
+set_edges("f1040_sched_a_expenses_minus_agi_slice", ["f1040_sched_a_employee_expenses", "f1040_sched_a_tax_prep_fees", "f1040_sched_a_other_work_expenses", "f1040_AGI",  ""])
 set_edges("f1040_sched_a_total_itemized_deductions", ["f1040_sched_a_excess_medical", "f1040_sched_a_total_taxes_deducted", "f1040_sched_a_total_interest_deduction", "f1040_sched_a_charity_total", "f1040_sched_a_casualty_or_theft_losses", "f1040_sched_a_expenses_minus_agi_slice", "f1040_sched_a_other_deductions",  ""])
 set_edges("f1040_sched_e_rental_depreciation", ["f4562_rental_property_depreciation",  ""])
 set_edges("f1040_sched_e_total_rental_expenses", ["f1040_sched_e_rental_advertising", "f1040_sched_e_rental_auto_and_travel", "f1040_sched_e_rental_cleaning_and_maintenance", "f1040_sched_e_rental_commissions", "f1040_sched_e_rental_insurance", "f1040_sched_e_rental_professional_fees", "f1040_sched_e_rental_management_fees", "f1040_sched_e_rental_mortgage_interest", "f1040_sched_e_rental_other_interest", "f1040_sched_e_rental_repairs", "f1040_sched_e_rental_supplies", "f1040_sched_e_rental_taxes", "f1040_sched_e_rental_utilities", "f1040_sched_e_rental_depreciation", "f1040_sched_e_rental_other_expenses",  ""])
@@ -657,8 +624,7 @@ set_edges("f8582_f8582_total_real_in", ["f8582_f8582_net_in", "f8582_f8582_net_l
 set_edges("f8582_f8582_passive_activities", ["f8582_f8582_total_real_in",  ""])
 set_edges("f8582_f8582_total_in", ["f8582_f8582_total_real_in", "f8582_f8582_commercial_revitalization", "f8582_f8582_passive_activities",  ""])
 set_edges("f8582_f8582_min", ["f8582_f8582_total_real_in", "f8582_f8582_total_in",  ""])
-set_edges("f8582_magi", ["f1040_MAGI",  ""])
-set_edges("f8582_f8582_half", ["f8582_magi",  ""])
+set_edges("f8582_f8582_half", ["f1040_MAGI",  ""])
 set_edges("f8582_allowed_extra_real_losses", ["f8582_f8582_min", "f8582_f8582_half",  ""])
 set_edges("f8582_allowed_real_losses", ["f8582_allowed_extra_real_losses", "f8582_f8582_net_in",  ""])
 set_edges("f8582_carryover_to_next_year", ["f8582_ws1_8582_prior_loss", "f8582_total_losses_8582",  ""])
@@ -666,12 +632,12 @@ set_edges("f8582_total_losses_8582", ["f8582_f8582_total_real_in", "f8582_f8582_
 set_edges("f6251_taxable_income", ["f1040_AGI", "f1040_deductions", "f1040_qbi",  ""])
 set_edges("f6251_taxes_deducted", ["f1040_sched_a_total_itemized_deductions", "f1040_sched_a_total_taxes_deducted", "f1040_std_deduction",  ""])
 set_edges("f6251_amt_refund_deduction", ["f1040_tax_refund_ws_taxable_refund",  ""])
-set_edges("f6251_amt_income", ["f6251_taxable_income", "f6251_taxes_deducted", "f6251_amt_refund_deduction", "f6251_amt_investment_expense_deduction", "f6251_amt_depletion_deduction", "f6251_nold", "f6251_amt_nold",  ""])
+set_edges("f6251_amt_income", ["f6251_taxable_income", "f6251_taxes_deducted", "f6251_amt_refund_deduction", "f6251_nold",  ""])
 set_edges("f6251_amt_exemption", ["f6251_amt_income",  ""])
 set_edges("f6251_amt_in_minus_exemption", ["f6251_amt_income", "f6251_amt_exemption",  ""])
 set_edges("f6251_amt_preftc", ["f6251_amt_in_minus_exemption",  ""])
 set_edges("f6251_amt_tentative", ["f6251_amt_preftc", "f6251_amt_ftc",  ""])
-set_edges("f6251_tax_from_1040", ["f1040_tax", "f1040sch2_credit_repayment", "f1040sch3_ftc",  ""])
+set_edges("f6251_tax_from_1040", ["f1040_base_tax", "f1040sch2_credit_repayment", "f1040sch3_ftc",  ""])
 set_edges("f6251_amt", ["f6251_amt_tentative", "f6251_tax_from_1040",  ""])
 set_edges("f8863_scaled_education_expenses_1", ["f8863_education_expenses_1",  ""])
 set_edges("f8863_rescaled_education_expenses_1", ["f8863_education_expenses_1", "f8863_education_expenses_1", "f8863_scaled_education_expenses_1",  ""])
@@ -686,15 +652,13 @@ set_edges("f8863_unscaled_credit", ["f8863_total_limited_expenses", "f8863_fract
 set_edges("f8863_refundable_credit", ["f8863_under_24", "f8863_unscaled_credit",  ""])
 set_edges("f8863_remaining_credit", ["f8863_unscaled_credit", "f8863_refundable_credit",  ""])
 set_edges("f8863_aqe", ["f8863_adjusted_qualified_expenses",  ""])
-set_edges("f8863_sixty_seven_k_less_agi", ["f8863_baseline2", "f1040_AGI",  ""])
-set_edges("f8863_fraction2", ["f8863_sixty_seven_k_less_agi",  ""])
+set_edges("f8863_fraction2", ["f8863_baseline2", "f1040_AGI",  ""])
 set_edges("f8863_frac_allowed", ["f8863_fraction2", "f8863_aqe",  ""])
-set_edges("f8863_nonrefundable_credit", ["f8863ws_limited_credit",  ""])
+set_edges("f8863_nonrefundable_credit", ["f8863ws_diff", "f8863ws_credit_sum",  ""])
 set_edges("f8863ws_credit_sum", ["f8863_remaining_credit", "f8863_frac_allowed",  ""])
 set_edges("f8863ws_tax", ["f1040_tax_plus_amt_and_repayment",  ""])
 set_edges("f8863ws_other_credits", ["f1040sch3_ftc", "f1040sch3_dependent_care", "f1040sch3_elderly_disabled_credits",  ""])
 set_edges("f8863ws_diff", ["f8863ws_tax", "f8863ws_other_credits",  ""])
-set_edges("f8863ws_limited_credit", ["f8863ws_diff", "f8863ws_credit_sum",  ""])
 
 
 }
