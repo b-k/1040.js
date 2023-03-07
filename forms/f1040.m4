@@ -398,25 +398,38 @@ Cell(total_in, 9, Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
         <|std_ded_fn()|>,
         critical
     )
-Cell(deductions, 12, Deductions, <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>, critical)
-
-Cell(qbi, 13, 20% discount on qualified business income (f8995), , u)
-Cell(taxable_income, 15, Taxable income, <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>, critical)
-
-Cell(tax, 16.1, Tax, <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_ws, total_tax))|>, critical)
-Cell(other_taxes, 16.3, <|Sched 2, AMT + F8962|>, <|CV(f1040sch2, amt) + CV(f1040sch2, credit_repayment)|>)
-Cell(pretotal_tax, 16.4, <|Tax + Sched 2, AMT + F8962|>, <|CV(tax) + CV(other_taxes)|>)
-    
-    Cell(tax_plus_amt_and_repayment, 18,
-        <|Tax plus Sch2|>,
-        <|CV(pretotal_tax)+CV(f1040sch2, sch2_total)|>
+Cell(deductions, 12,
+        Deductions,
+        <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>,
+        critical
     )
-    Cell(credits, 19,
+
+Cell(qbi, 13,
+        20% discount on qualified business income (f8995),
+        , u
+    )
+Cell(taxable_income, 15,
+        Taxable income,
+        <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>,
+        critical
+    )
+
+Cell(base_tax, 16.1,
+        Tax,
+        <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_ws, total_tax))|>,
+        critical
+    )
+    
+Cell(tax_plus_amt_and_repayment, 18,
+        <|Tax plus Sch2|>,
+        <|CV(base_tax)+CV(f1040sch2, sch2_total)|>
+    )
+Cell(credits, 19,
         <|CTC and Schedule 3, other credits|>,
         <|CV(f1040sch3, nonrefundable_total) + CV(ctc_sch8812_I, ctc)|>,
         critical
     )
-    Cell(tax_minus_credits, 22,
+Cell(tax_minus_credits, 22,
         Tax minus credits,
         <|max(CV(tax_plus_amt_and_repayment)-CV(credits), 0)|>,
         critical
@@ -444,9 +457,11 @@ m4_form(f1040sch2)
         itemizing
     )
     Cell(credit_repayment, 2,
-        Excess advance premium tax credit repayment, , u
+        Excess advance premium tax credit repayment,
+        , u itemizing
     )
-    Cell(sch2_total, 2,
+    Cell(sch2_total, 3,
+        <|Schedule 2 total|>,
         <|CV(amt)+CV(credit_repayment)|>,
         itemizing
     )
@@ -477,7 +492,7 @@ m4_form(f1040sch3)
     )
     Cell(nonrefundable_total, 8,
         Total nonrefundable credits,
-        <|CV(ftc)+CV(dependent_care)+CV(elderly_disabled_credits)+CV(ed_credits)|>
+        <|CV(ftc)+CV(dependent_care)+CV(retirement_savings) +CV(elderly_disabled_credits) + CV(alt_motor_vehicle) + CV(plug_in_motor_vehicle) +CV(ed_credits)|>
     )
 
 m4_form(student_loan_ws_1040)
@@ -528,7 +543,7 @@ Cell(tax_minus_some_credits, 13.1,
         m4_dnl From credit limit ws A.
         m4_dnl Not quite a limit; more like converting nonrefundable CTC into refundable.
         Calculated tax minus some credits,
-        <|CV(f1040, tax)
+        <|CV(f1040, base_tax)
           - CV(f1040sch3, ftc) - CV(f1040sch3, dependent_care)- CV(f1040sch3, ed_credits)
           - CV(f1040sch3, retirement_savings) - CV(f1040sch3, elderly_disabled_credits)
           - CV(f1040sch3, alt_motor_vehicle)  - CV(f1040sch3, plug_in_motor_vehicle)|>,
@@ -663,19 +678,9 @@ m4_form(qualified_dividends_ws)
                 CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>,
         cap_gains
     )
-    Cell(fifteen_pct_tax, 18,
-        <|15% tax on qualified gains|>,
-        <|CV(relimited_qualified)*0.15|>,
-        cap_gains
-    )
     Cell(income_minus_fifteen, 20,
         <|Gains minus 15% taxed part|>,
         <|min(CV(f1040,taxable_income), CV(qualified_dividends_and_gains)) - (CV(untaxed) + CV(relimited_qualified))|>,
-        cap_gains
-    )
-    Cell(twenty_pct_tax, 21,
-        <|20% tax on dividends and gains|>,
-        <|CV(income_minus_fifteen)*0.20|>,
         cap_gains
     )
     Cell(nongains_tax, 22,
@@ -685,6 +690,6 @@ m4_form(qualified_dividends_ws)
     )
     Cell(total_tax, 23,
         <|Total tax including qualified gains discounts|>,
-        <|SUM(fifteen_pct_tax, twenty_pct_tax, nongains_tax)|>,
+        <|CV(relimited_qualified)*0.15 +CV(income_minus_fifteen)*0.20 + CV(nongains_tax)|>,
         cap_gains
     )

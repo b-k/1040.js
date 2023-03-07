@@ -58,14 +58,9 @@ m4_form(f8582)
         <|max(min(CV(f8582_total_real_in),0), min(CV(f8582_total_in),0))|>,
         have_rr
     )
-    Cell(magi, 7,
-        MAGI,
-        <|CV(f1040, MAGI)|>,
-        have_rr
-    )
     Cell(f8582_half, 9,
         <|Half of line 8, up to 25k|>,
-        <|-min(25000, max(150000 - max(CV(magi), 0), 0)/2.0)|>,
+        <|-min(25000, max(150000 - max(CV(f1040, MAGI), 0), 0)/2.0)|>,
         have_rr
     )
     Cell(allowed_extra_real_losses, 10,

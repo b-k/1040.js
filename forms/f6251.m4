@@ -56,13 +56,21 @@ Cell(taxable_income, 1, AGI minus deductions, <|CV(f1040, AGI) - CV(f1040, deduc
 
 Cell(taxes_deducted, 2.05, State/local/other deducted on Schedule A or std deduction, <|IF(CV(f1040_sched_a, total_itemized_deductions)>0, CV(f1040_sched_a, total_taxes_deducted), CV(f1040,std_deduction))|>, itemizing)
 
-Cell(amt_refund_deduction, 2.1, <|Tax refund from Form 1040, line 10 or line 21 (only L10 implemented)|>, <|CV(f1040_tax_refund_ws, taxable_refund)|>, itemizing)
-Cell(amt_investment_expense_deduction, 2.15, Investment interest expense (UI), 0, itemizing)
-Cell(amt_depletion_deduction, 2.2, Depletion (UI), 0, itemizing),
+Cell(amt_refund_deduction, 2.1,
+        <|Tax refund from Form 1040, Sch A L7 or 1040 L12|>,
+        <|CV(f1040_tax_refund_ws, taxable_refund)|>,
+        itemizing
+    )
+m4_dnl Cell(amt_investment_expense_deduction, 2.15, Investment interest expense (UI), 0, itemizing)
+m4_dnl Cell(amt_depletion_deduction, 2.2, Depletion (UI), 0, itemizing),
 Cell(nold, 2.25, NOLD (UI), 0, itemizing),
-Cell(amt_nold, 2.3, Alt NOLD (UI), 0, itemizing),
+m4_dnl Cell(amt_nold, 2.3, Alt NOLD (UI), 0, itemizing),
 
-Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|SUM(taxable_income, taxes_deducted, amt_refund_deduction, amt_investment_expense_deduction, amt_depletion_deduction, nold, amt_nold)|>, itemizing)
+Cell(amt_income, 4,
+        <|Alternative minimum taxable income. (PI)|>,
+        <|SUM(taxable_income, taxes_deducted, amt_refund_deduction, nold)|>,
+        itemizing
+    )
 
     Cell(amt_exemption, 5,
         AMT exemption (phase-out not implemented),
@@ -80,7 +88,8 @@ Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|SUM(taxable_
         itemizing
     )
     Cell(amt_ftc, 8,
-        AMT foreign tax credit (UI), 0, itemizing
+        AMT foreign tax credit (UI), 0,
+        itemizing
     )
     Cell(amt_tentative, 9,
         Tentative AMT,
@@ -89,7 +98,7 @@ Cell(amt_income, 4, <|Alternative minimum taxable income. (PI)|>, <|SUM(taxable_
     )
     Cell(tax_from_1040, 10,
         Tax from F1040 (and f8978 losses, not implemented),
-        <|CV(f1040, tax)+CV(f1040sch2, credit_repayment)-CV(f1040sch3, ftc)|>,
+        <|CV(f1040, base_tax)+CV(f1040sch2, credit_repayment)-CV(f1040sch3, ftc)|>,
         itemizing
     )
     Cell(amt, 11,

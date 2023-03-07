@@ -28,15 +28,14 @@ Cell(refundable_credit, 8, Refundable education credit, <|IF(CV(under_24)<0, CV(
 Cell(pt2_divider, 8.5, >>>>>>>>>>>> Part II, Nonrefundable                           , 0)
 Cell(remaining_credit, 9, <|Remaining tentative credit|>, <|CV(unscaled_credit) - CV(refundable_credit)|>, s_loans)
 Cell(aqe, 12, <|20% of Adjusted qualified expenses or 1k|>, <|min(1000, CV(adjusted_qualified_expenses)) *.2|>, s_loans)
-    Cell(baseline2, 13,
+Cell(baseline2, 13,
         <|67k or 134k|>,
         <|Fswitch((married filing jointly, 180000), 90000)|>,
         s_loans
     )
-Cell(sixty_seven_k_less_agi, 15, <|Remaining after AGI subtraction|>, <|CV(baseline2)-CV(f1040, AGI)|>, s_loans)
-Cell(fraction2, 17, Fraction allowed, <|max(min(1, CV(sixty_seven_k_less_agi)/Fswitch((married filing jointly, 20000), 10000)), 0)|>, s_loans)
+Cell(fraction2, 17, Fraction allowed, <|max(min(1, (CV(baseline2)-CV(f1040, AGI))/Fswitch((married filing jointly, 20000), 10000)), 0)|>, s_loans)
 Cell(frac_allowed, 18, <|Fraction allowed|>, <|CV(fraction2)*CV(aqe)|>, s_loans)
-Cell(nonrefundable_credit, 19, <|Nonrefundable credit|>, <|CV(f8863ws, limited_credit)|>, s_loans)
+Cell(nonrefundable_credit, 19, <|Nonrefundable credit|>, <|min(CV(f8863ws, diff), CV(f8863ws, credit_sum))|>, s_loans)
 
 m4_form(f8863ws)
     Cell(credit_sum, 3,
@@ -57,10 +56,5 @@ m4_form(f8863ws)
     Cell(diff, 6,
         Tax minus credits,
         <|max(0, CV(tax)-CV(other_credits))|>,
-        s_loans
-    )
-    Cell(limited_credit, 7,
-        Limited nonrefundable credit,
-        <|min(CV(diff), CV(credit_sum))|>,
         s_loans
     )
