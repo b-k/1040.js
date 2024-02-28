@@ -6,13 +6,13 @@ jsversion(<|
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 10275, 41775, 89075, 170050, 215950, 539900, 1e20]
+        cuts=[0, 11000, 44725, 95375, 182100, 231250, 578125, 1e20]
     } else if (filing_status == "married filing separately") {
-        cuts=[0, 10275, 41775, 89075, 170050, 215950, 323925, 1e20]
+        cuts=[0, 11000, 44725, 95375, 182100, 231250, 346875, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 20550, 83550, 178150, 340100, 431900, 647850, 1e20]
+        cuts=[0, 22000, 89450, 190750, 364200, 462500, 693750, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 14650, 55900, 89050, 170050, 215950, 539900 ,1e20]
+        cuts=[0, 15700, 59850, 95350, 182100, 231250, 578100 ,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -34,28 +34,28 @@ var tax_calc = function (inval){
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 12950;
-         else if (over65ct==1) return 14700;
-         else                  return 16450;
+         if (over65ct==0)      return 13850;
+         else if (over65ct==1) return 15700;
+         else                  return 17550;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 25900;
-         else if (over65ct==1) return 27300;
-         else if (over65ct==2) return 28700;
-         else if (over65ct==3) return 30100;
-         else                  return 31500;
+         if (over65ct==0)      return 27700;
+         else if (over65ct==1) return 29200;
+         else if (over65ct==2) return 30700;
+         else if (over65ct==3) return 32200;
+         else                  return 33700;
     }
     if (fstatus() == "married filing separately"){
-         if (over65ct==0)      return 12950;
-         else if (over65ct==1) return 14350;
-         else if (over65ct==2) return 15750;
-         else if (over65ct==3) return 17150;
-         else                  return 18550;
+         if (over65ct==0)      return 13850;
+         else if (over65ct==1) return 15350;
+         else if (over65ct==2) return 16850;
+         else if (over65ct==3) return 18350;
+         else                  return 19850;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 19400;
-         else if (over65ct==1) return 21150;
-         else                  return 22900;
+         if (over65ct==0)      return 20800;
+         else if (over65ct==1) return 22650;
+         else                  return 24500;
     }
 }
 
@@ -69,12 +69,13 @@ var eitc = function(income, k){
     //For 2020: https://www.irs.gov/irb/2019-47_IRB
     //For 2021: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
     //For 2022: https://www.taxpolicycenter.org/statistics/eitc-parameters
+    //In the footnotes of that page, you'll find sources. For 23, I went straigtht to the IRB: https://www.irs.gov/pub/irs-irbs/irb22-45.pdf
     //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    mfj_add=6130 //See TPC footnote.
-    data=[[7320, 560, 9160, 16480,    9160+mfj_add,  16480+mfj_add],
-          [10980, 3733, 20130, 43492, 20130+mfj_add, 43492+mfj_add],
-          [15410, 6164, 20130, 49399, 20130+mfj_add, 49399+mfj_add],
-          [15410, 6935, 20130, 53057, 20130+mfj_add, 53057+mfj_add]]
+    mfj_add=6560 //See TPC footnote.
+    data=[[7840, 600, 9800, 17640,    9800+mfj_add+10,  17640+mfj_add+10],
+          [11750, 3995, 21560, 46560, 21560+mfj_add, 46560+mfj_add],
+          [16510, 6604, 21560, 52918, 21560+mfj_add, 52918+mfj_add],
+          [16510, 7430, 21560, 56838, 21560+mfj_add, 56838+mfj_add]]
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -153,10 +154,10 @@ var thousandkids = function(){
     return kids*2000 + deps*500
 }
 
-var fifteenkids = function(){
+var sixteenkids = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    return kids*1500
+    return kids*1600
 }
 
 var ctc_status = function(agi){
@@ -183,14 +184,15 @@ def fstatus():
 def tax_table(inval):
     filing_status = fstatus()
 
+
     if filing_status == "single":
-        cuts=[0, 10275, 41775, 89075, 170050, 215950, 539900, 1e20]
+        cuts=[0, 11000, 44725, 95375, 182100, 231250, 578125, 1e20]
     if filing_status == "married filing separately":
-        cuts=[0, 10275, 41775, 89075, 170050, 215950, 323925, 1e20]
+        cuts=[0, 11000, 44725, 95375, 182100, 231250, 346875, 1e20]
     if filing_status == "married filing jointly":
-        cuts=[0, 20550, 83550, 178150, 340100, 431900, 647850, 1e20]
+        cuts=[0, 22000, 89450, 190750, 364200, 462500, 693750, 1e20]
     if filing_status == "head of household":
-        cuts=[0, 14650, 55900, 89050, 170050, 215950, 539900 ,1e20]
+        cuts=[0, 15700, 59850, 95350, 182100, 231250, 578100 ,1e20]
 
     rate=[0.1, 0.12, 0.22 , 0.24 ,0.32, 0.35, 0.37]
     i=0
@@ -209,38 +211,38 @@ def tax_calc(inval):
 def std_ded_fn():
     over65ct = Situation(over_65) + Situation(spouse_over_65)
     if fstatus() == "single":
-         if (over65ct==0): return 12950;
-         if (over65ct==1): return 14700;
-         return 16450;
+         if (over65ct==0): return 13850;
+         if (over65ct==1): return 15700;
+         return 17550;
 
 
     if fstatus() == "married filing jointly":
-         if (over65ct==0): return 25900
-         if (over65ct==1): return 27300
-         if (over65ct==2): return 28700
-         if (over65ct==3): return 30100
-         return 31500
+         if (over65ct==0): return 27700
+         if (over65ct==1): return 29200
+         if (over65ct==2): return 30700
+         if (over65ct==3): return 32200
+         return 33700
 
     if fstatus() == "married filing separately":
-         if (over65ct==0): return 12950
-         if (over65ct==1): return 14350
-         if (over65ct==2): return 15750
-         if (over65ct==3): return 17150
-         return 18550
+         if (over65ct==0): return 13850
+         if (over65ct==1): return 15350
+         if (over65ct==2): return 16850
+         if (over65ct==3): return 18350
+         return 19850
 
     if fstatus() == "head of household":
-         if (over65ct==0): return 19400
-         if (over65ct==1): return 21150
-         return 22900
+         if (over65ct==0): return 20800
+         if (over65ct==1): return 22650
+         return 24500
 
 def eitc(income, kids):
     #See https://www.taxpolicycenter.org/statistics/eitc-parameters
     #plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    mfj_add=6130
-    data=[[7320, 560, 9160, 16480,    9160+mfj_add,  16480+mfj_add],
-          [10980, 3733, 20130, 43492, 20130+mfj_add, 43492+mfj_add],
-          [15410, 6164, 20130, 49399, 20130+mfj_add, 49399+mfj_add],
-          [15410, 6935, 20130, 53057, 20130+mfj_add, 53057+mfj_add]]
+    mfj_add=6560
+    data=[[7840, 600, 9800, 17640,    9800+mfj_add+10,  17640+mfj_add+10],
+          [11750, 3995, 21560, 46560, 21560+mfj_add, 46560+mfj_add],
+          [16510, 6604, 21560, 52918, 21560+mfj_add, 52918+mfj_add],
+          [16510, 7430, 21560, 56838, 21560+mfj_add, 56838+mfj_add]]
     row=kids if kids <=3 else 3
 
     plateu_start=0
@@ -287,8 +289,8 @@ def exemption_fn():
 def thousandkids():
     return kids*2000 + dependents*500
 
-def fifteenkids():
-    return kids*1500
+def sixteenkids():
+    return kids*1600
 
 def Floor(x):
     return int(x)
@@ -385,9 +387,14 @@ Cell(pensions, 5.5, Taxable pension distributions,, u)
 Cell(taxable_ss_benefits, 6.5,Taxable social security benefits,, u over_65 spouse_over_65)
 Cell(capital_gains, 7, <|Capital gains from Schedule D|>,, u cap_gains)
 
-Cell(MAGI, 0, Total income for MAGI (PI), <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras, pensions, taxable_ss_benefits,capital_gains)|>)
-Cell(total_in, 9, Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
-
+    Cell(MAGI, 0,
+        Total income for MAGI (PI),
+        <|CV(f1040sch1, sch1_magi_subtotal) + SUM(wages, interest, dividends, iras, pensions, taxable_ss_benefits,capital_gains)|>
+    )
+    Cell(total_in, 9,
+        Total income,
+        <|CV(MAGI) + CV(f1040sch1, rr_income)|>
+    )
     Cell(AGI, 11,
         Adjusted gross income,
         <|max(CV(total_in) - CV(f1040sch1, subtractions_from_income),0)|>,
@@ -398,57 +405,78 @@ Cell(total_in, 9, Total income, <|CV(MAGI) + CV(f1040sch1, rr_income)|>)
         <|std_ded_fn()|>,
         critical
     )
-Cell(deductions, 12,
+    Cell(deductions, 12,
         Deductions,
         <|max(CV(std_deduction), CV(f1040_sched_a, total_itemized_deductions))|>,
         critical
     )
-
-Cell(qbi, 13,
+    Cell(qbi, 13,
         20% discount on qualified business income (f8995),
         , u
     )
-Cell(taxable_income, 15,
+    Cell(taxable_income, 15,
         Taxable income,
         <|max(CV(AGI) - CV(deductions) - CV(qbi), 0)|>,
         critical
     )
-
-Cell(base_tax, 16.1,
+    Cell(base_tax, 16.1,
         Tax,
         <|min(tax_calc(CV(taxable_income)), CV(qualified_dividends_ws, total_tax))|>,
         critical
     )
-    
-Cell(tax_plus_amt_and_repayment, 18,
-        <|Tax plus Sch2|>,
+    Cell(tax_plus_amt_and_repayment, 18,
+        Tax plus Sch2,
         <|CV(base_tax)+CV(f1040sch2, sch2_total)|>
     )
-Cell(credits, 19,
+    Cell(credits, 19,
         <|CTC and Schedule 3, other credits|>,
         <|CV(f1040sch3, nonrefundable_total) + CV(ctc_sch8812_I, ctc)|>,
         critical
     )
-Cell(tax_minus_credits, 22,
+    Cell(tax_minus_credits, 22,
         Tax minus credits,
         <|max(CV(tax_plus_amt_and_repayment)-CV(credits), 0)|>,
         critical
     )
 
-Cell(postcredit_taxes, 23, <|Other taxes, incl. self-employment|>, , u)
+    Cell(postcredit_taxes, 23, <|Other taxes, incl. self-employment|>, , u)
 
-#62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
-Cell(total_tax, 24, Total tax, <|CV(tax_minus_credits)+CV(postcredit_taxes)|>)
+    #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
+    Cell(total_tax, 24,
+            Total tax,
+            <|CV(tax_minus_credits)+CV(postcredit_taxes)|>
+        )
+    Cell(federal_tax_withheld, 25, Federal income tax withheld from Forms W-2 and 1099,, u)
+    Cell(eitc, 27,
+            Earned income credit (EIC),
+            <|eitc(CV(AGI), kids)|>
+        )
+    Cell(actc, 28,
+            Refundable child tax credit,
+            <|CV(ctc_sch8812_IIA, refundable_ctc)|>,
+            kids
+        )
+    Cell(ed_tc, 29,
+            Refundable education credits,
+            <|CV(f8863, refundable_credit)|>,
+            s_loans
+        )
+    Cell(other_tc, 31, <|Other asst credits from Sch 3|>, ,u)
 
-Cell(federal_tax_withheld, 25, Federal income tax withheld from Forms W-2 and 1099,, u)
-Cell(eitc, 27, Earned income credit (EIC), <|eitc(CV(AGI), kids)|>)
-Cell(actc, 28, Refundable child tax credit, <|CV(ctc_sch8812_IIA, refundable_ctc)|>, kids)
-Cell(ed_tc, 29, Refundable education credits, <|CV(f8863, refundable_credit)|>, s_loans)
-Cell(other_tc, 31, <|Other asst credits from Sch 3|>, ,u)
-
-Cell(total_payments, 33, Total payments, <|SUM(federal_tax_withheld, eitc, actc, ed_tc, other_tc)|>)
-Cell(refund, 34, Refund, <|max(CV(total_payments)-CV(total_tax), 0)|>, critical)
-Cell(tax_owed, 37, Tax owed, <|max(CV(total_tax)-CV(total_payments), 0)|>, critical)
+    Cell(total_payments, 33,
+            Total payments,
+            <|SUM(federal_tax_withheld, eitc, actc, ed_tc, other_tc)|>
+        )
+    Cell(refund, 34,
+            Refund,
+            <|max(CV(total_payments)-CV(total_tax), 0)|>,
+            critical
+        )
+    Cell(tax_owed, 37,
+            Tax owed,
+            <|max(CV(total_tax)-CV(total_payments), 0)|>,
+            critical
+        )
 
 m4_form(f1040sch2)
     Cell(amt, 1,
@@ -509,7 +537,7 @@ m4_form(student_loan_ws_1040)
         total income minus phase-out limit,
         <|min(1, m4_dnl
             max(CV(f1040, total_in) - CV(f1040sch1, subtractions_from_income_wo_student_loans) m4_dnl
-                - Fswitch((married filing jointly, 145000), 70000), 0)/Fswitch((married filing jointly, 30000), 15000))|>,
+                - Fswitch((married filing jointly, 155000), 75000), 0)/Fswitch((married filing jointly, 30000), 15000))|>,
         s_loans
     )
     Cell(phased_out_loans, 8,
@@ -561,8 +589,8 @@ Cell(unused_ctc, 16,
          kids
      )
 Cell(fifteen_kids, 16.1,
-        <|$1,500 per kid|>,
-        <|fifteenkids()|>,
+        <|$1,600 per kid|>,
+        <|sixteenkids()|>,
         kids
     )
 Cell(limited_unused, 17,
@@ -570,7 +598,7 @@ Cell(limited_unused, 17,
         <|min(CV(unused_ctc), CV(fifteen_kids))|>,
         kids
     )
-Cell(scaled_earned_income, 8,
+Cell(scaled_earned_income, 19,
         <|15 percent of earned income-2500|>,
         <|max(0, 0.15*(CV(f1040, wages)-2500))|>,
         kids
@@ -614,13 +642,13 @@ m4_form(f1040_tax_refund_ws)
     )
     Cell(almost_std_deduction, 5,
         <|Last year's standard deduction (under your current status)|>,
-        <|Fswitch((married filing jointly, 25100), (head of household, 18800), 12550)|>,
+        <|Fswitch((married filing jointly, 25900), (head of household, 19400), 12950)|>,
         ly_refund
     )
     Cell(srblind, 6,
         <|Senior or blind exemption (blind UI; married filing jointly PI)|>,
         <|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))*         m4_dnl
-          Fswitch((married filing separately, 1350), (married filing jointly, 1350), 1700)|>,
+          Fswitch((married filing separately, 1400), (married filing jointly, 1400), 1750)|>,
         ly_refund
     )
     Cell(itemized_over_std, 6.5,
@@ -648,7 +676,7 @@ m4_form(qualified_dividends_ws)
     )
     Cell(limitation, 6,
         <|Limitation|>,
-        <|Fswitch((head of household, 55800), (married filing jointly, 83350), 41675)|>,
+        <|Fswitch((head of household, 59750), (married filing jointly, 89250), 44625)|>,
         cap_gains
     )
     Cell(limited_income, 7,
@@ -674,7 +702,7 @@ m4_form(qualified_dividends_ws)
     Cell(relimited_qualified, 13,
         <|qualified gains re-limited|>,
         <| min(CV(min_ded_or_gains_minus_zero),            m4_dnl
-            max( min(Fswitch((single, 459750), (married filing separately, 258600), (married filing jointly, 517200), 488500), m4_dnl
+            max( min(Fswitch((single, 523050), (married filing separately, 276900), (married filing jointly, 553850), 492300), m4_dnl
                 CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>,
         cap_gains
     )
