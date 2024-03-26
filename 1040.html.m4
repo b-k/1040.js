@@ -89,7 +89,8 @@ BOX(ly_refund, I got a tax refund and itemized last year.)
 BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
 BOX(cap_gains, I have long-term capital gains or associated dividends.)
-BOX(have_rr, I have rental or royalty income.)
+BOX(self_emp, I have self-employment (Schedule C) income.)
+BOX(have_rr, I have rental or royalty (Schedule E) income.)
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
 <a href="https://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
 </td></tr></table>

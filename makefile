@@ -1,4 +1,4 @@
-Forms = f1040.m4 schedule_a.m4 schedule_e.m4 f8582.m4 f6251.m4 f8863.m4
+Forms = f1040.m4 schedule_a.m4 schedule_e.m4 schedule_c_se.m4 f8582.m4 f6251.m4 f8863.m4
 tax.html: forms/f* 1040.html.m4
 	cd forms; m4 -P pull_fns.m4 $(Forms) | grep -v '>>>>' > ../fns
 	cd forms; m4 -P pull_nodes.m4 $(Forms) | grep -v '>>>>' > ../nodes

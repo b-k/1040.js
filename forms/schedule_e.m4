@@ -6,14 +6,10 @@ Cell(royalties_received, 4, Royalties received,, u have_rr)
 Cell(rental_advertising, 5, Advertising,, u have_rr)
 Cell(rental_auto_and_travel, 6, Auto and travel,, u have_rr)
 Cell(rental_cleaning_and_maintenance, 7, Cleaning and maintenance,, u have_rr)
-Cell(rental_commissions, 8, Commissions,, u have_rr)
-Cell(rental_insurance, 9, Insurance,, u have_rr)
-Cell(rental_professional_fees, 10, Legal and other professional fees,, u have_rr)
-Cell(rental_management_fees, 11, Management fees,, u have_rr)
+Cell(rental_fees, 8, <|Commissions, Insurance, Professional and Mgmt fees|>,, u have_rr)
 Cell(rental_mortgage_interest, 12, <|Mortgage interest paid to banks, etc|>,, u have_rr)
 Cell(rental_other_interest, 13, Other interest,, u have_rr)
-Cell(rental_repairs, 14, Repairs,, u have_rr)
-Cell(rental_supplies, 15, Supplies,, u have_rr)
+Cell(rental_repairs_supplies, 14, <|Repairs and supplies|>,, u have_rr)
 Cell(rental_taxes, 16, Taxes,, u have_rr)
 Cell(rental_utilities, 17, Utilities,, u have_rr)
 Cell(rental_depreciation, 18, Depreciation expense or depletion, <|CV(f4562, rental_property_depreciation)|>, have_rr)
@@ -21,9 +17,8 @@ Cell(rental_other_expenses, 19, Other,, u have_rr)
 Cell(royalty_expenses, 4.5, Other,, u have_rr)
 Cell(total_rental_expenses, 20, Total expenses, <|SUM(rental_advertising, 
             rental_auto_and_travel, rental_cleaning_and_maintenance, 
-            rental_commissions, rental_insurance, rental_professional_fees,
-            rental_management_fees, rental_mortgage_interest, rental_other_interest,
-            rental_repairs, rental_supplies, rental_taxes, rental_utilities,
+            rental_fees, rental_mortgage_interest, rental_other_interest,
+            rental_repairs_supplies, rental_taxes, rental_utilities,
             rental_depreciation, rental_other_expenses)|>, have_rr)
 
     I'm doing that thing where only the part that was modified for content gets modified for formatting.

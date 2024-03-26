@@ -316,7 +316,9 @@ m4_form(f1040sch1)
         alimony income received,, u
     )
     Cell(sched_c, 3,
-        Schedule C business income,, u
+        Schedule C business income,
+        <|CV(f1040_sched_c, net_pl)|>,
+        self_emp
     )
     Cell(sale_of_biz, 4,
         <|Sale of business property (f4797)|>,,u
@@ -354,7 +356,9 @@ m4_form(f1040sch1)
         Health Savings Account deduction, , u
     )
     Cell(self_employment_deductible, 15,
-        <|Deductible part of self-employment tax (Sch SE)|>, , u
+        <|Deductible part of self-employment tax (Sch SE)|>,
+        <|CV(sched_se, se_tax)*0.5|>
+        , self_emp
     )
     Cell(ira_deduction, 20,
         IRA deduction, , u
@@ -439,7 +443,10 @@ Cell(capital_gains, 7, <|Capital gains from Schedule D|>,, u cap_gains)
         critical
     )
 
-    Cell(postcredit_taxes, 23, <|Other taxes, incl. self-employment|>, , u)
+    Cell(postcredit_taxes, 23,
+        <|Other taxes, incl. self-employment|>,
+         <|CV(f1040sch2, se_tax) + CV(f1040sch2, other_taxes)|>,
+         itemizing self_emp)
 
     #62 Taxes from: a Form 8959 b Form 8960 c Instructions; enter code(s) 62
     Cell(total_tax, 24,
@@ -492,6 +499,18 @@ m4_form(f1040sch2)
         <|Schedule 2 total|>,
         <|CV(amt)+CV(credit_repayment)|>,
         itemizing
+    )
+
+    Cell(se_tax, 4,
+        <|Self-employment tax on Sch 2|>,
+        <|CV(sched_se, se_tax)|>,
+        self_emp
+    )
+
+    Cell(other_taxes, 4,
+        <|Sum other taxes (besides self-employment)|>,
+        ,
+        itemizing self_emp
     )
 
 m4_form(f1040sch3)
