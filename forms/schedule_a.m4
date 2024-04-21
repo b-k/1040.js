@@ -23,17 +23,25 @@ Cell(real_estate_taxes, 5.1,
         Real estate taxes,
         , u itemizing
     )
+
 Cell(property_taxes, 5.2,
         Personal property taxes,
         , u itemizing
     )
+
+Cell(salt_capped, 7,
+        <|State/local/real estate taxes, capped|>,
+        <|min(SUM(local_taxes, real_estate_taxes, property_taxes), Fswitch((maried filing separately, 5000), 10000))|>
+        , itemizing
+    )
+
 Cell(other_taxes, 6,
         Other taxes,
         , u itemizing
     )
 Cell(total_taxes_deducted, 7,
         Total taxes paid to be deducted,
-        <|min(10000, SUM(local_taxes, real_estate_taxes, property_taxes, other_taxes))|>,
+        <|min(10000, SUM(salt_capped, other_taxes))|>,
         itemizing
     )
 adiv3=cell('>>>>>>>>>>>> Interest you paid                        ', 7.9, '0'),

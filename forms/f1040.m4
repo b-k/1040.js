@@ -377,7 +377,7 @@ m4_form(f1040sch1)
     )
     Cell(subtractions_from_income, 26,
         Sum of adjustments to income,
-        <|SUM(hsa_deduction, ira_deduction, student_loan_interest_ded, other_adjustments)|>
+        <|SUM(hsa_deduction, self_employment_deductible, ira_deduction, student_loan_interest_ded, other_adjustments)|>
     )
 
 m4_form(f1040)
@@ -510,7 +510,7 @@ m4_form(f1040sch2)
     Cell(other_taxes, 4,
         <|Sum other taxes (besides self-employment)|>,
         ,
-        itemizing self_emp
+        u itemizing self_emp
     )
 
 m4_form(f1040sch3)
