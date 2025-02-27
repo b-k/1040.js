@@ -81,16 +81,16 @@ Or try <a href="https://github.com/b-k/py1040">the Python version</a>.<br>
 </td><td>
 
 
-<INPUT class=check TYPE=CHECKBOX NAME="over_65" id=".over_65" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I am over 65.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="over_65" id=".over_65" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I am over 65.</span><BR>
 
-<INPUT class=check TYPE=CHECKBOX NAME="spouse_over_65" id=".spouse_over_65" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> My spouse is over 65.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="s_loans" id=".s_loans" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I have student loans or education expenses.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="ly_refund" id=".ly_refund" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I got a tax refund and itemized last year.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="mort" id=".mort" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I have a mortgage.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I am itemizing.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="cap_gains" id=".cap_gains" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I have long-term capital gains or associated dividends.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="self_emp" id=".self_emp" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I have self-employment (Schedule C) income.</span><BR>
-<INPUT class=check TYPE=CHECKBOX NAME="have_rr" id=".have_rr" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> I have rental or royalty (Schedule E) income.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="spouse_over_65" id=".spouse_over_65" onclick="checkbox(id, checked)" ><span class="checkboxtext"> My spouse is over 65.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="s_loans" id=".s_loans" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I have student loans or education expenses.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="ly_refund" id=".ly_refund" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I got a tax refund and itemized last year.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="mort" id=".mort" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I have a mortgage.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="itemizing" id=".itemizing" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I am itemizing.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="cap_gains" id=".cap_gains" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I have long-term capital gains or associated dividends.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="self_emp" id=".self_emp" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I have self-employment (Schedule C) income.</span><BR>
+<INPUT class=check TYPE=CHECKBOX NAME="have_rr" id=".have_rr" onclick="checkbox(id, checked)" ><span class="checkboxtext"> I have rental or royalty (Schedule E) income.</span><BR>
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
 <a href="https://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
 </td></tr></table>
@@ -821,15 +821,20 @@ var kidcalc = function(){
     checkbox('.kids', (kids>0 ? true : false)); recalc();
 }
 
-document.getElementById(".have_rr").click()
-document.getElementById(".cap_gains").click()
-document.getElementById(".s_loans").click()
-document.getElementById(".ly_refund").click()
-document.getElementById(".mort").click()
-document.getElementById(".itemizing").click()
-document.getElementById(".over_65").click()
-document.getElementById(".spouse_over_65").click()
+function click_all() {
+    document.getElementById(".have_rr").click()
+    document.getElementById(".cap_gains").click()
+    document.getElementById(".s_loans").click()
+    document.getElementById(".ly_refund").click()
+    document.getElementById(".mort").click()
+    document.getElementById(".self_emp").click()
+    document.getElementById(".itemizing").click()
+    document.getElementById(".over_65").click()
+    document.getElementById(".spouse_over_65").click()
+}
 //checkbox(".kids", false)
+click_all()
+click_all()
 kidcalc()
 
 redrawIt()
