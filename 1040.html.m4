@@ -80,7 +80,8 @@ Or try <a href="https://github.com/b-k/py1040">the Python version</a>.<br>
 <input text id="nonkid_dependents" size=3em onchange="recalc()"> Dependents over 17<br>
 </td><td>
 
-m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
+m4_dnl m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" checked><span class="checkboxtext"> $2</span><BR>|>)
+m4_define(BOX, <|<INPUT class=check TYPE=CHECKBOX NAME="$1" id=".$1" onclick="checkbox(id, checked)" ><span class="checkboxtext"> $2</span><BR>|>)
 BOX(over_65, I am over 65.)
 
 BOX(spouse_over_65, My spouse is over 65.)
@@ -301,15 +302,20 @@ var kidcalc = function(){
     checkbox('.kids', (kids>0 ? true : false)); recalc();
 }
 
-document.getElementById(".have_rr").click()
-document.getElementById(".cap_gains").click()
-document.getElementById(".s_loans").click()
-document.getElementById(".ly_refund").click()
-document.getElementById(".mort").click()
-document.getElementById(".itemizing").click()
-document.getElementById(".over_65").click()
-document.getElementById(".spouse_over_65").click()
+function click_all() {
+    document.getElementById(".have_rr").click()
+    document.getElementById(".cap_gains").click()
+    document.getElementById(".s_loans").click()
+    document.getElementById(".ly_refund").click()
+    document.getElementById(".mort").click()
+    document.getElementById(".self_emp").click()
+    document.getElementById(".itemizing").click()
+    document.getElementById(".over_65").click()
+    document.getElementById(".spouse_over_65").click()
+}
 //checkbox(".kids", false)
+click_all()
+click_all()
 kidcalc()
 
 redrawIt()
