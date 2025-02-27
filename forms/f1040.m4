@@ -1,18 +1,18 @@
 jsversion(<|
 //tax rate schedules
 //Could be inlined, but not going to bother.
-//Buried in i1040gi.pdf, or use https://www.irs.gov/pub/irs-prior/f1040es--2022.pdf
+//Buried in i1040gi.pdf, or use https://www.irs.gov/pub/irs-prior/f1040es--2023.pdf
 
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 11000, 44725, 95375, 182100, 231250, 578125, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
     } else if (filing_status == "married filing separately") {
-        cuts=[0, 11000, 44725, 95375, 182100, 231250, 346875, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 22000, 89450, 190750, 364200, 462500, 693750, 1e20]
+        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 15700, 59850, 95350, 182100, 231250, 578100 ,1e20]
+        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626530,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -34,28 +34,24 @@ var tax_calc = function (inval){
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 13850;
-         else if (over65ct==1) return 15700;
-         else                  return 17550;
+         if (over65ct==0)      return 16550;
+         else /*(over65ct==1)*/ return 18500;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 27700;
-         else if (over65ct==1) return 29200;
-         else if (over65ct==2) return 30700;
-         else if (over65ct==3) return 32200;
-         else                  return 33700;
+         if (over65ct==0)      return 30750;
+         else if (over65ct==1) return 32300;
+         else if (over65ct==2) return 38850;
+         else /*(over65ct==3)*/ return 35400;
     }
     if (fstatus() == "married filing separately"){
-         if (over65ct==0)      return 13850;
-         else if (over65ct==1) return 15350;
-         else if (over65ct==2) return 16850;
-         else if (over65ct==3) return 18350;
-         else                  return 19850;
+         if (over65ct==0)      return 16150;
+         else if (over65ct==1) return 17700;
+         else if (over65ct==2) return 19250;
+         else /*(over65ct==3)*/ return 20800;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 20800;
-         else if (over65ct==1) return 22650;
-         else                  return 24500;
+         if (over65ct==0)      return 23850;
+         else /*(over65ct==1)*/ return 25800;
     }
 }
 
@@ -63,19 +59,11 @@ var eitc = function(income, k){
     if (fstatus()=="married filing separately") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    //Or, search the internet for the phrase "For taxable years beginning in 20xx, the following
-    // amounts are used to determine the earned income credit under § 32(b)."
-    //For 2019: https://www.irs.gov/irb/2018-49_IRB
-    //For 2020: https://www.irs.gov/irb/2019-47_IRB
-    //For 2021: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
-    //For 2022: https://www.taxpolicycenter.org/statistics/eitc-parameters
-    //In the footnotes of that page, you'll find sources. For 23, I went straigtht to the IRB: https://www.irs.gov/pub/irs-irbs/irb22-45.pdf
-    //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    mfj_add=6560 //See TPC footnote.
-    data=[[7840, 600, 9800, 17640,    9800+mfj_add+10,  17640+mfj_add+10],
-          [11750, 3995, 21560, 46560, 21560+mfj_add, 46560+mfj_add],
-          [16510, 6604, 21560, 52918, 21560+mfj_add, 52918+mfj_add],
-          [16510, 7430, 21560, 56838, 21560+mfj_add, 56838+mfj_add]]
+    //cut/paste the python version.
+    data=[[8260, 632, 10330, 18591,    17250, 25511],
+          [12390, 4213, 22720, 49084, 29640, 56004],
+          [17400, 6960, 22720, 55768, 29640, 62688],
+          [17400, 7830, 22720, 59899, 29640, 66819]]
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -133,17 +121,6 @@ var min = function(a,b) { return Math.min(a,b)}
 var Floor = function(a) { return Math.floor(a)}
 var Ceil = function(a) { return Math.ceil(a)}
 
-var exemption_fn = function(){
-    var ct = 1
-    var kids = parseFloat(document.getElementById("kids").value)
-    if (isNaN(kids)) kids = 0;
-    var deps = parseFloat(document.getElementById("nonkid_dependents").value)
-    if (isNaN(deps)) deps = 0;
-    ct += kids + deps
-    var status = fstatus()
-    if (status=="married filing separately" || status == "married filing jointly") ct += 1
-    return ct;
-}
 
 //CTC
 var thousandkids = function(){
@@ -154,10 +131,10 @@ var thousandkids = function(){
     return kids*2000 + deps*500
 }
 
-var sixteenkids = function(){
+var seventeenkids = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    return kids*1600
+    return kids*1700
 }
 
 var ctc_status = function(agi){
@@ -184,15 +161,14 @@ def fstatus():
 def tax_table(inval):
     filing_status = fstatus()
 
-
     if filing_status == "single":
-        cuts=[0, 11000, 44725, 95375, 182100, 231250, 578125, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
     if filing_status == "married filing separately":
-        cuts=[0, 11000, 44725, 95375, 182100, 231250, 346875, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
     if filing_status == "married filing jointly":
-        cuts=[0, 22000, 89450, 190750, 364200, 462500, 693750, 1e20]
+        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
     if filing_status == "head of household":
-        cuts=[0, 15700, 59850, 95350, 182100, 231250, 578100 ,1e20]
+        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626530,1e20]
 
     rate=[0.1, 0.12, 0.22 , 0.24 ,0.32, 0.35, 0.37]
     i=0
@@ -211,38 +187,39 @@ def tax_calc(inval):
 def std_ded_fn():
     over65ct = Situation(over_65) + Situation(spouse_over_65)
     if fstatus() == "single":
-         if (over65ct==0): return 13850;
-         if (over65ct==1): return 15700;
-         return 17550;
-
+         if (over65ct==0): return 16550;
+         if (over65ct==1): return 18500;
 
     if fstatus() == "married filing jointly":
-         if (over65ct==0): return 27700
-         if (over65ct==1): return 29200
-         if (over65ct==2): return 30700
-         if (over65ct==3): return 32200
-         return 33700
+         if (over65ct==0): return 30750
+         if (over65ct==1): return 32300
+         if (over65ct==2): return 38850
+         if (over65ct==3): return 35400
 
     if fstatus() == "married filing separately":
-         if (over65ct==0): return 13850
-         if (over65ct==1): return 15350
-         if (over65ct==2): return 16850
-         if (over65ct==3): return 18350
-         return 19850
+         if (over65ct==0): return 16150
+         if (over65ct==1): return 17700
+         if (over65ct==2): return 19250
+         if (over65ct==3): return 20800
 
     if fstatus() == "head of household":
-         if (over65ct==0): return 20800
-         if (over65ct==1): return 22650
-         return 24500
+         if (over65ct==0): return 23850
+         if (over65ct==1): return 25800
 
 def eitc(income, kids):
     #See https://www.taxpolicycenter.org/statistics/eitc-parameters
-    #plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    mfj_add=6560
-    data=[[7840, 600, 9800, 17640,    9800+mfj_add+10,  17640+mfj_add+10],
-          [11750, 3995, 21560, 46560, 21560+mfj_add, 46560+mfj_add],
-          [16510, 6604, 21560, 52918, 21560+mfj_add, 52918+mfj_add],
-          [16510, 7430, 21560, 56838, 21560+mfj_add, 56838+mfj_add]]
+    # Or, search the internet for the phrase "For taxable years beginning in 20xx, the following amounts are used to determine the earned income credit under § 32(b)."
+    # For 2019: https://www.irs.gov/irb/2018-49_IRB
+    # For 2020: https://www.irs.gov/irb/2019-47_IRB
+    # For 2021: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
+    # For 2022: https://www.taxpolicycenter.org/statistics/eitc-parameters
+    # In the footnotes of that page, you'll find sources. For 23, I went straigtht to the IRB: https://www.irs.gov/pub/irs-irbs/irb22-45.pdf
+    #plateu start, plateu value, plateu end, zero point, phaseout for married joint, phaseout end for mj
+
+    data=[[8260, 632, 10330, 18591,    17250, 25511],
+          [12390, 4213, 22720, 49084, 29640, 56004],
+          [17400, 6960, 22720, 55768, 29640, 62688],
+          [17400, 7830, 22720, 59899, 29640, 66819]]
     row=kids if kids <=3 else 3
 
     plateu_start=0
@@ -280,17 +257,12 @@ def actc(limited_unused, scaled_income, ss_med, eitc):
         return min(max(ss_med-eitc, scaled_income), limited_unused)
 
 
-def exemption_fn():
-    status = fstatus()
-    spouse = 1 if (status=="married filing separately" or status == "married filing jointly") else 0
-    return 1 + kids + dependents + spouse
-
 # CTC
 def thousandkids():
     return kids*2000 + dependents*500
 
-def sixteenkids():
-    return kids*1600
+def seventeenkids():
+    return kids*1700
 
 def Floor(x):
     return int(x)
@@ -607,14 +579,14 @@ Cell(unused_ctc, 16,
          <|max(0, CV(ctc_sch8812_I, credit_remaining) - CV(ctc_sch8812_I, ctc))|>,
          kids
      )
-Cell(fifteen_kids, 16.1,
-        <|$1,600 per kid|>,
-        <|sixteenkids()|>,
+Cell(seventeen_kids, 16.1,
+        <|$1,700 per kid|>,
+        <|seventeenkids()|>,
         kids
     )
 Cell(limited_unused, 17,
         Limited unused CTC,
-        <|min(CV(unused_ctc), CV(fifteen_kids))|>,
+        <|min(CV(unused_ctc), CV(seventeen_kids))|>,
         kids
     )
 Cell(scaled_earned_income, 19,
