@@ -66,7 +66,7 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 </style>
 
 <body>
-The 2023 U.S. tax graph<br>
+The 2024 U.S. tax graph<br>
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
 Hover your mouse over a box to see a little more text and the form the box is from.<br>
@@ -107,18 +107,18 @@ var spouse_over_65 = 0;
 
 //tax rate schedules
 //Could be inlined, but not going to bother.
-//Buried in i1040gi.pdf, or use https://www.irs.gov/pub/irs-prior/f1040es--2022.pdf
+//Buried in i1040gi.pdf, or use https://www.irs.gov/pub/irs-prior/f1040es--2023.pdf
 
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 11000, 44725, 95375, 182100, 231250, 578125, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
     } else if (filing_status == "married filing separately") {
-        cuts=[0, 11000, 44725, 95375, 182100, 231250, 346875, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 22000, 89450, 190750, 364200, 462500, 693750, 1e20]
+        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 15700, 59850, 95350, 182100, 231250, 578100 ,1e20]
+        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626530,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -140,28 +140,24 @@ var tax_calc = function (inval){
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 13850;
-         else if (over65ct==1) return 15700;
-         else                  return 17550;
+         if (over65ct==0)      return 16550;
+         else /*(over65ct==1)*/ return 18500;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 27700;
-         else if (over65ct==1) return 29200;
-         else if (over65ct==2) return 30700;
-         else if (over65ct==3) return 32200;
-         else                  return 33700;
+         if (over65ct==0)      return 30750;
+         else if (over65ct==1) return 32300;
+         else if (over65ct==2) return 38850;
+         else /*(over65ct==3)*/ return 35400;
     }
     if (fstatus() == "married filing separately"){
-         if (over65ct==0)      return 13850;
-         else if (over65ct==1) return 15350;
-         else if (over65ct==2) return 16850;
-         else if (over65ct==3) return 18350;
-         else                  return 19850;
+         if (over65ct==0)      return 16150;
+         else if (over65ct==1) return 17700;
+         else if (over65ct==2) return 19250;
+         else /*(over65ct==3)*/ return 20800;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 20800;
-         else if (over65ct==1) return 22650;
-         else                  return 24500;
+         if (over65ct==0)      return 23850;
+         else /*(over65ct==1)*/ return 25800;
     }
 }
 
@@ -169,19 +165,11 @@ var eitc = function(income, k){
     if (fstatus()=="married filing separately") return 0
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    //Or, search the internet for the phrase "For taxable years beginning in 20xx, the following
-    // amounts are used to determine the earned income credit under § 32(b)."
-    //For 2019: https://www.irs.gov/irb/2018-49_IRB
-    //For 2020: https://www.irs.gov/irb/2019-47_IRB
-    //For 2021: https://www.irs.gov/pub/irs-drop/rp-19-44.pdf
-    //For 2022: https://www.taxpolicycenter.org/statistics/eitc-parameters
-    //In the footnotes of that page, you'll find sources. For 23, I went straigtht to the IRB: https://www.irs.gov/pub/irs-irbs/irb22-45.pdf
-    //plateu start, plateu value, plateu end, zero point, end for married joint, zero for mj
-    mfj_add=6560 //See TPC footnote.
-    data=[[7840, 600, 9800, 17640,    9800+mfj_add+10,  17640+mfj_add+10],
-          [11750, 3995, 21560, 46560, 21560+mfj_add, 46560+mfj_add],
-          [16510, 6604, 21560, 52918, 21560+mfj_add, 52918+mfj_add],
-          [16510, 7430, 21560, 56838, 21560+mfj_add, 56838+mfj_add]]
+    //cut/paste the python version.
+    data=[[8260, 632, 10330, 18591,    17250, 25511],
+          [12390, 4213, 22720, 49084, 29640, 56004],
+          [17400, 6960, 22720, 55768, 29640, 62688],
+          [17400, 7830, 22720, 59899, 29640, 66819]]
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -239,17 +227,6 @@ var min = function(a,b) { return Math.min(a,b)}
 var Floor = function(a) { return Math.floor(a)}
 var Ceil = function(a) { return Math.ceil(a)}
 
-var exemption_fn = function(){
-    var ct = 1
-    var kids = parseFloat(document.getElementById("kids").value)
-    if (isNaN(kids)) kids = 0;
-    var deps = parseFloat(document.getElementById("nonkid_dependents").value)
-    if (isNaN(deps)) deps = 0;
-    ct += kids + deps
-    var status = fstatus()
-    if (status=="married filing separately" || status == "married filing jointly") ct += 1
-    return ct;
-}
 
 //CTC
 var thousandkids = function(){
@@ -260,10 +237,10 @@ var thousandkids = function(){
     return kids*2000 + deps*500
 }
 
-var sixteenkids = function(){
+var seventeenkids = function(){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
-    return kids*1600
+    return kids*1700
 }
 
 var ctc_status = function(agi){
@@ -282,9 +259,9 @@ function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
     var mfj= (status=="married filing jointly")
-    if (s_or_hh && income<578150) return 81300
-    if (mfj && income<1156300) return 126500
-    if (status=="married filing separately" && income < 578150) return 63250
+    if (s_or_hh && income<609350) return 85700
+    if (mfj && income<1218700) return 133300
+    if (status=="married filing separately" && income < 609350) return 66650
 
     return 0
     //No longer calculating phase-out
@@ -295,8 +272,8 @@ function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
     return (status=="married filing separately")
-       ? income * (income <=110350  ? 0.26 : 0.28) - 2207
-       : income * (income <=220700 ? 0.26 : 0.28) - 4414
+       ? income * (income <=116300  ? 0.26 : 0.28) - 2326
+       : income * (income <=232600 ? 0.26 : 0.28) - 4652
 }
 
 function med_expenses(expenses, agi){
@@ -384,8 +361,8 @@ g.setNode("ctc_sch8812_I_credit_remaining",  { label: "credit_remaining", basela
 g.setNode("ctc_sch8812_I_tax_minus_some_credits",  { label: "tax_minus_some_credits", baselabel: "tax_minus_some_credits", form: "ctc_sch8812_I", fullname: "                Calculated tax minus some credits", class: "a_node kids    ", val:0 , eqn: "Cv('f1040_base_tax')          - Cv('f1040sch3_ftc') - Cv('f1040sch3_dependent_care')- Cv('f1040sch3_ed_credits')          - Cv('f1040sch3_retirement_savings') - Cv('f1040sch3_elderly_disabled_credits')          - Cv('f1040sch3_alt_motor_vehicle')  - Cv('f1040sch3_plug_in_motor_vehicle')", last_eval:0 });
 g.setNode("ctc_sch8812_I_ctc",  { label: "ctc", baselabel: "ctc", form: "ctc_sch8812_I", fullname: "Nonrefundable child tax credit", class: "a_node kids    ", val:0 , eqn: "min(Cv('ctc_sch8812_I_tax_minus_some_credits'), Cv('ctc_sch8812_I_credit_remaining'))", last_eval:0 });
 g.setNode("ctc_sch8812_IIA_unused_ctc",  { label: "unused_ctc", baselabel: "unused_ctc", form: "ctc_sch8812_IIA", fullname: "CTC not used", class: "a_node kids     ", val:0 , eqn: "max(0, Cv('ctc_sch8812_I_credit_remaining') - Cv('ctc_sch8812_I_ctc'))", last_eval:0 });
-g.setNode("ctc_sch8812_IIA_fifteen_kids",  { label: "fifteen_kids", baselabel: "fifteen_kids", form: "ctc_sch8812_IIA", fullname: "$1,600 per kid", class: "a_node kids    ", val:0 , eqn: "sixteenkids()", last_eval:0 });
-g.setNode("ctc_sch8812_IIA_limited_unused",  { label: "limited_unused", baselabel: "limited_unused", form: "ctc_sch8812_IIA", fullname: "Limited unused CTC", class: "a_node kids    ", val:0 , eqn: "min(Cv('ctc_sch8812_IIA_unused_ctc'), Cv('ctc_sch8812_IIA_fifteen_kids'))", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_seventeen_kids",  { label: "seventeen_kids", baselabel: "seventeen_kids", form: "ctc_sch8812_IIA", fullname: "$1,700 per kid", class: "a_node kids    ", val:0 , eqn: "seventeenkids()", last_eval:0 });
+g.setNode("ctc_sch8812_IIA_limited_unused",  { label: "limited_unused", baselabel: "limited_unused", form: "ctc_sch8812_IIA", fullname: "Limited unused CTC", class: "a_node kids    ", val:0 , eqn: "min(Cv('ctc_sch8812_IIA_unused_ctc'), Cv('ctc_sch8812_IIA_seventeen_kids'))", last_eval:0 });
 g.setNode("ctc_sch8812_IIA_scaled_earned_income",  { label: "scaled_earned_income", baselabel: "scaled_earned_income", form: "ctc_sch8812_IIA", fullname: "15 percent of earned income-2500", class: "a_node kids    ", val:0 , eqn: "max(0, 0.15*(Cv('f1040_wages')-2500))", last_eval:0 });
 g.setNode("ctc_sch8812_IIA_ss_and_medicare_withheld",  { label: "ss_and_medicare_withheld", baselabel: "ss_and_medicare_withheld", form: "ctc_sch8812_IIA", fullname: "Social security and medicare withheld on W-2 lines 4 and 6", class: "a_node u kids    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("ctc_sch8812_IIA_refundable_ctc",  { label: "refundable_ctc", baselabel: "refundable_ctc", form: "ctc_sch8812_IIA", fullname: "Refundable child tax credit", class: "a_node kids    ", val:0 , eqn: "actc(Cv('ctc_sch8812_IIA_limited_unused'), Cv('ctc_sch8812_IIA_scaled_earned_income'),Cv('f1040sch1_self_employment_deductible') + Cv('ctc_sch8812_IIA_ss_and_medicare_withheld'), Cv('f1040_eitc'))", last_eval:0 });
@@ -600,7 +577,7 @@ set_edges("ctc_sch8812_I_credit_remaining", ["ctc_sch8812_I_two_thousand_per_chi
 set_edges("ctc_sch8812_I_tax_minus_some_credits", ["f1040_base_tax", "f1040sch3_ftc", "f1040sch3_dependent_care", "f1040sch3_ed_credits", "f1040sch3_retirement_savings", "f1040sch3_elderly_disabled_credits", "f1040sch3_alt_motor_vehicle", "f1040sch3_plug_in_motor_vehicle",  ""])
 set_edges("ctc_sch8812_I_ctc", ["ctc_sch8812_I_tax_minus_some_credits", "ctc_sch8812_I_credit_remaining",  ""])
 set_edges("ctc_sch8812_IIA_unused_ctc", ["ctc_sch8812_I_credit_remaining", "ctc_sch8812_I_ctc",  ""])
-set_edges("ctc_sch8812_IIA_limited_unused", ["ctc_sch8812_IIA_unused_ctc", "ctc_sch8812_IIA_fifteen_kids",  ""])
+set_edges("ctc_sch8812_IIA_limited_unused", ["ctc_sch8812_IIA_unused_ctc", "ctc_sch8812_IIA_seventeen_kids",  ""])
 set_edges("ctc_sch8812_IIA_scaled_earned_income", ["f1040_wages",  ""])
 set_edges("ctc_sch8812_IIA_refundable_ctc", ["ctc_sch8812_IIA_limited_unused", "ctc_sch8812_IIA_scaled_earned_income", "f1040sch1_self_employment_deductible", "ctc_sch8812_IIA_ss_and_medicare_withheld", "f1040_eitc",  ""])
 set_edges("f1040_tax_refund_ws_last_year_reduced", ["f1040_tax_refund_ws_last_year_5d", "f1040_tax_refund_ws_last_year_limited_deductions",  ""])
