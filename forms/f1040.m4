@@ -6,13 +6,13 @@ jsversion(<|
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
+        cuts=[0, 11600, 47150, 100525, 191950, 243725, 609350, 1e20]
     } else if (filing_status == "married filing separately") {
-        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
+        cuts=[0, 11600, 47150, 100525, 191950, 243725, 365600, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
+        cuts=[0, 23200, 94300, 201050, 383900, 487450, 731200, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626530,1e20]
+        cuts=[0, 16550, 63100, 100500, 191950, 243700, 609350,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -34,23 +34,27 @@ var tax_calc = function (inval){
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 16550;
-         else /*(over65ct==1)*/ return 18500;
+         if (over65ct==0)      return 14600;
+         else if (over65ct==1)  return 16550;
+         else /*(over65ct==2)*/ return 18500;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 30750;
-         else if (over65ct==1) return 32300;
-         else if (over65ct==2) return 38850;
-         else /*(over65ct==3)*/ return 35400;
+         if (over65ct==0)      return 29200;
+         else if (over65ct==1) return 30750;
+         else if (over65ct==2) return 32300;
+         else if (over65ct==3) return 33850;
+         else /*(over65ct==4)*/ return 35400;
     }
     if (fstatus() == "married filing separately"){
-         if (over65ct==0)      return 16150;
-         else if (over65ct==1) return 17700;
-         else if (over65ct==2) return 19250;
-         else /*(over65ct==3)*/ return 20800;
+         if (over65ct==0)      return 14600;
+         else if (over65ct==1) return 16150;
+         else if (over65ct==2) return 17700;
+         else if (over65ct==3) return 19250;
+         else /*(over65ct==4)*/ return 20800;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 23850;
+         if (over65ct==0)      return 21900;
+         else if (over65ct==1) return 23850;
          else /*(over65ct==1)*/ return 25800;
     }
 }
@@ -162,13 +166,13 @@ def tax_table(inval):
     filing_status = fstatus()
 
     if filing_status == "single":
-        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
+        cuts=[0, 11600, 47150, 100525, 191950, 243725, 609350, 1e20]
     if filing_status == "married filing separately":
-        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
+        cuts=[0, 11600, 47150, 100525, 191950, 243725, 365600, 1e20]
     if filing_status == "married filing jointly":
-        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
+        cuts=[0, 23200, 94300, 201050, 383900, 487450, 731200, 1e20]
     if filing_status == "head of household":
-        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626530,1e20]
+        cuts=[0, 16550, 63100, 100500, 191950, 243700, 609350,1e20]
 
     rate=[0.1, 0.12, 0.22 , 0.24 ,0.32, 0.35, 0.37]
     i=0
@@ -187,24 +191,30 @@ def tax_calc(inval):
 def std_ded_fn():
     over65ct = Situation(over_65) + Situation(spouse_over_65)
     if fstatus() == "single":
-         if (over65ct==0): return 16550;
-         if (over65ct==1): return 18500;
+         if (over65ct==0):  return 14600
+         if (over65ct==1):  return 16550
+         else: return 18500
 
     if fstatus() == "married filing jointly":
-         if (over65ct==0): return 30750
-         if (over65ct==1): return 32300
-         if (over65ct==2): return 38850
-         if (over65ct==3): return 35400
+         if (over65ct==0): return 29200
+         if (over65ct==1): return 30750
+         if (over65ct==2): return 32300
+         if (over65ct==3): return 33850
+         else:  return 35400
 
     if fstatus() == "married filing separately":
-         if (over65ct==0): return 16150
-         if (over65ct==1): return 17700
-         if (over65ct==2): return 19250
-         if (over65ct==3): return 20800
+         if (over65ct==0): return 14600
+         if (over65ct==1): return 16150
+         if (over65ct==2): return 17700
+         if (over65ct==3): return 19250
+         else:  return 20800
 
     if fstatus() == "head of household":
-         if (over65ct==0): return 23850
-         if (over65ct==1): return 25800
+         if (over65ct==0): return 21900
+         if (over65ct==1): return 23850
+         else: return 25800
+
+
 
 def eitc(income, kids):
     #See https://www.taxpolicycenter.org/statistics/eitc-parameters
