@@ -6,13 +6,13 @@ jsversion(<|
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 11600, 47150, 100525, 191950, 243725, 609350, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
     } else if (filing_status == "married filing separately") {
-        cuts=[0, 11600, 47150, 100525, 191950, 243725, 365600, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 23200, 94300, 201050, 383900, 487450, 731200, 1e20]
+        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 16550, 63100, 100500, 191950, 243700, 609350,1e20]
+        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626350,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -34,28 +34,24 @@ var tax_calc = function (inval){
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 14600;
-         else if (over65ct==1)  return 16550;
-         else /*(over65ct==2)*/ return 18500;
+         return 15750 + 2000 * over65ct;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 29200;
-         else if (over65ct==1) return 30750;
-         else if (over65ct==2) return 32300;
-         else if (over65ct==3) return 33850;
-         else /*(over65ct==4)*/ return 35400;
+         if (over65ct==0)      return 31500;
+         else if (over65ct==1) return 33100;
+         else if (over65ct==2) return 34700;
+         else if (over65ct==3) return 36300;
+         else /*(over65ct==4)*/ return 37900;
     }
     if (fstatus() == "married filing separately"){
-         if (over65ct==0)      return 14600;
-         else if (over65ct==1) return 16150;
-         else if (over65ct==2) return 17700;
-         else if (over65ct==3) return 19250;
-         else /*(over65ct==4)*/ return 20800;
+         if (over65ct==0)      return 15750;
+         else if (over65ct==1) return 17350;
+         else if (over65ct==2) return 18950;
+         else if (over65ct==3) return 20550;
+         else /*(over65ct==4)*/ return 22150;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 21900;
-         else if (over65ct==1) return 23850;
-         else /*(over65ct==1)*/ return 25800;
+         return 23625 + over65ct * 2000;
     }
 }
 
@@ -64,10 +60,12 @@ var eitc = function(income, k){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     //cut/paste the python version.
-    data=[[8260, 632, 10330, 18591,    17250, 25511],
-          [12390, 4213, 22720, 49084, 29640, 56004],
-          [17400, 6960, 22720, 55768, 29640, 62688],
-          [17400, 7830, 22720, 59899, 29640, 66819]]
+    data=[[8490,	649,	10620,	19104,	17730,	26214],
+		 [12730,	4328,	23350,	50434,	30470,	57554],
+		 [17880,	7152,	23350,	57310,	30470,	64430],
+		 [17880,	8046,	23350,	61555,	30470,	68675]]
+
+
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -132,7 +130,7 @@ var thousandkids = function(){
     if (isNaN(kids)) kids = 0;
     var deps = parseFloat(document.getElementById("nonkid_dependents").value)
     if (isNaN(deps)) deps = 0;
-    return kids*2000 + deps*500
+    return kids*2200 + deps*500
 }
 
 var seventeenkids = function(){
@@ -166,13 +164,13 @@ def tax_table(inval):
     filing_status = fstatus()
 
     if filing_status == "single":
-        cuts=[0, 11600, 47150, 100525, 191950, 243725, 609350, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
     if filing_status == "married filing separately":
-        cuts=[0, 11600, 47150, 100525, 191950, 243725, 365600, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
     if filing_status == "married filing jointly":
-        cuts=[0, 23200, 94300, 201050, 383900, 487450, 731200, 1e20]
+        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
     if filing_status == "head of household":
-        cuts=[0, 16550, 63100, 100500, 191950, 243700, 609350,1e20]
+        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626350, 1e20]
 
     rate=[0.1, 0.12, 0.22 , 0.24 ,0.32, 0.35, 0.37]
     i=0
@@ -191,28 +189,24 @@ def tax_calc(inval):
 def std_ded_fn():
     over65ct = Situation(over_65) + Situation(spouse_over_65)
     if fstatus() == "single":
-         if (over65ct==0):  return 14600
-         if (over65ct==1):  return 16550
-         else: return 18500
+         return 15750 + 2000*over65ct
 
     if fstatus() == "married filing jointly":
-         if (over65ct==0): return 29200
-         if (over65ct==1): return 30750
-         if (over65ct==2): return 32300
-         if (over65ct==3): return 33850
-         else:  return 35400
+         if (over65ct==0): return 31500
+         if (over65ct==1): return 33100
+         if (over65ct==2): return 34700
+         if (over65ct==3): return 36300
+         else:  return 37900
 
     if fstatus() == "married filing separately":
-         if (over65ct==0): return 14600
-         if (over65ct==1): return 16150
-         if (over65ct==2): return 17700
-         if (over65ct==3): return 19250
-         else:  return 20800
+         if (over65ct==0): return 15750
+         if (over65ct==1): return 17350
+         if (over65ct==2): return 18950
+         if (over65ct==3): return 20550
+         else:  return 22150
 
     if fstatus() == "head of household":
-         if (over65ct==0): return 21900
-         if (over65ct==1): return 23850
-         else: return 25800
+         return 23625 + over65ct * 2000
 
 
 
@@ -226,10 +220,11 @@ def eitc(income, kids):
     # In the footnotes of that page, you'll find sources. For 23, I went straigtht to the IRB: https://www.irs.gov/pub/irs-irbs/irb22-45.pdf
     #plateu start, plateu value, plateu end, zero point, phaseout for married joint, phaseout end for mj
 
-    data=[[8260, 632, 10330, 18591,    17250, 25511],
-          [12390, 4213, 22720, 49084, 29640, 56004],
-          [17400, 6960, 22720, 55768, 29640, 62688],
-          [17400, 7830, 22720, 59899, 29640, 66819]]
+    data=[[8490,	649,	10620,	19104,	17730,	26214],
+		 [12730,	4328,	23350,	50434,	30470,	57554],
+		 [17880,	7152,	23350,	57310,	30470,	64430],
+		 [17880,	8046,	23350,	61555,	30470,	68675]]
+
     row=kids if kids <=3 else 3
 
     plateu_start=0
@@ -269,7 +264,7 @@ def actc(limited_unused, scaled_income, ss_med, eitc):
 
 # CTC
 def thousandkids():
-    return kids*2000 + dependents*500
+    return kids*2200 + dependents*500
 
 def seventeenkids():
     return kids*1700
@@ -538,7 +533,7 @@ m4_form(student_loan_ws_1040)
         total income minus phase-out limit,
         <|min(1, m4_dnl
             max(CV(f1040, total_in) - CV(f1040sch1, subtractions_from_income_wo_student_loans) m4_dnl
-                - Fswitch((married filing jointly, 155000), 75000), 0)/Fswitch((married filing jointly, 30000), 15000))|>,
+                - Fswitch((married filing jointly, 170000), 85000), 0)/Fswitch((married filing jointly, 30000), 15000))|>,
         s_loans
     )
     Cell(phased_out_loans, 8,
@@ -552,9 +547,9 @@ m4_form(student_loan_ws_1040)
         s_loans
     )
 
-m4_form(ctc_sch8812_I)
+m4_form(ctc_sch8812_I) m4_dnl AKA f1040 Schedule 8
 Cell(two_thousand_per_child, 5,
-        <|$2,000 per child under 17 w/an SSN ($500 for other children unimplemented)|>,
+        <|$2,200 per child under 17 w/an SSN ($500 for other children)|>,
         <|thousandkids()|>,
         kids
     )
@@ -564,7 +559,7 @@ Cell(ctc_subtraction, 11,
         kids
     )
 Cell(credit_remaining, 12,
-        <|$2,000 per child minus the subtraction|>,
+        <|$2,200 per child minus the subtraction|>,
         <|max(CV(two_thousand_per_child) - CV(ctc_subtraction), 0)|>,
         kids
     )
@@ -643,13 +638,13 @@ m4_form(f1040_tax_refund_ws)
     )
     Cell(almost_std_deduction, 5,
         <|Last year's standard deduction (under your current status)|>,
-        <|Fswitch((married filing jointly, 25900), (head of household, 19400), 12950)|>,
+        <|Fswitch((married filing jointly, 29200), (head of household, 21900), 14600)|>,
         ly_refund
     )
     Cell(srblind, 6,
         <|Senior or blind exemption (blind UI; married filing jointly PI)|>,
         <|((Situation(over_65)==1)+(Situation(spouse_over_65)==1))*         m4_dnl
-          Fswitch((married filing separately, 1400), (married filing jointly, 1400), 1750)|>,
+          Fswitch((married filing separately, 1550), (married filing jointly, 1550), 1950)|>,
         ly_refund
     )
     Cell(itemized_over_std, 6.5,
@@ -677,7 +672,7 @@ m4_form(qualified_dividends_ws)
     )
     Cell(limitation, 6,
         <|Limitation|>,
-        <|Fswitch((head of household, 59750), (married filing jointly, 89250), 44625)|>,
+        <|Fswitch((head of household, 64750), (married filing jointly, 96700), 48350)|>,
         cap_gains
     )
     Cell(limited_income, 7,
@@ -703,7 +698,7 @@ m4_form(qualified_dividends_ws)
     Cell(relimited_qualified, 13,
         <|qualified gains re-limited|>,
         <| min(CV(min_ded_or_gains_minus_zero),            m4_dnl
-            max( min(Fswitch((single, 523050), (married filing separately, 276900), (married filing jointly, 553850), 492300), m4_dnl
+            max( min(Fswitch((single, 533400), (married filing separately, 300000), (married filing jointly, 600050), 566700), m4_dnl
                 CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>,
         cap_gains
     )

@@ -50,7 +50,7 @@ Caveats
 
 The tax graph on this form is incomplete. For example, the earned income credit
 calculation is in place, but if you are a member of the clergy there is a different
-calculation. There are some details for people making over $155,000/year (AGI) which we
+calculation. There are some details for people making over $500,000/year (AGI) which we
 will handle if any of the contributors have that problem. The code is open source,
 and you are encouraged to add cells or logical nuances that apply to your situation;
 see Contributing.md for details.
@@ -64,6 +64,7 @@ Generally covered
 * Earned Income Credit
 * Child Tax Credit, including refundable portion
 * Schedule A, itemized deductions
+* Schedule C, P/L from business
 * Schedule E, rental/royalty income
 * Alternative minimum tax (f6251, but the simpler of the two calculations)
 * f8582, real estate loss carryover

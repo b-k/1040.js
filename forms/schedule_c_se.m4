@@ -41,7 +41,7 @@ Cell(ss_wages, 8, <|Social Security wages and tips (W-2 boxes 3 plus 7)|>, , u s
 
 Cell(distance_to_max, 9, 
         <|Distance to cap|>,
-        <|max(0, 160200 - CV(ss_wages))|>,
+        <|max(0, 176100 - CV(ss_wages))|>,
         self_emp
     )
 

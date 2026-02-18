@@ -31,7 +31,7 @@ Cell(property_taxes, 5.2,
 
 Cell(salt_capped, 7,
         <|State/local/real estate taxes, capped|>,
-        <|min(SUM(local_taxes, real_estate_taxes, property_taxes), Fswitch((maried filing separately, 5000), 10000))|>
+        <|min(SUM(local_taxes, real_estate_taxes, property_taxes), Fswitch((maried filing separately, 20000), 40000))|>
         , itemizing
     )
 
@@ -46,7 +46,7 @@ Cell(total_taxes_deducted, 7,
     )
 adiv3=cell('>>>>>>>>>>>> Interest you paid                        ', 7.9, '0'),
 Cell(reported_mort_interest, 8,
-        Home mortgage interest/points reported on Form 1099,
+        Home mortgage interest/points reported on Form 1098,
         , u itemizing mort
     )
 Cell(unreported_mort_interest, 8.1,
