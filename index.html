@@ -66,7 +66,7 @@ div.tooltip { /* thx, http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-grap
 </style>
 
 <body>
-The 2024 U.S. tax graph<br>
+The 2025 U.S. tax graph<br>
 Click an avocado box to enter a value.<br>
 To see more or less, use your browser's zoom (often &lt;ctrl&gt;-&lt;+&gt; or &lt;ctrl&gt;-&lt;-&gt;, or try your mouse wheel).<br>
 Hover your mouse over a box to see a little more text and the form the box is from.<br>
@@ -112,13 +112,13 @@ var spouse_over_65 = 0;
 var tax_table = function (inval){
     var filing_status = fstatus();
     if (filing_status == "single") {
-        cuts=[0, 11600, 47150, 100525, 191950, 243725, 609350, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 626350, 1e20]
     } else if (filing_status == "married filing separately") {
-        cuts=[0, 11600, 47150, 100525, 191950, 243725, 365600, 1e20]
+        cuts=[0, 11925, 48475, 103350, 197300, 250525, 375800, 1e20]
     } else if (filing_status == "married filing jointly") {
-        cuts=[0, 23200, 94300, 201050, 383900, 487450, 731200, 1e20]
+        cuts=[0, 23850, 96950, 206700, 394600, 501050, 751600, 1e20]
     } else if (filing_status == "head of household") {
-        cuts=[0, 16550, 63100, 100500, 191950, 243700, 609350,1e20]
+        cuts=[0, 17000, 64850, 103350, 197300, 250500, 626350,1e20]
     }
     rate=[0.1, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
     i=0
@@ -140,28 +140,24 @@ var tax_calc = function (inval){
 var std_ded_fn = function(){
     var over65ct = situations[".over_65"] + situations[".spouse_over_65"];
     if (fstatus() == "single"){
-         if (over65ct==0)      return 14600;
-         else if (over65ct==1)  return 16550;
-         else /*(over65ct==2)*/ return 18500;
+         return 15750 + 2000 * over65ct;
     }
     if (fstatus() == "married filing jointly"){
-         if (over65ct==0)      return 29200;
-         else if (over65ct==1) return 30750;
-         else if (over65ct==2) return 32300;
-         else if (over65ct==3) return 33850;
-         else /*(over65ct==4)*/ return 35400;
+         if (over65ct==0)      return 31500;
+         else if (over65ct==1) return 33100;
+         else if (over65ct==2) return 34700;
+         else if (over65ct==3) return 36300;
+         else /*(over65ct==4)*/ return 37900;
     }
     if (fstatus() == "married filing separately"){
-         if (over65ct==0)      return 14600;
-         else if (over65ct==1) return 16150;
-         else if (over65ct==2) return 17700;
-         else if (over65ct==3) return 19250;
-         else /*(over65ct==4)*/ return 20800;
+         if (over65ct==0)      return 15750;
+         else if (over65ct==1) return 17350;
+         else if (over65ct==2) return 18950;
+         else if (over65ct==3) return 20550;
+         else /*(over65ct==4)*/ return 22150;
     }
     if (fstatus() == "head of household"){
-         if (over65ct==0)      return 21900;
-         else if (over65ct==1) return 23850;
-         else /*(over65ct==1)*/ return 25800;
+         return 23625 + over65ct * 2000;
     }
 }
 
@@ -170,10 +166,12 @@ var eitc = function(income, k){
     var kids = parseFloat(document.getElementById("kids").value)
     if (isNaN(kids)) kids = 0;
     //cut/paste the python version.
-    data=[[8260, 632, 10330, 18591,    17250, 25511],
-          [12390, 4213, 22720, 49084, 29640, 56004],
-          [17400, 6960, 22720, 55768, 29640, 62688],
-          [17400, 7830, 22720, 59899, 29640, 66819]]
+    data=[[8490,	649,	10620,	19104,	17730,	26214],
+		 [12730,	4328,	23350,	50434,	30470,	57554],
+		 [17880,	7152,	23350,	57310,	30470,	64430],
+		 [17880,	8046,	23350,	61555,	30470,	68675]]
+
+
      row = Math.min(kids,3);
 
     plateu_start=0
@@ -238,7 +236,7 @@ var thousandkids = function(){
     if (isNaN(kids)) kids = 0;
     var deps = parseFloat(document.getElementById("nonkid_dependents").value)
     if (isNaN(deps)) deps = 0;
-    return kids*2000 + deps*500
+    return kids*2200 + deps*500
 }
 
 var seventeenkids = function(){
@@ -263,9 +261,9 @@ function get_amt_exemption(income){
     var status=fstatus();
     var s_or_hh = (status=="single" || status=="head of household")
     var mfj= (status=="married filing jointly")
-    if (s_or_hh && income<609350) return 85700
-    if (mfj && income<1218700) return 133300
-    if (status=="married filing separately" && income < 609350) return 66650
+    if (s_or_hh && income<626350) return 88100
+    if (mfj && income<1252700) return 137000
+    if (status=="married filing separately" && income < 626350) return 68500
 
     return 0
     //No longer calculating phase-out
@@ -276,8 +274,8 @@ function get_tamt(income){
     if (income<=0) return 0
     var status=fstatus();
     return (status=="married filing separately")
-       ? income * (income <=116300  ? 0.26 : 0.28) - 2326
-       : income * (income <=232600 ? 0.26 : 0.28) - 4652
+       ? income * (income <=119550  ? 0.26 : 0.28) - 2391
+       : income * (income <=239100 ? 0.26 : 0.28) - 4782
 }
 
 function med_expenses(expenses, agi){
@@ -356,12 +354,12 @@ g.setNode("f1040sch3_plug_in_motor_vehicle",  { label: "plug_in_motor_vehicle", 
 g.setNode("f1040sch3_nonrefundable_total",  { label: "nonrefundable_total", baselabel: "nonrefundable_total", form: "f1040sch3", fullname: "Total nonrefundable credits", class: "a_node ", val:0 , eqn: "Cv('f1040sch3_ftc')+Cv('f1040sch3_dependent_care')+Cv('f1040sch3_retirement_savings') +Cv('f1040sch3_elderly_disabled_credits') + Cv('f1040sch3_alt_motor_vehicle') + Cv('f1040sch3_plug_in_motor_vehicle') +Cv('f1040sch3_ed_credits')    ", last_eval:0 });
 g.setNode("student_loan_ws_1040_student_loan_interest",  { label: "student_loan_interest", baselabel: "student_loan_interest", form: "student_loan_ws_1040", fullname: "Interest you paid in 2021 on qualified student loans", class: "a_node u s_loans    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("student_loan_ws_1040_loans_maxed",  { label: "loans_maxed", baselabel: "loans_maxed", form: "student_loan_ws_1040", fullname: "Student loan interest, maxed at $2,500", class: "a_node s_loans    ", val:0 , eqn: "min(Cv('student_loan_ws_1040_student_loan_interest'), 2500)", last_eval:0 });
-g.setNode("student_loan_ws_1040_phase_out_pct",  { label: "phase_out_pct", baselabel: "phase_out_pct", form: "student_loan_ws_1040", fullname: "total income minus phase-out limit", class: "a_node s_loans    ", val:0 , eqn: "min(1,             max(Cv('f1040_total_in') - Cv('f1040sch1_subtractions_from_income_wo_student_loans')                 - ((fstatus()=='married filing jointly') ? (155000) : (75000 )) , 0)/((fstatus()=='married filing jointly') ? (30000) : (15000 )) )", last_eval:0 });
+g.setNode("student_loan_ws_1040_phase_out_pct",  { label: "phase_out_pct", baselabel: "phase_out_pct", form: "student_loan_ws_1040", fullname: "total income minus phase-out limit", class: "a_node s_loans    ", val:0 , eqn: "min(1,             max(Cv('f1040_total_in') - Cv('f1040sch1_subtractions_from_income_wo_student_loans')                 - ((fstatus()=='married filing jointly') ? (170000) : (85000 )) , 0)/((fstatus()=='married filing jointly') ? (30000) : (15000 )) )", last_eval:0 });
 g.setNode("student_loan_ws_1040_phased_out_loans",  { label: "phased_out_loans", baselabel: "phased_out_loans", form: "student_loan_ws_1040", fullname: "phased-out loans", class: "a_node s_loans    ", val:0 , eqn: "Cv('student_loan_ws_1040_loans_maxed')*Cv('student_loan_ws_1040_phase_out_pct')/15000.", last_eval:0 });
 g.setNode("student_loan_ws_1040_final_credit",  { label: "final_credit", baselabel: "final_credit", form: "student_loan_ws_1040", fullname: "Student loan interest credit", class: "a_node s_loans    ", val:0 , eqn: "max(Cv('student_loan_ws_1040_loans_maxed') - Cv('student_loan_ws_1040_phased_out_loans'), 0)", last_eval:0 });
-g.setNode("ctc_sch8812_I_two_thousand_per_child",  { label: "two_thousand_per_child", baselabel: "two_thousand_per_child", form: "ctc_sch8812_I", fullname: "$2,000 per child under 17 w/an SSN ($500 for other children unimplemented)", class: "a_node kids    ", val:0 , eqn: "thousandkids()", last_eval:0 });
+g.setNode("ctc_sch8812_I_two_thousand_per_child",  { label: "two_thousand_per_child", baselabel: "two_thousand_per_child", form: "ctc_sch8812_I", fullname: "$2,200 per child under 17 w/an SSN ($500 for other children)", class: "a_node kids    ", val:0 , eqn: "thousandkids()", last_eval:0 });
 g.setNode("ctc_sch8812_I_ctc_subtraction",  { label: "ctc_subtraction", baselabel: "ctc_subtraction", form: "ctc_sch8812_I", fullname: "5% of AGI minus a filing-status dependent number", class: "a_node kids    ", val:0 , eqn: "ctc_status(Cv('f1040_AGI'))", last_eval:0 });
-g.setNode("ctc_sch8812_I_credit_remaining",  { label: "credit_remaining", baselabel: "credit_remaining", form: "ctc_sch8812_I", fullname: "$2,000 per child minus the subtraction", class: "a_node kids    ", val:0 , eqn: "max(Cv('ctc_sch8812_I_two_thousand_per_child') - Cv('ctc_sch8812_I_ctc_subtraction'), 0)", last_eval:0 });
+g.setNode("ctc_sch8812_I_credit_remaining",  { label: "credit_remaining", baselabel: "credit_remaining", form: "ctc_sch8812_I", fullname: "$2,200 per child minus the subtraction", class: "a_node kids    ", val:0 , eqn: "max(Cv('ctc_sch8812_I_two_thousand_per_child') - Cv('ctc_sch8812_I_ctc_subtraction'), 0)", last_eval:0 });
 g.setNode("ctc_sch8812_I_tax_minus_some_credits",  { label: "tax_minus_some_credits", baselabel: "tax_minus_some_credits", form: "ctc_sch8812_I", fullname: "                Calculated tax minus some credits", class: "a_node kids    ", val:0 , eqn: "Cv('f1040_base_tax')          - Cv('f1040sch3_ftc') - Cv('f1040sch3_dependent_care')- Cv('f1040sch3_ed_credits')          - Cv('f1040sch3_retirement_savings') - Cv('f1040sch3_elderly_disabled_credits')          - Cv('f1040sch3_alt_motor_vehicle')  - Cv('f1040sch3_plug_in_motor_vehicle')", last_eval:0 });
 g.setNode("ctc_sch8812_I_ctc",  { label: "ctc", baselabel: "ctc", form: "ctc_sch8812_I", fullname: "Nonrefundable child tax credit", class: "a_node kids    ", val:0 , eqn: "min(Cv('ctc_sch8812_I_tax_minus_some_credits'), Cv('ctc_sch8812_I_credit_remaining'))", last_eval:0 });
 g.setNode("ctc_sch8812_IIA_unused_ctc",  { label: "unused_ctc", baselabel: "unused_ctc", form: "ctc_sch8812_IIA", fullname: "CTC not used", class: "a_node kids     ", val:0 , eqn: "max(0, Cv('ctc_sch8812_I_credit_remaining') - Cv('ctc_sch8812_I_ctc'))", last_eval:0 });
@@ -376,18 +374,18 @@ g.setNode("f1040_tax_refund_ws_last_year_limited_deductions",  { label: "last_ye
 g.setNode("f1040_tax_refund_ws_last_year_reduced",  { label: "last_year_reduced", baselabel: "last_year_reduced", form: "f1040_tax_refund_ws", fullname: "Last year's deductions, maybe reduced", class: "a_node ly_refund    ", val:0 , eqn: "max(Cv('f1040_tax_refund_ws_last_year_5d')-Cv('f1040_tax_refund_ws_last_year_limited_deductions'), 0)", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_post_limit",  { label: "last_year_post_limit", baselabel: "last_year_post_limit", form: "f1040_tax_refund_ws", fullname: "Last year's tax deducted, limited", class: "a_node ly_refund    ", val:0 , eqn: "max(Cv('f1040_tax_refund_ws_last_year_refund')-Cv('f1040_tax_refund_ws_last_year_reduced'), 0)", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_last_year_total_deductions",  { label: "last_year_total_deductions", baselabel: "last_year_total_deductions", form: "f1040_tax_refund_ws", fullname: "Last year's itemized deductions", class: "a_node u ly_refund    ", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_tax_refund_ws_almost_std_deduction",  { label: "almost_std_deduction", baselabel: "almost_std_deduction", form: "f1040_tax_refund_ws", fullname: "Last year's standard deduction (under your current status)", class: "a_node ly_refund    ", val:0 , eqn: "((fstatus()=='married filing jointly') ? (25900) : (((fstatus()=='head of household') ? (19400) : (12950 )) )) ", last_eval:0 });
-g.setNode("f1040_tax_refund_ws_srblind",  { label: "srblind", baselabel: "srblind", form: "f1040_tax_refund_ws", fullname: "Senior or blind exemption (blind UI; married filing jointly PI)", class: "a_node ly_refund    ", val:0 , eqn: "(( situations['.over_65'] ==1)+( situations['.spouse_over_65'] ==1))*                   ((fstatus()=='married filing separately') ? (1400) : (((fstatus()=='married filing jointly') ? (1400) : (1750 )) )) ", last_eval:0 });
+g.setNode("f1040_tax_refund_ws_almost_std_deduction",  { label: "almost_std_deduction", baselabel: "almost_std_deduction", form: "f1040_tax_refund_ws", fullname: "Last year's standard deduction (under your current status)", class: "a_node ly_refund    ", val:0 , eqn: "((fstatus()=='married filing jointly') ? (29200) : (((fstatus()=='head of household') ? (21900) : (14600 )) )) ", last_eval:0 });
+g.setNode("f1040_tax_refund_ws_srblind",  { label: "srblind", baselabel: "srblind", form: "f1040_tax_refund_ws", fullname: "Senior or blind exemption (blind UI; married filing jointly PI)", class: "a_node ly_refund    ", val:0 , eqn: "(( situations['.over_65'] ==1)+( situations['.spouse_over_65'] ==1))*                   ((fstatus()=='married filing separately') ? (1550) : (((fstatus()=='married filing jointly') ? (1550) : (1950 )) )) ", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_itemized_over_std",  { label: "itemized_over_std", baselabel: "itemized_over_std", form: "f1040_tax_refund_ws", fullname: "Itemized deduction minus standard for last year", class: "a_node ly_refund    ", val:0 , eqn: "max(Cv('f1040_tax_refund_ws_last_year_total_deductions') - Cv('f1040_tax_refund_ws_almost_std_deduction') - Cv('f1040_tax_refund_ws_srblind'), 0)", last_eval:0 });
 g.setNode("f1040_tax_refund_ws_taxable_refund",  { label: "taxable_refund", baselabel: "taxable_refund", form: "f1040_tax_refund_ws", fullname: "Taxable tax refund", class: "a_node ly_refund    ", val:0 , eqn: "min(Cv('f1040_tax_refund_ws_itemized_over_std'), Cv('f1040_tax_refund_ws_last_year_post_limit'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_qualified_dividends_and_gains",  { label: "qualified_dividends_and_gains", baselabel: "qualified_dividends_and_gains", form: "qualified_dividends_ws", fullname: "Qualified dividends plus cap gains", class: "a_node cap_gains    ", val:0 , eqn: "Cv('f1040_qualified_dividends')+Cv('f1040_capital_gains')", last_eval:0 });
 g.setNode("qualified_dividends_ws_income_minus_gains",  { label: "income_minus_gains", baselabel: "income_minus_gains", form: "qualified_dividends_ws", fullname: "Income minus gains", class: "a_node cap_gains    ", val:0 , eqn: "Cv('f1040_taxable_income')-Cv('qualified_dividends_ws_qualified_dividends_and_gains')", last_eval:0 });
-g.setNode("qualified_dividends_ws_limitation",  { label: "limitation", baselabel: "limitation", form: "qualified_dividends_ws", fullname: "Limitation", class: "a_node cap_gains    ", val:0 , eqn: "((fstatus()=='head of household') ? (59750) : (((fstatus()=='married filing jointly') ? (89250) : (44625 )) )) ", last_eval:0 });
+g.setNode("qualified_dividends_ws_limitation",  { label: "limitation", baselabel: "limitation", form: "qualified_dividends_ws", fullname: "Limitation", class: "a_node cap_gains    ", val:0 , eqn: "((fstatus()=='head of household') ? (64750) : (((fstatus()=='married filing jointly') ? (96700) : (48350 )) )) ", last_eval:0 });
 g.setNode("qualified_dividends_ws_limited_income",  { label: "limited_income", baselabel: "limited_income", form: "qualified_dividends_ws", fullname: "Limited income", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('f1040_taxable_income'), Cv('qualified_dividends_ws_limitation'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_alt_limited_income",  { label: "alt_limited_income", baselabel: "alt_limited_income", form: "qualified_dividends_ws", fullname: "Limited income again", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('qualified_dividends_ws_limited_income'), Cv('qualified_dividends_ws_income_minus_gains'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_untaxed",  { label: "untaxed", baselabel: "untaxed", form: "qualified_dividends_ws", fullname: "Untaxed portion", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_limited_income') - Cv('qualified_dividends_ws_alt_limited_income')", last_eval:0 });
 g.setNode("qualified_dividends_ws_min_ded_or_gains_minus_zero",  { label: "min_ded_or_gains_minus_zero", baselabel: "min_ded_or_gains_minus_zero", form: "qualified_dividends_ws", fullname: "Remove untaxed from income", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('f1040_taxable_income'), Cv('qualified_dividends_ws_income_minus_gains')) - Cv('qualified_dividends_ws_untaxed')", last_eval:0 });
-g.setNode("qualified_dividends_ws_relimited_qualified",  { label: "relimited_qualified", baselabel: "relimited_qualified", form: "qualified_dividends_ws", fullname: "qualified gains re-limited", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('qualified_dividends_ws_min_ded_or_gains_minus_zero'),                        max( min(((fstatus()=='single') ? (523050) : (((fstatus()=='married filing separately') ? (276900) : (((fstatus()=='married filing jointly') ? (553850) : (492300 )) )) )) ,                 Cv('f1040_taxable_income')) - (Cv('qualified_dividends_ws_income_minus_gains') + Cv('qualified_dividends_ws_untaxed')) , 0))", last_eval:0 });
+g.setNode("qualified_dividends_ws_relimited_qualified",  { label: "relimited_qualified", baselabel: "relimited_qualified", form: "qualified_dividends_ws", fullname: "qualified gains re-limited", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('qualified_dividends_ws_min_ded_or_gains_minus_zero'),                        max( min(((fstatus()=='single') ? (533400) : (((fstatus()=='married filing separately') ? (300000) : (((fstatus()=='married filing jointly') ? (600050) : (566700 )) )) )) ,                 Cv('f1040_taxable_income')) - (Cv('qualified_dividends_ws_income_minus_gains') + Cv('qualified_dividends_ws_untaxed')) , 0))", last_eval:0 });
 g.setNode("qualified_dividends_ws_income_minus_fifteen",  { label: "income_minus_fifteen", baselabel: "income_minus_fifteen", form: "qualified_dividends_ws", fullname: "Gains minus 15% taxed part", class: "a_node cap_gains    ", val:0 , eqn: "min(Cv('f1040_taxable_income'), Cv('qualified_dividends_ws_qualified_dividends_and_gains')) - (Cv('qualified_dividends_ws_untaxed') + Cv('qualified_dividends_ws_relimited_qualified'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_nongains_tax",  { label: "nongains_tax", baselabel: "nongains_tax", form: "qualified_dividends_ws", fullname: "Tax on income without qualified gains", class: "a_node cap_gains    ", val:0 , eqn: "tax_calc(Cv('qualified_dividends_ws_income_minus_gains'))", last_eval:0 });
 g.setNode("qualified_dividends_ws_total_tax",  { label: "total_tax", baselabel: "total_tax", form: "qualified_dividends_ws", fullname: "Total tax including qualified gains discounts", class: "a_node cap_gains    ", val:0 , eqn: "Cv('qualified_dividends_ws_relimited_qualified')*0.15 +Cv('qualified_dividends_ws_income_minus_fifteen')*0.20 + Cv('qualified_dividends_ws_nongains_tax')", last_eval:0 });
@@ -397,7 +395,7 @@ g.setNode("f1040_sched_a_excess_medical",  { label: "excess_medical", baselabel:
 g.setNode("f1040_sched_a_local_taxes",  { label: "local_taxes", baselabel: "local_taxes", form: "f1040_sched_a", fullname: "State/local Income OR general sales tax", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_real_estate_taxes",  { label: "real_estate_taxes", baselabel: "real_estate_taxes", form: "f1040_sched_a", fullname: "Real estate taxes", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_property_taxes",  { label: "property_taxes", baselabel: "property_taxes", form: "f1040_sched_a", fullname: "Personal property taxes", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
-g.setNode("f1040_sched_a_salt_capped",  { label: "salt_capped", baselabel: "salt_capped", form: "f1040_sched_a", fullname: "State/local/real estate taxes, capped", class: "a_node itemizing    ", val:0 , eqn: "min(Cv('f1040_sched_a_local_taxes') + Cv('f1040_sched_a_real_estate_taxes') + Cv('f1040_sched_a_property_taxes') + 0, ((fstatus()=='maried filing separately') ? (5000) : (10000 )) )        ", last_eval:0 });
+g.setNode("f1040_sched_a_salt_capped",  { label: "salt_capped", baselabel: "salt_capped", form: "f1040_sched_a", fullname: "State/local/real estate taxes, capped", class: "a_node itemizing    ", val:0 , eqn: "min(Cv('f1040_sched_a_local_taxes') + Cv('f1040_sched_a_real_estate_taxes') + Cv('f1040_sched_a_property_taxes') + 0, ((fstatus()=='maried filing separately') ? (20000) : (40000 )) )        ", last_eval:0 });
 g.setNode("f1040_sched_a_other_taxes",  { label: "other_taxes", baselabel: "other_taxes", form: "f1040_sched_a", fullname: "Other taxes", class: "a_node u itemizing    ", val:0 , eqn: "", last_eval:0 });
 g.setNode("f1040_sched_a_total_taxes_deducted",  { label: "total_taxes_deducted", baselabel: "total_taxes_deducted", form: "f1040_sched_a", fullname: "Total taxes paid to be deducted", class: "a_node itemizing    ", val:0 , eqn: "min(10000, Cv('f1040_sched_a_salt_capped') + Cv('f1040_sched_a_other_taxes') + 0)", last_eval:0 });
 g.setNode("f1040_sched_a_reported_mort_interest",  { label: "reported_mort_interest", baselabel: "reported_mort_interest", form: "f1040_sched_a", fullname: "Home mortgage interest/points reported on Form 1099", class: "a_node u itemizing mort    ", val:0 , eqn: "", last_eval:0 });
@@ -451,7 +449,7 @@ g.setNode("f1040_sched_c_net_pl",  { label: "net_pl", baselabel: "net_pl", form:
 g.setNode("sched_se_in_from_sch_c",  { label: "in_from_sch_c", baselabel: "in_from_sch_c", form: "sched_se", fullname: "Schedule C business income", class: "a_node self_emp    ", val:0 , eqn: "Cv('f1040_sched_c_net_pl')", last_eval:0 });
 g.setNode("sched_se_net_pl_reduced",  { label: "net_pl_reduced", baselabel: "net_pl_reduced", form: "sched_se", fullname: "P/L slightly reduced", class: "a_node self_emp    ", val:0 , eqn: "((Cv('sched_se_in_from_sch_c')>0) ? (Cv('sched_se_in_from_sch_c')*0.9235) : (Cv('sched_se_in_from_sch_c')))", last_eval:0 });
 g.setNode("sched_se_ss_wages",  { label: "ss_wages", baselabel: "ss_wages", form: "sched_se", fullname: "Social Security wages and tips (W-2 boxes 3 plus 7)", class: "a_node u self_emp", val:0 , eqn: "", last_eval:0 });
-g.setNode("sched_se_distance_to_max",  { label: "distance_to_max", baselabel: "distance_to_max", form: "sched_se", fullname: "Distance to cap", class: "a_node self_emp    ", val:0 , eqn: "max(0, 160200 - Cv('sched_se_ss_wages'))", last_eval:0 });
+g.setNode("sched_se_distance_to_max",  { label: "distance_to_max", baselabel: "distance_to_max", form: "sched_se", fullname: "Distance to cap", class: "a_node self_emp    ", val:0 , eqn: "max(0, 176100 - Cv('sched_se_ss_wages'))", last_eval:0 });
 g.setNode("sched_se_twelve_pct",  { label: "twelve_pct", baselabel: "twelve_pct", form: "sched_se", fullname: "12.4% of self-employment income, limited", class: "a_node self_emp    ", val:0 , eqn: "min(Cv('sched_se_distance_to_max'), Cv('sched_se_net_pl_reduced'))*0.124", last_eval:0 });
 g.setNode("sched_se_two_pct",  { label: "two_pct", baselabel: "two_pct", form: "sched_se", fullname: "2.9% of self-employment income", class: "a_node self_emp    ", val:0 , eqn: "0.029 * Cv('sched_se_net_pl_reduced')", last_eval:0 });
 g.setNode("sched_se_se_tax",  { label: "se_tax", baselabel: "se_tax", form: "sched_se", fullname: "Self-employment tax", class: "a_node self_emp    ", val:0 , eqn: "Cv('sched_se_twelve_pct') + Cv('sched_se_two_pct')", last_eval:0 });
