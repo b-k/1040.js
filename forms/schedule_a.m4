@@ -41,7 +41,7 @@ Cell(other_taxes, 6,
     )
 Cell(total_taxes_deducted, 7,
         Total taxes paid to be deducted,
-        <|min(10000, SUM(salt_capped, other_taxes))|>,
+        <|SUM(salt_capped, other_taxes)|>,
         itemizing
     )
 adiv3=cell('>>>>>>>>>>>> Interest you paid                        ', 7.9, '0'),
@@ -93,26 +93,6 @@ Cell(casualty_or_theft_losses, 15,
         , u itemizing
     )
 
-adiv6=cell('>>>>>>>>>>>> Job expenses, &c                         ', 20.9, '0'),
-Cell(employee_expenses, 16.1,
-        <|Unreimbursed employee expenses—job travel, union dues, job education, etc.|>,
-        , u itemizing
-    )
-Cell(tax_prep_fees, 16.2,
-        Tax prep fees,
-        , u itemizing
-    )
-Cell(other_work_expenses, 16.3,
-        <|Other expenses—investment, safe deposit box, etc.|>,
-        , u itemizing
-    )
-
-Cell(expenses_minus_agi_slice, 16.4,
-        Expenses minus fraction of AGI,
-        <|max(SUM(employee_expenses, tax_prep_fees, other_work_expenses) - (CV(f1040, AGI)* 0.02), 0)|>,
-        itemizing
-    )
-
 Cell(other_deductions, 16.5,
         Other deductions,
         , u itemizing
@@ -121,6 +101,6 @@ Cell(other_deductions, 16.5,
 adiv8=cell('>>>>>>>>>>>> Total                                    ', 28.9, '0'),
 Cell(total_itemized_deductions, 29,
         Total itemized deductions,
-        <|SUM(excess_medical, total_taxes_deducted, total_interest_deduction, charity_total, casualty_or_theft_losses, expenses_minus_agi_slice, other_deductions)|>,
+        <|SUM(excess_medical, total_taxes_deducted, total_interest_deduction, charity_total, casualty_or_theft_losses, other_deductions)|>,
         itemizing
     )

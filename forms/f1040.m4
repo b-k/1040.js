@@ -366,7 +366,12 @@ Cell(dividends, 3.5, all dividends,, u)
 Cell(iras, 4.5, Taxable IRA distributions,, u)
 Cell(pensions, 5.5, Taxable pension distributions,, u)
 Cell(taxable_ss_benefits, 6.5,Taxable social security benefits,, u over_65 spouse_over_65)
-Cell(capital_gains, 7, <|Capital gains from Schedule D|>,, u cap_gains)
+
+Cell(capital_gains, 7,
+        <|Capital gains from Schedule D|>,
+        <|max(CV(f1040_sched_d, total_cap_gains), Fswitch((married filing separately, -1500), -3000))|>,
+        cap_gains
+    )
 
     Cell(MAGI, 0,
         Total income for MAGI (PI),
@@ -656,64 +661,4 @@ m4_form(f1040_tax_refund_ws)
         Taxable tax refund,
         <|min(CV(itemized_over_std), CV(last_year_post_limit))|>,
         ly_refund
-    )
-
-
-m4_form(qualified_dividends_ws)
-    Cell(qualified_dividends_and_gains, 4,
-        <|Qualified dividends plus cap gains|>,
-        <|CV(f1040,qualified_dividends)+CV(f1040, capital_gains)|>,
-        cap_gains
-    )
-    Cell(income_minus_gains, 5,
-        <|Income minus gains|>,
-        <|CV(f1040,taxable_income)-CV(qualified_dividends_and_gains)|>,
-        cap_gains
-    )
-    Cell(limitation, 6,
-        <|Limitation|>,
-        <|Fswitch((head of household, 64750), (married filing jointly, 96700), 48350)|>,
-        cap_gains
-    )
-    Cell(limited_income, 7,
-        <|Limited income|>,
-        <|min(CV(f1040,taxable_income), CV(limitation))|>,
-        cap_gains
-    )
-    Cell(alt_limited_income, 8,
-        <|Limited income again|>,
-        <|min(CV(limited_income), CV(income_minus_gains))|>,
-        cap_gains
-    )
-    Cell(untaxed, 9,
-        <|Untaxed portion|>,
-        <|CV(limited_income) - CV(alt_limited_income)|>,
-        cap_gains
-    )
-    Cell(min_ded_or_gains_minus_zero, 12,
-        <|Remove untaxed from income|>,
-        <|min(CV(f1040,taxable_income), CV(income_minus_gains)) - CV(untaxed)|>,
-        cap_gains
-    )
-    Cell(relimited_qualified, 13,
-        <|qualified gains re-limited|>,
-        <| min(CV(min_ded_or_gains_minus_zero),            m4_dnl
-            max( min(Fswitch((single, 533400), (married filing separately, 300000), (married filing jointly, 600050), 566700), m4_dnl
-                CV(f1040,taxable_income)) - (CV(income_minus_gains) + CV(untaxed)) , 0))|>,
-        cap_gains
-    )
-    Cell(income_minus_fifteen, 20,
-        <|Gains minus 15% taxed part|>,
-        <|min(CV(f1040,taxable_income), CV(qualified_dividends_and_gains)) - (CV(untaxed) + CV(relimited_qualified))|>,
-        cap_gains
-    )
-    Cell(nongains_tax, 22,
-        <|Tax on income without qualified gains|>,
-        <|tax_calc(CV(income_minus_gains))|>,
-        cap_gains
-    )
-    Cell(total_tax, 23,
-        <|Total tax including qualified gains discounts|>,
-        <|CV(relimited_qualified)*0.15 +CV(income_minus_fifteen)*0.20 + CV(nongains_tax)|>,
-        cap_gains
     )
