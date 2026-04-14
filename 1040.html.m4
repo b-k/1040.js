@@ -89,8 +89,8 @@ BOX(s_loans, I have student loans or education expenses.)
 BOX(ly_refund, I got a tax refund and itemized last year.)
 BOX(mort, I have a mortgage.)
 BOX(itemizing, I am itemizing.)
-BOX(cap_gains, I have long-term capital gains or associated dividends.)
 BOX(self_emp, I have self-employment (Schedule C) income.)
+BOX(cap_gains, I have long-term capital gains or associated dividends (Schedule D).)
 BOX(have_rr, I have rental or royalty (Schedule E) income.)
 <INPUT class=check TYPE=CHECKBOX NAME="hide_zeros" id=".hide_zeros" onclick="hidezeros(id, checked)" ><span class="checkboxtext"> I want to hide the inessential zero cells.</span><BR>
 <a href="https://github.com/b-k/1040.js">I want to make this tax explorer better.</a>
@@ -100,6 +100,8 @@ BOX(have_rr, I have rental or royalty (Schedule E) income.)
 
 <script id="js">
 <!-- Much of this started at http://cpettitt.github.io/project/dagre-d3/latest/demo/sentence-tokenization.html -->
+
+var debug = false;
 
 var itemizing = 0;
 var over_65 = 0;
@@ -229,6 +231,7 @@ function Cv(name){
     if (typeof this_cell === "undefined") this_cell = nodestorage[name];
     if (this_cell.eqn==="" || this_cell.last_eval >= last_eval)
         return parseFloat(this_cell.val);
+    if (debug) {console.log(`evaluating ${this_cell.eqn}`);}
     var out = parseFloat(eval(this_cell.eqn));
 
     if (g._nodes[name]){

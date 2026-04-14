@@ -477,11 +477,6 @@ m4_form(f1040sch2)
         Excess advance premium tax credit repayment,
         , u itemizing
     )
-    Cell(sch2_total, 3,
-        <|Schedule 2 total|>,
-        <|CV(amt)+CV(credit_repayment)|>,
-        itemizing
-    )
 
     Cell(se_tax, 4,
         <|Self-employment tax on Sch 2|>,
@@ -493,6 +488,12 @@ m4_form(f1040sch2)
         <|Sum other taxes (besides self-employment)|>,
         ,
         u itemizing self_emp
+    )
+
+    Cell(sch2_total, 21,
+        <|Schedule 2 total|>,
+        <|SUM(amt, credit_repayment, se_tax, other_taxes)|>,
+        itemizing
     )
 
 m4_form(f1040sch3)
